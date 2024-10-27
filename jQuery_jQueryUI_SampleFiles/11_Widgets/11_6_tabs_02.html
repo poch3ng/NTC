@@ -1,0 +1,114 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>jQuery UI Example Page</title>
+	<link rel="stylesheet" href="../themes/ui-lightness/jquery-ui.css" />
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../jquery-ui.js"></script>
+	
+	<script type="text/javascript">
+	$(document).ready(init);
+	function init(){
+		$("#myTabs").tabs({
+			active: 0,
+			heightStyle: "content"
+		});
+		$("button:eq(0)").click(disableHandler);
+		$("button:eq(1)").click(enableHandler);
+		$("button:eq(2)").click(optionHandler);
+		$("button:eq(3)").click(loadHandler);
+		$("button:eq(4)").click(destroyHandler);
+		$("button:eq(5)").click(rebuildHandler);
+		$("button:eq(6)").click(refreshHandler);
+	}
+	function disableHandler(){
+		$("#myTabs").tabs("disable");
+	}
+	function enableHandler(){
+		$("#myTabs").tabs("enable");
+	}
+	function optionHandler(){
+		$("#myTabs").tabs("option","active",2);
+	}
+	function loadHandler(){
+		$("#myTabs").tabs("load",3);
+	}
+	function destroyHandler(){
+		$("#myTabs").tabs("destroy");
+	}
+	function rebuildHandler(){
+		$("#myTabs").tabs({});
+	}
+	function refreshHandler(){
+		$("#myTabs ul").append("<li><a href='#tabs-4'>Donald</a></li>");
+		$("#myTabs").append($("#tabs-4"));
+		$("#myTabs").tabs( "refresh" );
+	}
+	</script>
+	<style>
+	#myTabs{
+		width:450px;
+		margin:auto;
+	}
+	img{
+		border:1px gray solid;
+		margin-right:20px;
+		float:left;
+		height:150px;
+		widows:150px;
+	}
+	</style>
+</head>
+<body>
+<h1>Tabs Methods</h1>
+<button>disable</button>
+<button>enable</button>
+<button>option</button>
+<button>load</button>
+<button>destroy</button>
+<button>rebuild</button>
+<button>refresh</button>
+<br>
+<div id="myTabs">
+  <ul>
+    <li><a href="#tabs-1">Mickey</a></li>
+    <li><a href="#tabs-2">Minnie</a></li>
+    <li><a href="#tabs-3">Friends</a></li>
+	<li id="remote">
+		<a href="remote.html"> Remote </a>
+	</li>
+  </ul>
+  <div id="tabs-1">
+    <img src="../images/ch03_mickey.jpg" />
+    <p>
+    Mickey has been through many design changes from 1928. In his first cartoon Plane Crazy, Mickey had no gloves or shoes and his eyes were large black ovals. He first wore gloves when he sat down to play piano in the Opry House and by 1939 in The Pointer Mickey was shown with a pupil.    </p>
+  </div>
+  <div id="tabs-2">
+    <img src="../images/ch03_minnie.jpg" />
+    <p>
+    Minnie was designed in the fashion of a "flapper" girl. Although she always appears in red, she was originally designed to have a blue and green outfit. In the 1929 cartoon The Karnival Kid it was also revealed that she wears black stockings.
+    </p>
+  </div>
+  <div id="tabs-3">
+    <img src="../images/ch03_goofy.jpg" />
+    <p>
+    Goofy made his first appearance in the 1932 classic, Mickey’s Revue. He’s had some name changes over the years, being called Dippy Dawg and Dippy the Goof before becoming known simply as Goofy, one of Mickey’s hilarious pals that we have all come to know and love. Garsh!
+    </p>
+	<hr/>
+	<img src="../images/ch03_pluto.jpg" />
+    <p>
+    Pluto first appeared in The Chain Gang as one of the bloodhounds sent to look for Mickey, who had escaped from prison. Then in The Picnic, his second film role, he had a new name: Rover. From that point on though, he was called Pluto and was Mickey’s dog and best friend.
+    </p>
+  </div>
+</div>
+
+  <div id="tabs-4">
+  	<img src="../images/ch03_donald.jpg" />
+    <p>
+    Donald was first seen in The Wise Little Hen back in 1934. He was a big hit with audiences and his popularity continued to increase until he eventually starred in 128 cartoons! That’s more than any other Disney character, even Mickey! 
+    </p>
+  </div>
+</body>
+</html>

@@ -1,0 +1,76 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>jQuery UI Example Page</title>
+	<link rel="stylesheet" href="../themes/ui-lightness/jquery-ui.css" />
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../jquery-ui.js"></script>
+	
+	<script type="text/javascript">
+	$(document).ready(init);
+	function init(){
+		$("#myDialog").dialog({
+			autoOpen: false,
+			resizable:false,
+		});
+		$("#myDialog2").dialog({
+			autoOpen: true,
+		});
+		$("button:eq(0)").click(openHandler);
+		$("button:eq(1)").click(closeHandler);
+		$("button:eq(2)").click(optionHandler);
+		$("button:eq(3)").click(destoryHandler);
+		$("button:eq(4)").click(rebuildHandler);
+		$("button:eq(5)").click(isOpenHandler);
+		$("button:eq(6)").click(moveToTopHandler);
+	}
+	function openHandler(){
+		$("#myDialog").dialog("open")
+	}
+	function closeHandler(){
+		$("#myDialog").dialog("close")
+	}
+	function optionHandler(){
+		$("#myDialog").dialog("option","resizable", true);
+	}
+	function destoryHandler(){
+		$("#myDialog").dialog("destroy");
+	}
+	function rebuildHandler(){
+		$("#myDialog").dialog({
+			autoOpen: true,
+			resizable:false
+		});
+	}
+	function isOpenHandler(){
+		alert($("#myDialog").dialog("isOpen"));
+	}
+	function moveToTopHandler(){
+		$("#myDialog").dialog("moveToTop");
+	}
+	</script>
+	<style>
+	</style>
+</head>
+<body>
+
+<h1>Dialog Methods</h1>
+<button>open</button>
+<button>close</button>
+<button>option</button>
+<button>destory</button>
+<button>rebuild</button>
+<button>isOpen</button>
+<button>moveToTop</button>
+<br />
+<div id="myDialog" title="First dialog">
+  <p>jQuery UI is a curated set of user interface interactions, effects, widgets, and themes built on top of the jQuery JavaScript Library.</p>
+</div>
+
+<div id="myDialog2" title="second dialog">
+  <p>Whether you're building highly interactive web applications or you just need to add a date picker to a form control, jQuery UI is the perfect choice.</p>
+</div>
+</body>
+</html>

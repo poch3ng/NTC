@@ -1,0 +1,67 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>jQuery UI Example Page</title>
+	<link rel="stylesheet" href="../themes/ui-lightness/jquery-ui.css" />
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../jquery-ui.js"></script>
+	
+	<script type="text/javascript">
+	$(document).ready(init);
+	function init(){
+		$("#myProgressbar").progressbar({
+			value: 50,
+			max: 200
+		});
+	
+		$("button:eq(0)").click(disableHandler);
+		$("button:eq(1)").click(enableHandler);
+		$("button:eq(2)").click(optionHandler);
+		$("button:eq(3)").click(valueHandler);
+		$("button:eq(4)").click(destroyHandler);
+		$("button:eq(5)").click(rebuildHandler);
+	}
+	function disableHandler(){
+		$("#myProgressbar").progressbar("disable");
+	}
+	function enableHandler(){
+		$("#myProgressbar").progressbar("enable");
+	}
+	function optionHandler(){
+		$("#myProgressbar").progressbar("option",{"value":false});
+	}
+	function valueHandler(){
+		// alert($("#myProgressbar").progressbar("value"));
+		$("#myProgressbar").progressbar("value", 100);
+	}
+	function destroyHandler(){
+		$("#myProgressbar").progressbar("destroy");
+	}
+	function rebuildHandler(){
+		$("#myProgressbar").progressbar({
+			value: false,
+		});
+	}
+	</script>
+	<style>
+		.ui-progressbar{
+			margin:auto;
+			width:50%;
+			position:relative;
+		}
+	</style>
+</head>
+<body>
+<h1>Progressbar Methods</h1>
+<button>disable</button>
+<button>enable</button>
+<button>option</button>
+<button>value</button>
+<button>destroy</button>
+<button>rebuild</button>
+<br>
+<div id="myProgressbar"></div>
+</body>
+</html>

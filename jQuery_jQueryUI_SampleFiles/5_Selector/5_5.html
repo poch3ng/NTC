@@ -1,0 +1,99 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<title>jQuery Selector</title>
+<style type="text/css">
+body {
+	margin: 0;
+	padding: 0;
+	font: 12px / 1.5 Arial, Georgia, Times, "Times New Roman", serif;
+}
+.main {
+	width: 800px;
+	margin: 0 auto;
+	margin-top: 50px;
+}
+#demo {
+	width: 250px;
+	height: 300px;
+	border: 1px dotted gray;
+	background: #da9999;
+	float: left;
+	padding: 10px;
+	padding-left: 20px;
+}
+button {
+	font: 14px / 1.5 Arial, Georgia, Times, "Times New Roman", serif;
+}
+.demo1 {
+	width: 50px;
+	height: 50px;
+	border: 1px dotted black;
+	text-align: center;
+	padding: 20px;
+	margin-right: 10px;
+	margin-bottom: 10px;
+	float: left;
+}
+.show {
+	background: black;
+	color: white;
+}
+.hidden {
+	display: none;
+	width: 200px;
+	clear: both;
+}
+.link {
+	width: 200px;
+	clear: both;
+}
+</style>
+<script type="text/javascript" src="../jquery.js"></script>
+<script type="text/javascript">
+$(document).ready(init);
+function init()
+{
+	// $(".demo1").addClass("show");
+	// $(".demo1:contains('DiV')").addClass("show");//:contains('text')
+	// $(".demo1:has('p')").addClass("show");//:has('tag')
+	// $(".demo1:has('h5,h6')").addClass("show");//:has('tag')
+
+	// $(".demo1:empty").addClass("show");
+	// $(".demo1:parent").addClass("show");//not empty
+
+	// $("div:hidden").addClass("show");
+	// $("div:hidden").fadeIn(1000);
+
+	// $("div:hidden").addClass("show").fadeIn(1000);
+	// $("div:visible").addClass("show").fadeOut(1000);
+}
+//html -> DOM -> CSSOM
+</script>  
+</head>
+<body>
+<div class="main">
+  <h1>Selector</h1>
+  <br />
+  <div id="demo">
+    <h1>Selector Demo</h1>
+    <div id="first" class="demo1"> DIV
+      <p> ID=first </p>
+    </div>
+    <div id="second" class="demo1"></div>
+
+    <div id="third" class="demo1"> DiV
+      <p> ID=third </p>
+	  <h5>h5</h5>
+    </div>
+
+    <div id="fourth" class="demo1"> DiV
+      <p> ID=fourth </p>
+	  <h6>h6</h6>
+    </div>
+    <div class="hidden"> This is a hidden div </div>
+</div>
+</body>
+</html>

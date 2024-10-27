@@ -1,0 +1,71 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Hierarchy demo</title>
+  <style>
+  div,p,span {
+    width: 200px;
+    height: 20px;
+	display:block;
+    background: #abc;
+    border: 2px solid black;
+    margin: 10px;
+  }
+  .main{
+	width:350px;
+    height:auto;
+ }
+  .outerDiv{
+	  width:300px;
+	  height:250px;
+}
+  .innerDiv{
+	  width:250px;
+	  height:200px;
+}
+  .show {
+    border-color: red;
+  }
+  </style>
+<script type="text/javascript" src="../jquery.js"></script>
+<script type="text/javascript">
+	$(document).ready(init);
+	function init(){
+    // $(".outerDiv").addClass("show");
+
+    // $(".outerDiv div").addClass("show");
+    // $(".outerDiv").find("div").addClass("show");
+
+    // $(".outerDiv>div").addClass("show");
+    // $(".outerDiv").children("div").addClass("show");
+    // $(".outerDiv>div>div").addClass("show");
+    // var objtext = "div";
+    // $(".outerDiv").children("div").children(objtext).addClass("show");
+
+    // $(".innerDiv").parent().addClass("show");
+    // $(".innerDiv").parent().parent().addClass("show");
+
+    // $(".innerDiv").parents().addClass("show");
+    // $(".innerDiv").parents(".outerDiv").addClass("show");
+
+    // $(".innerDiv").parentsUntil(".main").addClass("show");
+    $(".innerDiv").parentsUntil(".main").find("span").addClass("show");
+ 	}
+</script>
+</head>
+<body>
+	<div class="main">main
+        <div class="outerDiv">outerDiv
+            <div class="innerDiv">innerDiv
+                <div class="abc">inner div 1</div>
+                <span class="abc">inner span1</span>
+                <div>inner div 2</div>
+                <span class="abc">inner span2</span>
+                <div class="abc">inner div 3</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

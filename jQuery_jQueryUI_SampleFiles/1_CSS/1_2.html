@@ -1,0 +1,24 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>CSS Section</title>
+		<style type="text/css">
+			@import url(import.css);
+			div{
+				/* 儘量在此使用!important，因為後續仍然可能被修改 */
+				color: red !important;
+				/* background: yellow !important; */
+			}
+
+			/*inline > id > class > type > inherit */
+		</style>
+	</head>
+		<link type="text/css" href="link.css" rel="stylesheet">
+	
+	<body>
+		<!-- 不建議用inline，但是加上!important會讓他變成最高階級 -->
+		<div id="myId" class="myClass" style="color: cyan !important;">This is a div!</div>
+	</body>
+</html>

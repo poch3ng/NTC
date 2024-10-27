@@ -1,0 +1,70 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>jQuery FadeTo</title>
+    <style type="text/css">
+        body, select {
+            margin: 0;
+            padding: 0;
+            font: 12px / 1.5 Arial, Georgia, Times, "Times New Roman", serif;
+        }
+        
+        .main {
+            width: 400px;
+            margin: 0 auto;
+            margin-top: 200px;
+        }
+        
+        #demo {
+            width: 300px;
+            height: 225px;
+            border: 1px dotted gray;
+            background: black;
+            float: left;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        #choose {
+            width: 300px;
+            float: left;
+            margin-right: 20px;
+        }
+    </style>
+    <script type="text/javascript" src="../jquery.js"></script>
+    <script type="text/javascript">
+        // $("target").jQueryFunction(inputValue);
+        $(document).ready(init);
+        function init(){
+            $("#show").click(showHandler);
+            $("#reset").click(resetHandler);
+        }
+        function showHandler(){
+            // $("#demo").fadeTo("slow", 0.4);
+            $("#demo").fadeTo(1200, 0.4);
+            // $("#demo").fadeTo(1200, 0.4, callback);
+        }
+        function resetHandler(){
+            $("#demo").fadeTo(200, 1);
+        }
+        function callback(){
+            alert("End!");
+        }
+    </script>
+</head>
+<body>
+
+    <div class="main">
+        <h1>FadeTo</h1>
+        <div id="choose">
+            <button id="show">Fade To</button>
+            <button id="reset">Reset</button>
+        </div>
+        <div id="demo">
+            <img src="../images/class02.jpg" alt="class02.jpg"/>
+        </div>
+    </div>
+</body>
+</html>

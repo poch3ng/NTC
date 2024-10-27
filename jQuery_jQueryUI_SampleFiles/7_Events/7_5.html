@@ -1,0 +1,60 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <title>hover</title>
+
+        <style type="text/css">
+            html {
+                background-color: gray;
+                color: white;
+                width: 400px;
+                font: 100% Verdana;
+            }
+            
+            .class1 {
+                background-color: red;
+                color: yellow;
+                font: 100% Verdana;
+            }
+        </style>
+
+        <script type="text/javascript" src="../jquery.js"></script>
+		<script type="text/javascript">
+		$(document).ready(init);
+		function init()
+		{
+			// $("div").hover(hoverHandler);
+			// $("div").hover(mouseenterHandler, mouseleaveHandler);
+			$("div").mouseenter(mouseenterHandler);
+			$("div").mouseleave(mouseleaveHandler);
+			// $("div").on("mouseleave",mouseleaveHandler);
+		}
+        function hoverHandler(){
+            $(this).toggleClass("class1");
+           console.log("Hover!");
+        }
+        function mouseenterHandler(){
+            $(this).addClass("class1");
+            $(this).text("Enter!");
+            console.log("mouseenter!");
+        }
+        function mouseleaveHandler(){
+            $(this).removeClass("class1");
+            $(this).text("Leave!");
+            console.log("mouseleave!");
+			// $(this).off("mouseleave",mouseleaveHandler);
+        }
+		</script>  
+    </head>
+    <body>
+
+        <div>
+            學習Jquery是很愉快的事情
+        </div>
+        <div>
+            沒有Jquery是很痛苦的事情
+        </div>
+    </body>
+</html>

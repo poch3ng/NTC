@@ -1,0 +1,57 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>jQuery UI Example Page</title>
+	<link rel="stylesheet" href="../themes/ui-lightness/jquery-ui.css" />
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../jquery-ui.js"></script>
+	
+	<script type="text/javascript">
+	$(document).ready(init);
+	function init(){
+		$("#myDatepicker").datepicker({
+			showButtonPanel: true,
+			currentText: "今天",
+			closeText: "關閉",
+
+			// beforeShow: beforeShowFunction,
+			beforeShowDay: beforeShowDayFunction
+		});
+	}
+	function beforeShowFunction(){
+		if(confirm("Need multi datepicker?")){
+			$("#myDatepicker").datepicker("option","numberOfMonths", 2);
+		}else{
+			$("#myDatepicker").datepicker("option","numberOfMonths", 1);
+		}
+	}
+	function beforeShowDayFunction(date){
+		//console.log(date);//Sun Jul 28 2024 00:00:00 GMT+0800
+		var weekInfo = date.toString().slice(0,3);//slice(startNumber:included,endNumber:not included)
+		// console.log(weekInfo);//Sun Sat // Mon .....
+		// console.log("Sun Sat".indexOf(weekInfo));
+		if("Sun Sat".indexOf(weekInfo) != -1){
+			return [false, "disabled","weekend"];
+		}else{
+			return [true, "enabled","workday"];
+		}
+	}
+	</script>
+	<style>
+		.disabled{
+			font-weight: 900;
+		}
+		.enabled{
+			font-size: 1.1em;
+			font-style: italic;
+		}
+	</style>
+</head>
+<body>
+
+<h1>Datepicker</h1>
+<p>Date: <input type="text" id="myDatepicker" autocomplete="off"></p>
+</body>
+</html>

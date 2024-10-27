@@ -1,0 +1,56 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>jQuery addClass</title>
+
+    <style type="text/css">
+        .main {
+            width: 200px;
+			height:400px;
+			background:pink;
+            margin: 0 auto;
+            margin-top: 50px;
+        }
+        .show{
+			width: 400px;
+			height:200px;
+			background:orange;
+		}
+    </style>
+
+    <script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript">
+	$(document).ready(init);
+	function init()
+	{
+		$("#add").click(addHandler);
+		$("#remove").click(removeHandler);
+		$("#toggle").click(toggleHandler);
+		$("#has").click(hasHandler);
+	}
+    function addHandler(){
+        $(".main").addClass("show");
+    }
+    function removeHandler(){
+        $(".main").removeClass("show");
+    }
+    function toggleHandler(){
+        $(".main").toggleClass("show");
+    }
+    function hasHandler(){
+        alert($(".main").hasClass("show"));
+    }
+	</script>  
+</head>
+<body>
+    <input type="button" value="Add Class" id="add"/>
+    <input type="button" value="Remove Class" id="remove"/>
+    <input type="button" value="Toggle Class" id="toggle"/>
+    <input type="button" value="Has Class" id="has"/>
+    <div class="main">
+     	CSS Class!!!
+    </div>
+</body>
+</html>

@@ -1,0 +1,42 @@
+
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>Untitled Document</title>
+	<style type="text/css">
+		body {
+			font-size: 2em;
+		}
+
+		p {
+			color: red;
+		}
+
+		span {
+			color: green;
+		}
+	</style>
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript">
+		$(document).ready(init);
+		function init() {
+			$("div").wrap("<p>");
+			$("div:first").unwrap();
+		}
+	</script>
+
+</head>
+
+<body>
+
+	<div>This is a div1</div>
+	<div>This is a div2</div>
+	<div>This is a div3</div>
+	<div>This is a div4</div>
+
+</body>
+
+</html>

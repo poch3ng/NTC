@@ -1,0 +1,51 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <title>dblclick</title>
+        <style type="text/css">
+            body {
+                margin: 0;
+                padding: 0;
+                font: 12px / 5 Arial, Georgia, Times, "Times New Roman", serif;
+            }
+            
+            .main {
+                background-color: green;
+                color: white;
+                width: 300px;
+                font: 90% Verdana;
+                margin: 0 auto;
+                margin-top: 100px;
+                padding: 20px;
+            }
+            
+            input {
+                font: 12px / 1.5 Arial, Georgia, Times, "Times New Roman", serif;
+            }
+        </style>
+
+        <script type="text/javascript" src="../jquery.js"></script>
+		<script type="text/javascript">
+		$(document).ready(init);
+		function init()
+		{
+			$(":input").dblclick(dblclickHandler)
+		}
+        function dblclickHandler(){
+            $(this).css("backgroundColor", "red").hide(600);
+        }
+		</script>  
+    </head>
+    <body>
+
+        <div class="main">
+            姓名:<input type="text" name="name" size="20"/>
+            <br/>
+            暱稱:<input type="text" name="nick" size="20"/>
+            <br/>
+            <span id="dis"></span>
+        </div>
+    </body>
+</html>

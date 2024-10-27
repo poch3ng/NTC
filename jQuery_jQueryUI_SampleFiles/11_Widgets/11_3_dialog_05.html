@@ -1,0 +1,95 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>jQuery UI Example Page</title>
+	<link rel="stylesheet" href="../themes/ui-lightness/jquery-ui.css" />
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../jquery-ui.js"></script>
+	
+	<script type="text/javascript">
+	$(document).ready(init);
+	function init(){
+		$("#myDialog").dialog({
+			hide: {effect:"explode", duration: 1500},
+
+			create:createHandler,
+			focus:focusHandler,
+			open:openHandler,
+			beforeClose:beforeCloseHandler,
+			close:closeHandler,
+			
+			dragStart:dragStartHandler,
+			drag:dragHandler,
+			dragStop:dragStopHandler,
+			
+			resizeStart:resizeStartHandler,
+			resize:resizeHandler,
+			resizeStop:resizeStopHandler
+			//create focus open resizeStart resize resizeStop beforeClose close
+		});
+	}
+	var info="";
+	function createHandler(event, ui){
+		info+="create "
+		output(info);
+	}
+	function openHandler(event, ui){
+		info+="open ";
+		output(info);
+	}
+	function closeHandler(event, ui){
+		info+="close ";
+		output(info);
+	}
+	function beforeCloseHandler(event, ui){
+		info+="beforeClose ";
+		output(info);
+	}
+	function focusHandler(event, ui){
+		info+="focus ";
+		output(info);
+	}
+	function dragStartHandler(event, ui){
+		info+="dragStart ";
+		output(info);
+	}
+	function dragHandler(event, ui){
+		info+="drag ";
+		output(info);
+	}
+	function dragStopHandler(event, ui){
+		info+="dragStop ";
+		output(info);
+	}
+	function resizeStartHandler(event, ui){
+		info+="resizeStart ";
+		output(info);
+	}
+	function resizeHandler(event, ui){
+		info+="resize ";
+		output(info);
+	}
+	function resizeStopHandler(event, ui){
+		info+="resizeStop ";
+		output(info);
+	}
+	
+	function output(str){
+		$("#info").text(str);
+	}
+	</script>
+	<style>
+	</style>
+</head>
+<body>
+
+<h1>Dialog Events</h1>
+<div id="info">Info</div><br />
+<div id="myDialog" title="Basic dialog">
+  <p>This is the default dialog which is useful for displaying information. The dialog window can be moved, resized and closed with the 'x' icon.</p>
+</div>
+
+</body>
+</html>

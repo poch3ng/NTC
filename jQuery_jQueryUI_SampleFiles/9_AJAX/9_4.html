@@ -1,0 +1,37 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>jQuery</title>
+       
+        <style type="text/css">
+        </style>
+
+        <script type="text/javascript" src="../jquery.js"></script>
+        <script type="text/javascript">
+            $(document).ready(init);
+			function init(){
+                $("#mybtn").click(runHandler);
+            }
+            function runHandler(){
+                // $.get("get.htm", callbackFun);//.get()//.post()
+                // $.get("https://jsonplaceholder.typicode.com/photos",callbackFun);
+                $.get("https://jsonplaceholder.typicode.com/photos",{"_start":10,"_limit":12},callbackFun);
+
+            }
+            function callbackFun(data){
+                // $("#info").append("data="+data+"<br>");
+                // $("#info").append("data="+data.length+"<br>");//10
+                for (var i=0; i<data.length; i++){
+                    $("#info").append(i+". "+data[i].title+"<br>");
+                }
+            }
+            //<div>Load HTML!</div>
+        </script>
+    </head>
+    <body>
+    	<input type="button" id="mybtn" value="Get" />
+    	<div id="info">Info:<br></div>
+    </body>
+</html>

@@ -1,0 +1,56 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<title>jQuery animate</title>
+<style type="text/css">
+div {
+    background-color: #999966;
+    font: normal 90% "Arial", "Trebuchet MS", "Lucida Grande", Verdana, Sans-Serif;
+    color: white;
+    width: 100px;
+    height: 40px;
+    border: 1px solid #666633;
+    overflow: hidden;
+}
+button {
+    font: normal 90% "Arial", "Trebuchet MS", "Lucida Grande", Verdana, Sans-Serif;
+}
+</style>
+<script type="text/javascript" src="../jquery.js"></script>
+<script type="text/javascript">
+$(document).ready(init);
+function init()
+{
+	$("#show").click(showHandler);
+}
+var index = 0;
+function showHandler(){
+// $("#myshow").animate({opacity: 0},"slow");
+// $("#myshow").animate({opacity: 0.4}, 1200);
+// $("#myshow").animate({height:"0px"}, 1200);
+// $("#myshow").animate({"width":"0px",height:"0px"}, 1200);
+// $("#myshow").animate({"width":"90%",height:"200px"}, 1200);
+// $("#myshow").animate({"width":"90%",height:"200px",fontSize:"10em"}, 1200);
+// $("#myshow").animate({"width":"90%",height:"200px","font-size":"10em"}, 1200);
+// $("#myshow").animate({"width":"90%",height:"200px",fontSize:"10em",opacity:0.3}, 1200);
+index++;
+ if(index <= 3) $("#myshow").animate({"width":"90%",height:"200px",fontSize:"10em",opacity:0.3}, 1200, callback);
+// $("#myshow").animate({"width":"90%",height:"200px",fontSize:"10em",opacity:0.3}, 1200);
+// console.log("End!");
+}
+function callback(){
+    // console.log("End!");
+    $("#myshow").animate({"width":"100px",height:"40px",fontSize:"1em",opacity:1}, 1200, showHandler);
+}
+//  CSS: font-size     JavaScript: fontSize
+</script>  
+
+</head>
+<body>
+    <h1>animate</h1>
+    <button id="show">Show</button>
+    <div id="myshow"> Look </div>
+</body>
+</html>

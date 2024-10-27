@@ -1,0 +1,33 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>jQuery</title>
+       
+        <style type="text/css">
+        </style>
+
+        <script type="text/javascript" src="../jquery.js"></script>
+        <script type="text/javascript">
+            $(document).ready(init);
+			function init(){
+                $("#mybtn").click(runHandler);
+            }
+            function runHandler(){
+                $.getJSON("json.json", callbackFun);
+            }
+            function callbackFun(data){
+                $("#info").append("data="+data+"<br>");//{"name":"Ken","age":"32"}
+                $("#info").append("name="+data.name+"<br>");//"Ken"
+                $("#info").append("age="+data.age+"<br>");//32
+            }
+
+            //{"name":"Ken","age":"32"}
+        </script>
+    </head>
+    <body>
+    	<input type="button" id="mybtn" value="Get JSON" />
+    	<div id="info">Info:<br></div>
+    </body>
+</html>

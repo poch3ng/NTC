@@ -1,0 +1,60 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>jQuery Filter</title>
+<style type="text/css">
+#album{
+	width:350px;
+	height:360px;
+	border:1px solid gray;
+	padding:10px;
+	background:#666;
+	color:white;
+}
+
+#main{
+	width:350px;
+}
+
+.smallPic{
+	width:100px;
+	padding:5px;
+	background:white;
+	margin:10px 2px;
+}
+.selected{
+	background: orange;
+}
+</style>
+
+<script type="text/javascript" src="../jquery.js"></script>
+<script type="text/javascript">
+$(document).ready(init);
+function init()
+{
+	$(".smallPic").click(showHandler);
+	$(".smallPic:eq(0)").trigger("click");
+}
+function showHandler(){
+	var src = $(this).attr("src");
+	$("#main").attr("src", src);
+	$(".smallPic").removeClass("selected");
+	$(this).addClass("selected");
+}
+</script>  
+</head>
+<body>
+
+<div id="album">
+	<img id="main" src="images/00034a.jpg"/>
+    <div>
+    	<img src="images/00034a.jpg" class="smallPic"/>
+        <img src="images/00035a.jpg" class="smallPic"/>
+        <img src="images/00036a.jpg" class="smallPic"/>
+    </div>
+</div>
+
+</body>
+</html>

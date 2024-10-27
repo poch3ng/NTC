@@ -1,0 +1,46 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>click</title>
+
+    <style type="text/css">
+        body,
+        select {
+            margin: 0;
+            padding: 0;
+            margin: 0 auto;
+            margin-top: 100px;
+            font: 12px / 5 Arial, Georgia, Times, "Times New Roman", serif;
+            width: 400px;
+        }
+    </style>
+
+    <script type="text/javascript" src="../jquery.js">
+    </script>
+    <script type="text/javascript">
+        $(document).ready(init);
+        function init() {
+            // $("div").click(clickHandler);
+            $("div").on("click", clickHandler);
+        }
+        function clickHandler() {
+            alert($(this).text());
+            // $("div").off("click", clickHandler);
+            $(this).off("click", clickHandler);
+        }
+    </script>
+</head>
+
+<body>
+    <div>
+        這是第一個DIV
+    </div>
+    <div>
+        這是第二個DIV
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,56 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>jQuery UI Example Page</title>
+	<link rel="stylesheet" href="../themes/ui-lightness/jquery-ui.css" />
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../jquery-ui.js"></script>
+
+	<script type="text/javascript">
+	$(document).ready(init);
+	function init(){
+		$("#myDatepicker").datepicker({
+			dateFormat: "yy/mm/dd",
+			appendText: " (年/月/日)",
+			// showWeek: true,
+			// weekHeader: "No.",
+
+			showOn: "both",//focus button both
+			buttonText: "Show",
+			buttonImage:"../images/calendar-blue.png",
+			buttonImageOnly: true,
+
+			// minDate: "-1m-2d",//int
+			// maxDate: "+1y-2m+3d",//d w m y
+			minDate: new Date(2022,6,15),//2022/07/15
+			maxDate: new Date(2026,1,5),//2026/02/05
+
+			showMonthAfterYear: true,
+			changeMonth: true,
+			changeYear: true,
+			// yearRange: "2020:2030",
+
+			showOtherMonths: true,
+			selectOtherMonths: true,
+
+			// defaultDate: "+1m-2d"//d w m y
+			defaultDate: new Date(2024,9,5),//2024/10/05
+		});
+	}
+	</script>
+	<style>
+		.ui-datepicker-trigger{
+			position: relative;
+			top: 12px;
+			left: 3px;
+		}
+	</style>
+</head>
+<body>
+
+<h1>Datepicker</h1>
+<p>Date: <input type="text" id="myDatepicker" autocomplete="off"></p>
+</body>
+</html>

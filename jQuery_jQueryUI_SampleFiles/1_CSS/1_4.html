@@ -1,0 +1,39 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>CSS Background</title>
+<style type="text/css">
+	body{
+		margin: 0px;
+	}
+	.myheading{
+		/* width: 100%; */
+		height: 300px;
+		
+		/* background:url(images/citybg.jpg) pink right center; */
+
+		/* background-color: pink;
+		background-image: url(images/citybg.jpg);
+		background-position: right center; */
+
+		/* 綜合寫法 > 可能會將前面的值初始化*/
+		background: right center; 
+		/* Recommend 指令寫法 */
+		background-color: pink;
+		background-image: url(images/citybg.jpg);
+	}
+
+	img{
+		width: 500px;
+	}
+</style>
+</head>
+
+<body>
+	<div class="myheading"></div>
+	<hr>
+	<img src="images/citybg.jpg">
+</body>
+</html>

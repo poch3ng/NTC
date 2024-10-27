@@ -1,0 +1,48 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>jQuery UI Example Page</title>
+	<link rel="stylesheet" href="../themes/ui-lightness/jquery-ui.css" />
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../jquery-ui.js"></script>
+	
+	<script type="text/javascript">
+	$(document).ready(init);
+	function init(){
+		var str = '<p>jQuery UI is a curated set of user interface interactions, effects, widgets, and themes built on top of the jQuery JavaScript Library. <a href="#" id="myA">jQuery UI is the perfect choice.</a></p>';
+		$("#myDialog").dialog({
+			modal: true,
+			width:400,
+			height:300
+		});
+		$("#myDialog").html(str);
+		$("#myA").click(myAHandler);
+	}
+	function myAHandler(){
+		var newDia=$('<div id="newDialog" title="new dialog">');
+		newDia.html("<a href='http://www.google.com'>google</a>");
+		newDia.dialog({
+			width:300,
+			height:200,
+			modal: true
+		});
+	}
+    // $("div") //get div
+    // $("<div>")// create div element
+    
+	</script>
+	<style>
+	</style>
+</head>
+<body>
+
+<h1>Dialog</h1>
+<div id="myDialog" title="Basic dialog">
+  
+</div>
+
+</body>
+</html>

@@ -1,0 +1,47 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>jQuery UI Example Page</title>
+	<link rel="stylesheet" href="../themes/ui-lightness/jquery-ui.css" />
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../jquery-ui.js"></script>
+	
+	<script type="text/javascript">
+	$(document).ready(init);
+	function init(){
+		$("#mySlider").slider({
+			disabled: false,
+			min: 20,
+			max: 50,
+			value: 30,
+
+			change: changeHandler
+		});
+	}
+	function changeHandler(event, ui){
+		var value = ui.value;
+		$("#info").text(value);
+	}
+	
+	</script>
+	<style>
+	/*
+		CSS結構：
+			ui-slider: 滑棒的外框
+				ui-slider-handle: 滑動指標
+				ui-slider-range: 當有設定範圍時，範圍中間的區塊
+	*/
+		#mySlider{
+			width:50%;
+			margin:auto;
+		}
+	</style>
+</head>
+<body>
+<h1>Slider</h1>
+<div id="info">info</div><br>
+<div id="mySlider"></div>
+</body>
+</html>

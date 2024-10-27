@@ -1,0 +1,52 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<title>jQuery Effect</title>
+<style type="text/css">
+body, #btn {
+    margin: 0;
+    padding: 0;
+    font: 12px / 1.5 Arial, Georgia, Times, "Times New Roman", serif;
+}
+#demo {
+    width: 200px;
+    height: 200px;
+    border: 1px dotted gray;
+    background: #da9999;
+    padding: 10px;
+    /* display: none; */
+}
+.main {
+    width:250px;
+    margin: 0 auto;
+    margin-top: 200px;
+    font: 12px / 1.5 Arial, Georgia, Times, "Times New Roman", serif;
+}
+</style>
+<script type="text/javascript" src="../jquery.js"></script>
+<script type="text/javascript">
+    // $("target").jQueryFunction(inputValue);
+    $(document).ready(init);
+    function init(){
+        $("#hide").click(hideHandler);
+        $("#show").click(showHandler);
+    }
+    function hideHandler(){
+        $("#demo").hide();
+    }
+    function showHandler(){
+        $("#demo").show();
+    }
+</script>
+</head>
+<body>
+  <button id="show">Info</button>
+  <hr>
+<div class="main">
+  
+  <div id="demo"><button id="hide">X</button> 你好嗎? welcome!! </div>
+</div>
+</body>
+</html>

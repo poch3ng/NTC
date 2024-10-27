@@ -1,0 +1,82 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>JSON</title>
+<style type="text/css">
+</style>
+<script type="text/javascript">
+ /*    // var a = 3;//number string boolean
+    var ar = new Array(0,1,2);
+    document.write("ar="+ar+"<br>");
+    document.write("ar="+ar.length+"<br>");//3
+    document.write("ar="+ar[0]+"<br>");
+    ar[0]=9;
+    ar[1]="cat";
+    ar[4]="dog";
+    document.write("ar="+ar+"<br>");
+    document.write("ar="+ar.length+"<br>");//5
+    document.write("ar="+ar[3]+"<br>");//undefined
+    // ar.length = 3;
+    document.write("ar="+ar+"<br>");
+    document.write("splice="+ar.splice(1,2)+"<br>");//cat,2
+    //splice(startNumber,deleteLength);
+    document.write("ar="+ar+"<br>");
+    document.write("splice="+ar.splice(1,0,8,"pig")+"<br>");//
+    //splice(startNumber,deleteLength,addItem1,adItme2,.....);
+    document.write("ar="+ar+"<br>");
+ */
+/* //  var ar = new Array(1,"dog");
+    var ar =[1,"dog"];
+    document.write("ar="+ar[0]+"<br>");
+    document.write("ar="+ar[1]+"<br>");
+    ar[0] = 9;
+    document.write("ar="+ar[0]+"<br>");
+    document.write("ar="+ar[1]+"<hr>");
+    console.log(ar);
+
+    // var obj = new Object({a:1, b:"dog"});
+    var obj = {a:1, b:"dog"};
+    document.write("obj="+obj.a+"<br>");
+    document.write("obj="+obj.b+"<br>");
+    obj.a = 9;
+    document.write("obj="+obj.a+"<br>");
+    document.write("obj="+obj.b+"<br>");
+    console.log(obj); */
+
+  /*   var data = {tony:22,mary:33,tony:44};
+    document.write("data="+data.tony+"<br>");
+    document.write("data="+data.mary+"<br>"); */
+
+/*     var data = [22,33,44];
+    document.write("data="+data[0]+"<br>");
+    document.write("data="+data[1]+"<br>");
+    document.write("data="+data[2]+"<br>"); */
+
+  /*   var data = [["tony",22],["mary",33],["tony",44]];
+    document.write("data="+data[0][0]+"<br>");
+    document.write("data="+data[0][1]+"<br>");
+    document.write("data="+data[2][0]+"<br>");
+    document.write("data="+data[2][1]+"<br>"); */
+
+    var data = [{name:"tony",age:22,skin:"black"},
+                {name:"mary",age:33,skin:"white"},
+                {name:"tony",age:44,skin:"yellow",edu:["aa","bb","cc"]},
+    ];
+    document.write("data="+data[0].name+"<br>");
+    document.write("data="+data[0].skin+"<br>");
+    document.write("data="+data[2].name+"<br>");
+    document.write("data="+data[2].skin+"<br>");
+    document.write("data="+data[2].edu[1]+"<br>");
+
+
+//JSON : JavaScript Object Notation
+// alert(typeof({}));//object
+// alert(typeof([]));//object
+</script>
+</head>
+
+<body>
+</body>
+</html>

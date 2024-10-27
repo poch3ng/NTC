@@ -1,0 +1,62 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>jQuery UI Example Page</title>
+	<link rel="stylesheet" href="../themes/ui-lightness/jquery-ui.css" />
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../jquery-ui.js"></script>
+	
+	<script type="text/javascript">
+	$(document).ready(init);
+	function init(){
+		$("#myDialog").dialog({
+			title:"Dialog Title",
+			closeOnEscape: true,
+			buttons: [
+				{text: "Yes", click: yesHandler},
+				{text: "No", click: noHandler},
+				{text: "other", click: noHandler},
+			],
+			dialogClass: "addDialog"
+		});
+	}
+	function yesHandler(){
+		alert("Yes!");
+		$("#myDialog").dialog("close");
+	}
+	function noHandler(){
+		alert("No!");
+		// $("#myDialog").dialog("close");
+	}
+	</script>
+	<style>
+		/*
+		CSS結構：
+			ui-dialog: 對話視窗的外框
+				ui-dialog-titlebar: 對話視窗的標題列外框
+					ui-dialog-title: 標題列文字
+					ui-dialog-titlebar-close: 標題列關閉按鈕
+				ui-dialog-content: 對話視窗內容的外框
+				ui-dialog-buttonpane: 對話視窗下方按鈕的外框
+					ui-dialog-buttonset: 對話視窗下方按鈕
+		*/
+		.addDialog{
+			padding:15px;
+			color:blue;
+			background:pink;
+			border:1px gray solid;
+		}
+	</style>
+</head>
+<body>
+
+<h1>Dialog</h1>
+<div id="myDialog" title="hello">
+	<input type="text">
+	<p>jQuery UI is a curated set of user interface interactions, effects, widgets, and themes built on top of the jQuery JavaScript Library. jQuery UI is the perfect choice.</p>
+</div>
+</div>
+</body>
+</html>

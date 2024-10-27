@@ -1,0 +1,71 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>jQuery UI Example Page</title>
+	<link rel="stylesheet" href="../themes/ui-lightness/jquery-ui.css" />
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../jquery-ui.js"></script>
+
+	<script type="text/javascript">
+	$(document).ready(init);
+	function init(){
+	$("#myDatepicker").datepicker({
+			// dateFormat: "yy/mm/dd/DD/D/MM/M",
+			dateFormat: "yy/mm/dd",
+			showMonthAfterYear: true,
+			autoSize: true,
+
+			// dayNames: [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ],
+			dayNames: [ "星期ㄖ", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六" ],//DD
+			//dayNamesShort: [ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" ]
+			dayNamesShort: [ "週ㄖ", "週一", "週二", "週三", "週四", "週五", "週六" ],//D
+			//dayNamesMin: [ "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa" ],
+			dayNamesMin:[ "日", "一", "二", "三", "四", "五", "六"],//title
+
+			//monthNames:[ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ]
+			monthNames:["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"],//MM
+			// monthNamesShort:[ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ],
+			monthNamesShort:["一","二","三","四","五","六","七","八","九","十","十一","十二"],//M pulldown
+			// changeMonth: true,
+
+			showButtonPanel: true,
+			gotoCurrent: true,
+			currentText: "Select",
+			closeText: "Close",
+
+			// numberOfMonths: [2,3],//int []
+			numberOfMonths: 3,
+			showCurrentAtPos: 0,
+			stepMonths : 3,
+
+			showAnim: "drop",
+			showOptions:{direction: "up"},//up, down, left, right
+			duration: 1000
+		});
+	}
+
+//https://api.jqueryui.com/category/effects/
+
+
+
+	</script>
+	<style>
+	.ui-datepicker {  
+		/* width: 400px;  
+		height:350px;   */
+		margin: 5px auto 0;  
+		font: 16pt Arial, sans-serif;  
+		-webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, .5);  
+		-moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, .5);  
+		box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, .5);  
+	}  
+	</style>
+</head>
+<body>
+
+<h1>Datepicker</h1>
+<p>Date: <input type="text" id="myDatepicker" autocomplete="off"></p>
+</body>
+</html>

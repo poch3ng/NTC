@@ -1,0 +1,49 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Locical</title>
+<style type="text/css">
+</style>
+<script type="text/javascript">
+    var x = 5;
+    var y = 0;
+    document.write("x="+ x +"<br>");//5
+    document.write("y="+ y +"<br>");//0
+
+    document.write((x > 1 && y > 1) +"<br>");//and && false
+    document.write((y > 1 && x > 1) +"<br>");//and && false
+
+    document.write((y > 1 || x > 1) +"<br>");//or || true
+    document.write((x > 1 || y > 1) +"<br>");//or || true
+
+    document.write((x > 1 && y > 1 && x < y) +"<br>");//false
+    document.write((x > 1 || y > 1 || x < y) +"<br>");//true
+    document.write((x > 1 || y > 1 && x < y) +"<br>");//true
+
+    //*/ > +- //&& > ||
+
+    var z = 31;//31 //10
+    // z = 031;//25 //8
+    z = 0X31;//49 //16
+    z = 0x00fF00;
+    z = 65535 - 255;
+    document.write("z="+ z +"<br>");
+
+    //bitwise
+    document.write((3 & 5) +"<br>");//1 and
+    document.write((3 | 5) +"<br>");//7 or
+    document.write((3 ^ 5) +"<br>");//6 xor
+
+</script>
+<style>
+    span{color: #aaaa00;}
+
+</style>
+</head>
+
+<body>
+    <span>Hello</span>
+</body>
+</html>

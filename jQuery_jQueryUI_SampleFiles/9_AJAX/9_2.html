@@ -1,0 +1,38 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>jQuery</title>
+       
+        <style type="text/css">
+        </style>
+
+        <script type="text/javascript" src="../jquery.js"></script>
+        <script type="text/javascript">
+            $(document).ready(init);
+			function init(){
+                $("#mybtn").click(runHandler);
+            }
+            function runHandler(){
+                $.getScript("javascript.js", callbackFun);
+            }
+            function callbackFun(){
+                $("#info").append("loadData="+loadData+"<br>");
+                $("#info").append(loadFun("Hello"));
+            }
+            /*
+            var loadData="Global";
+            function loadFun(input)
+            {	
+                var loadData="Local";
+                return "loadData="+loadData+"<br> input="+input;
+            } */
+
+        </script>
+    </head>
+    <body>
+    	<input type="button" id="mybtn" value="Get Javascipt" />
+    	<div id="info">Info:<br></div>
+    </body>
+</html>

@@ -1,0 +1,75 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>News List </title>
+<style type="text/css">
+#catalog h1{
+	font:18px/2 Arial, Helvetica, sans-serif;
+	background-color:#bbb;
+	color:#333;
+	border:5px silver solid;
+	width:30%;
+	float:left;
+}
+div{
+	border:1px solid gray;
+	margin:10px 5px;
+	font:12px/1.5 Arial, Helvetica, sans-serif;
+	background-color:#ccc;
+	clear:both;
+	width:90%;
+}
+h1{
+	margin:0;
+	padding:5px;
+	font-size:16px;
+	background:#999;
+	border-bottom:2px solid white;	
+}
+p{
+	margin:0;
+	padding:5px;
+	text-indent:2em;
+}
+</style>
+
+<script type="text/javascript" src="../jquery.js"></script>
+<script type="text/javascript">
+	$(document).ready(init);
+	function init()
+	{
+		var gotoTop = "<a href='#gotoTop'>Go to top</a>";
+		$("div p").append(gotoTop);//create
+
+		// $("#catalog").append($("div h1"));//move
+		$("#catalog").append($("div h1").clone());//copy
+
+		$("div p:first").replaceWith("<span>replace With Span</span>");//over write
+		$("div p:first").remove();//delete
+		$("div p:first").html("<span>HTML</span>");//modify
+		$("div p:first").empty();//clear folder
+	}
+</script>
+</head>
+
+<body>
+	<div id="catalog"></div>
+    
+	<div>
+		<h1>快速掌握PMP認證通過秘訣，免費報名參加</h1>
+		<p>PMP專案管理認證不僅為國際專業認定標準，更是職場用人的熱門趨勢。搶先看PMP認證培訓學員影音專訪！</p>
+	</div>
+    
+    <div>
+		<h1>掌握最新VMWare技術，VMware vSphere 虛擬化講座!</h1>
+		<p>企業口碑保證的培訓品質，歷屆學員獲得國際資訊認證高通過率，就業可立即應用所培訓的實用技術，讓您轉職、求職必勝！</p>
+	</div>
+    
+    <div>
+		<h1>Android APP開發全制霸！幫你新年補足手機開發能量</h1>
+		<p>完整上手Eclipse, Android SDK, 平板應用與多樣業界熱門開發實例，月底前每科省錢折抵1,000元活動開跑！</p>
+	</div>
+</body>
+</html>

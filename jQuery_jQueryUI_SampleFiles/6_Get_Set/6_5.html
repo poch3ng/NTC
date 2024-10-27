@@ -1,0 +1,49 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>jQuery addClass</title>
+
+    <style type="text/css">
+        .main {
+            width: 200px;
+			height:400px;
+            margin: 0 auto;
+            margin-top: 50px;
+			background:pink;
+        }
+        .show{
+			width: 400px;
+			height:200px;
+			background:orange;
+		}
+    </style>
+
+    <script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript">
+	$(document).ready(init);
+	function init()
+	{
+        $("#btn1").click(btn1Handler);
+        $("#btn2").click(btn2Handler);
+        $("#btn3").click(btn3Handler);
+	}
+    function btn1Handler(){
+        alert($(".main").attr("title"));
+    }
+    function btn2Handler(){
+        $(".main").attr("title","Hello world!");
+    }
+    function btn3Handler(){
+        $(".main").removeAttr("title");
+    }
+	</script>  
+</head>
+<body>
+    <input type="button" value="Btn 1" id="btn1"/>
+    <input type="button" value="Btn 2" id="btn2"/>
+    <input type="button" value="Btn 3" id="btn3"/>
+    <div class="main" title="My Title">Main</div>
+</body>
+</html>

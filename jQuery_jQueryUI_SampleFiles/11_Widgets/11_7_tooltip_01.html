@@ -1,0 +1,60 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>jQuery UI Example Page</title>
+	<link rel="stylesheet" href="../themes/ui-lightness/jquery-ui.css" />
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../jquery-ui.js"></script>
+	
+	<script type="text/javascript">
+	$(document).ready(init);
+	function init(){
+		// $("#myDiv").tooltip();
+		$("#outer").tooltip({
+			disabled: false,
+			// show: {effect:"blind", duration: 500},
+			// hide: {effect:"blind", duration: 500},
+			show:false,
+			hide:false,
+			position: {my:"left+25 top", at:"right center"},
+			track: true
+		});
+		
+	}
+	</script>
+	<style>
+	/*
+		CSS結構：
+			ui-tooltip: 提示元件的外框
+				ui-tooltip-content: 提示元件的內容
+	*/
+	#outer{
+		width:400px;
+		height:300px;
+		margin:auto;
+	}
+	#myDiv{
+		width:200px;
+		height:200px;
+		background:silver;
+	}
+	.myStyle{
+		background:blue;
+		color:cyan;
+		border:dotted;
+	}
+	</style>
+</head>
+<body>
+<h1>Tooltip</h1>
+<div id="outer">
+	<div id="myDiv" title="This is a div!">Div</div>
+	<p>Here is a <a href="http://www.google.com" title="This is a link!">link!</a></p>
+	<p>Here is a <a href="#" title="This is another link!">link!</a></p>
+
+	<p><label for="myInput">Input here:</label><input id="myInput" title="This is an input!"></p>
+</div>	
+</body>
+</html>

@@ -1,0 +1,97 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>jQuery UI Example Page</title>
+	<link rel="stylesheet" href="../themes/ui-lightness/jquery-ui.css" />
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../jquery-ui.js"></script>
+	
+	<script type="text/javascript">
+	//補充範例 考試時間
+	$(document).ready(init);
+	function init(){
+		$("#timeProgressbar").progressbar({
+			value: false,
+			max: 100,
+			change:timechangeHandler,
+			complete:timeCompleteHandler
+		});
+		$("#testProgressbar").progressbar({
+			value:false,
+			max: 5,
+			complete:testCompleteHandler,
+		});
+		$("#start").click(startHandler);
+		$("#next").click(nextHandler).hide(0);
+	}
+	var testValue = 0;
+	function nextHandler(){
+		testValue++;
+		$("#testProgressbar").progressbar("value",testValue);
+		$("#next").text("test:"+testValue);
+		$(".test-progress-label").text(testValue);
+	}
+	function testCompleteHandler(){
+		$("#info").html("Test complete in "+timeValue+" seconds!");
+		$("#next").hide(0);
+		clearInterval(myInterval);
+	}
+	
+	var myInterval;
+	var timeValue=0;
+	function startHandler(){
+		$("#start").hide(0);
+		$("#next").show(0);
+		myInterval = setInterval(intervalFun,100);
+	}
+	function intervalFun(){
+		timeValue++;
+		$("#timeProgressbar").progressbar("value",timeValue);
+	}
+	function timechangeHandler(){
+		$(".time-progress-label").text(timeValue);
+		var itemBG=$("#timeProgressbar .ui-progressbar-value");
+		if (timeValue == 50){
+			itemBG.css({backgroundColor:"#F88"});
+		}
+		if (timeValue == 80){
+			itemBG.css({backgroundColor:"#F33"});
+		}
+	}
+	function timeCompleteHandler(){
+		clearInterval(myInterval);
+		$("#info").text("You only answer "+testValue+" of 5!");
+		$("#next").hide(0);
+	}
+	</script>
+	<style>
+		.ui-progressbar{
+			margin:auto;
+			width:50%;
+			position:relative;
+		}
+		#timeProgressbar .ui-progressbar-value{
+			background:#ff9;
+		}
+		#testProgressbar .ui-progressbar-value{
+			background:#9f9;
+		}
+	  .time-progress-label,.test-progress-label{
+		position: absolute;
+		left: 50%;
+		top: 5px;
+		font-weight: bold;
+	  }
+	</style>
+</head>
+<body>
+<h1>Progressbar</h1>
+<button id="start">start</button><button id="next">test:0</button><br/>
+
+<div id="info"></div><br />
+<div id="testProgressbar"><div class="test-progress-label">Test</div></div>
+<div id="timeProgressbar"><div class="time-progress-label">Time</div></div>
+</body>
+</html>

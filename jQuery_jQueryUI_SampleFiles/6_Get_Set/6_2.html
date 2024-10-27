@@ -1,0 +1,94 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>jQuery Position</title>
+
+    <style type="text/css">
+        body {
+            margin: 0;
+            padding: 0;
+            font: 12px / 1.5 Arial, Georgia, Times, "Times New Roman", serif;
+            background: pink;
+        }
+        
+        .main {
+            width: 800px;
+            margin: 0 auto;
+            margin-top: 50px;
+        }
+        
+        #demo {
+            width: 300px;
+            height: 500px;
+            border: 10px dotted gray;
+            background: #e9e9e9;
+            float: left;
+            padding: 10px;
+            /* padding-left: 20px; */
+        }
+        
+        button {
+            font: 14px / 1.5 Arial, Georgia, Times, "Times New Roman", serif;
+        }
+    </style>
+
+    <script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript">
+	$(document).ready(init);
+	function init()
+	{
+		$("button").click(checkHandler);
+	}
+    function checkHandler(){
+        // alert($("#demo").css("width"));//300px
+        // alert($("#demo").css("height"));//500px
+        // alert($("#demo").width());//300 //content
+        // alert($("#demo").height());//500 //content
+        // alert($("#demo").innerWidth());//320 //content + padding
+        // alert($("#demo").innerHeight());//520 //content + padding
+        // alert($("#demo").outerWidth());//340 //content + padding + border
+        // alert($("#demo").outerHeight());//540 //content + padding + border
+
+        // alert($("#demo").css("width")+100);//300px100
+        // alert($("#demo").width()+100);//400
+        // alert(parseInt($("#demo").css("width")));//300
+        // alert($("#demo").width()+"px");//300px
+
+        // alert($(window).css("width"));//NO
+        // alert($(window).width());//500//1125
+        // alert($(document).width());//800//1125
+        // alert($(window).css("height"));//NO
+        // alert($(window).height());//753//346
+        // alert($(document).height());//753//651
+
+        // $("#demo").width(400);
+        // $("#demo").height(400);
+
+        //================================================
+        var imgOffset = $("#demo img").offset();
+        // alert("imgOffset.left="+imgOffset.left +" imgOffset.top="+imgOffset.top);//20 217.234375
+        $("#demo img").offset({left:50, top:80});
+        $("#demo img").width(100);
+        $("#demo img").height(150);
+    }
+	</script>  
+</head>
+<body>
+
+    <div class="main">
+        <h1>Position</h1>
+        
+            <button>
+                 Check Position
+            </button><br/>
+            
+            
+        <div id="demo">
+            <h1>Position Demo</h1>
+            <img src="../images/bread.jpg" alt="bread"/>
+        </div>
+    </div>
+</body>
+</html>

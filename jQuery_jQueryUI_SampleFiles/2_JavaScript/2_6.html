@@ -1,0 +1,70 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>If statement</title>
+<style type="text/css">
+</style>
+<script type="text/javascript">
+    // var a = true;
+    // a = 3>4;
+    // document.write("a="+a+"<br>");
+    // document.write("a="+typeof(a)+"<br>");
+    
+    // if(true) document.write("TRUE!");
+    /* if(true){
+        document.write("TRUE!");
+    } */
+/*     if(4<3){
+        document.write("TRUE!");
+    }else{
+        document.write("FALSE!");
+    } */
+
+    //alert("Alert!");
+    //window.alert("Alert!!");
+
+    // confirm("Confirm!");
+    // window.confirm("Confirm!");
+    // var ans = confirm("Confirm!");
+    // document.write("ans= "+ans+"<br>");
+
+    // prompt("Prompt!");
+    // prompt("Prompt!","Hello");
+    // window.prompt("Prompt!","Hello");
+    // var ans = prompt("Prompt!");
+    // document.write("ans= "+ans+"<br>");
+
+    var year = prompt("Please input an year!");
+    let ans = Number(year)
+
+    //平年 閏年
+    // 公元年份非4的倍數，為365天平年。
+    // 公元年份為4的倍數但非100的倍數，為366天閏年。
+    // 公元年份為100的倍數但非400的倍數，為365天平年。。
+    // 公元年份為400的倍數，為366天閏年。
+
+    //0
+    //-3
+    //3.5
+    //ok
+    //cancel
+    //abc
+    if(Number.isInteger(ans) && ans > 0){ // 透過自動轉型來寫
+        if(ans%4 == 0 && ans%100 != 0 || ans%400 == 0 && ans%4000 != 0) {
+            document.write("ans= "+ans+" 是閏年<br>");
+        } else {
+            document.write("ans= "+ans+" 是平年<br>");
+        }
+    }else {
+        document.write("錯誤<br>");
+    }
+
+
+</script>
+</head>
+
+<body>
+</body>
+</html>

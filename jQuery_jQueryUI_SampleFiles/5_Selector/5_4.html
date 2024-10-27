@@ -1,0 +1,99 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<title>jQuery Selector</title>
+<style type="text/css">
+body {
+	margin: 0;
+	padding: 0;
+	font: 12px / 1.5 Arial, Georgia, Times, "Times New Roman", serif;
+}
+.main {
+	width: 800px;
+	margin: 0 auto;
+	margin-top: 50px;
+}
+#demo {
+	width: 250px;
+	height: 450px;
+	border: 1px dotted gray;
+	background: #da9999;
+	float: left;
+	padding: 10px;
+	padding-left: 20px;
+}
+button {
+	font: 14px / 1.5 Arial, Georgia, Times, "Times New Roman", serif;
+}
+.show {
+	background: black;
+	color: white;
+}
+</style>
+<script type="text/javascript" src="../jquery.js"></script>
+<script type="text/javascript">
+$(document).ready(init);
+function init()
+{
+  // $("ul li:first").addClass("show");//first in all li
+  // $("ul li:last").addClass("show");//last in all li
+  // $("ul li:eq(2)").addClass("show");//start from 0
+  // $("ul li:odd").addClass("show");
+  
+  // $("ul li:first-child").addClass("show");//first in each group
+  // $("ul li:last-child").addClass("show");//last in each group
+  // $("ul li:only-child").addClass("show");
+  // $("ul li:nth-child(2)").addClass("show");//in each group start 1
+  // $("ul li:nth-child(odd)").addClass("show");
+  // $("ul li:nth-child(even)").addClass("show");
+
+  // $("ul li:nth-child(2n)").addClass("show");
+  // $("ul li:nth-child(2n+2)").addClass("show");
+  //nth-child(gapNumber n+startNumber)
+  $("ul li:nth-child(3n+3)").addClass("show");
+
+
+
+}
+</script>  
+</head>
+<body>
+<div class="main">
+  <h1>Selector</h1>
+  <br/>
+  <div id="demo">
+    <h1>Selector Demo</h1>
+    <ul>
+      <li> First li </li>
+      <li> Second li </li>
+      <li> Third li </li>
+	    <li> Fourth li </li>
+      <li> Fifth li </li>
+      <li> Sixth li </li>
+	    <li> Seventh li </li>
+      <li> Eighth li </li>
+      <li> Ninth li </li>
+    </ul>
+    <ul>
+      <li> 001 li </li>
+      <li> 002 li </li>
+      <li> 003 li </li>
+      <li> 004 li </li>
+      <li> 005 li </li>
+      <li> 006 li </li>
+      <li> 007 li </li>
+      <li> 008 li </li>
+      <li> 009 li </li>
+    </ul>
+    <ul>
+      <li> Only One li </li>
+    </ul>
+    <ul>
+      <li> Only One li2 </li>
+    </ul>
+  </div>
+</div>
+</body>
+</html>

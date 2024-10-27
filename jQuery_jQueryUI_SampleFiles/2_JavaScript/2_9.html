@@ -1,0 +1,95 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Function</title>
+<style type="text/css">
+</style>
+<script type="text/javascript">
+/*     var a = 3;
+    document.write("a="+a+"<br>");
+    function hello(){
+        document.write("Hello!"+"<br>");
+    }
+    hello(); */
+
+/*     function hello(name, time){
+        document.write("Hello "+ name+", "+ time +"<br>");
+    }
+    hello("Mary", "evening");
+    hello("Tony", "morning");
+    hello("Tony", 123);
+    hello("Tony", "evening", 123);
+    hello("Mary"); */
+
+    // function hello(){
+    //     document.write("Wow "+"<br>");
+    // }
+
+/*     function add(){
+        document.write("line 1 "+"<br>");
+        return;//stop here
+        document.write("line 2 "+"<br>");
+        document.write("line 3 "+"<br>");
+    }
+    add(); */
+/* 
+    function add(){
+        document.write("line 1 "+"<br>");
+        return "Hello";//undefined
+    }
+    var back = add();
+    document.write("back="+back+"<br>");//hello / undefined
+ */
+/* 
+    function add(a, b){
+        var c = a + b;
+        return c;
+    }
+    var back = add(2,3);
+    document.write("back="+back+"<br>");//5
+    back = add(4,5);
+    document.write("back="+back+"<br>");//9 */
+
+    var mainStr = "Main string";//Global variable
+    document.write("Main call mainStr="+mainStr+"<br>");
+
+    function fun1(){
+        var funStr = "fun1 string";//local variable
+        document.write("Fun1 call mainStr="+mainStr+"<br>");
+        mainStr = "Fun1 modified!";
+        document.write("Fun1 call mainStr="+mainStr+"<br>");
+        document.write("Fun1 call funStr="+funStr+"<br>");
+    }
+    fun1();
+    function fun2(){
+        var funStr = "fun2 string";//local variable
+        document.write("Fun2 call mainStr="+mainStr+"<br>");
+        document.write("Fun2 call funStr="+funStr+"<br>");//NO
+    }
+    fun2();
+    // document.write("Main call funStr="+funStr+"<br>"); //NO
+
+    // var a = 3;
+    // var a = 7;
+    // a = 5;
+
+    // let a = 3;
+    // let a = 7;//NO
+    // var a = 7;//NO
+    // a = 5;
+
+    // const a = 3;
+    // const a = 7;//no
+    // var a =7;//no
+    // let a = 7;//no
+    // a = 5;//no
+    // document.write("a="+a+"<br>");
+
+</script>
+</head>
+
+<body>
+</body>
+</html>

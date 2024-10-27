@@ -1,0 +1,58 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>jQuery addClass</title>
+
+    <style type="text/css">
+        .main {
+            width: 200px;
+			height:400px;
+            margin: 0 auto;
+            margin-top: 50px;
+			background:pink;
+        }
+        .show{
+			width: 400px;
+			height:200px;
+			background:orange;
+		}
+    </style>
+
+    <script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript">
+	$(document).ready(init);
+	function init()
+	{
+        $("#btn1").click(btn1Handler);
+        $("#btn2").click(btn2Handler);
+        $("#btn3").click(btn3Handler);
+	}
+    function btn1Handler(){
+        // alert($(".myDiv1").text());
+        // $(".myDiv1").text("Hello");
+        $(".myDiv1").text("<hr>");
+    }
+    function btn2Handler(){
+        // alert($(".myDiv2").html());
+        // $(".myDiv2").html("Hello");
+        $(".myDiv2").html("<hr>");
+    }
+    function btn3Handler(){
+        // alert($(".myInput").val());
+        $(".myInput").val("Hello");
+    }
+	</script>  
+</head>
+<body>
+    <!-- &lt;hr&gt;
+    <hr> -->
+    <input type="button" value="Btn 1" id="btn1"/>
+    <input type="button" value="Btn 2" id="btn2"/>
+    <input type="button" value="Btn 3" id="btn3"/>
+    <div class="myDiv1">Div 1 Text!</div>
+    <div class="myDiv2">Div 2 Text!</div>
+    <input type="text" value="Input text" class="myInput"/>
+</body>
+</html>

@@ -1,0 +1,103 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<title>jQuery Selector</title>
+<style type="text/css">
+body {
+	margin: 0;
+	padding: 0;
+	font: 12px / 1.5 Arial, Georgia, Times, "Times New Roman", serif;
+}
+.main {
+	width: 800px;
+	margin: 0 auto;
+	margin-top: 50px;
+}
+#demo {
+	width: 250px;
+	height: 400px;
+	border: 1px dotted gray;
+	background: #da9999;
+	float: left;
+	padding: 10px;
+	padding-left:20px;
+}
+button {
+	font: 14px / 1.5 Arial, Georgia, Times, "Times New Roman", serif;
+}
+.demo1 {
+	width:50px;
+	height:50px;
+	border:1px dotted black;
+	text-align:center;
+	padding:20px;
+	margin-right:10px;
+	margin-bottom:10px;
+	float:left;
+}
+.show {
+	background:black;
+	color:white;
+}
+</style>
+<script type="text/javascript" src="../jquery.js"></script>
+<script type="text/javascript">
+$(document).ready(init);
+function init()
+{
+	// $(".demo1").addClass("show");
+	// $(".demo1:first").addClass("show");
+	// $(".demo1:last").addClass("show");
+	// $(".demo1:not(:first)").addClass("show");//!not 
+
+	// $(".demo1:even").addClass("show");
+	// $(".demo1:odd").addClass("show");
+
+	// $(".demo1:lt(3)").addClass("show");//lt(3) less than 3
+	// $(".demo1:eq(1)").addClass("show");//eq(1) equal to 1
+	// $(".demo1:gt(2)").addClass("show");//gt(2) greater than 2
+
+	// $(".demo1:eq(2),.demo1:eq(3)").addClass("show");//eq(1) equal to 1
+
+	// $(".demo1:lt(2)").addClass("show");
+	// $(".demo1:lt(4):gt(1)").addClass("show");
+	$(".demo1:gt(1):lt(2)").addClass("show");
+	//先早出比1大的 再用找出來的去算比2小的
+
+	// $(".demo1:gt(3)").addClass("show");
+
+
+
+}
+</script>  
+</head>
+<body>
+<div class="main">
+  <h1>Selector</h1>
+  <br/>
+  <div id="demo">
+    <h1>Selector Demo</h1>
+    <div id="first" class="demo1">DIV
+      <p>ID=first</p>
+    </div>
+    <div id="second" class="demo1">DIV
+      <p>ID=second</p>
+    </div>
+    <div id="third" class="demo1">DIV
+      <p>ID=third</p>
+    </div>
+    <div id="fourth" class="demo1">DIV
+      <p>ID=fourth</p>
+    </div>
+    <div id="fifth" class="demo1">DIV
+      <p>ID=fifth</p>
+    </div>
+    <div id="sixth" class="demo1">DIV
+      <p>ID=sixth</p>
+    </div>
+  </div>
+</div>
+</body>
+</html>

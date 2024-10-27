@@ -1,0 +1,71 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Level Selector</title>
+<style>
+div{
+	border:1px solid black;
+	background:#CCC;
+	margin:5px;
+	padding:5px;	
+}
+
+span{
+	border:1px red solid;
+}
+
+.show{
+	background:black;
+	color:white;
+}
+</style>
+
+<script type="text/javascript" src="../jquery.js"></script>
+<script type="text/javascript">
+$(document).ready(init);
+function init()
+{
+	// $("span").addClass("show");
+	// $("body span").addClass("show");
+	// $("body>span").addClass("show");
+    // $("div span").addClass("show");
+
+    // $("div+span").addClass("show");
+    // $("div~span").addClass("show");
+
+    // $("#myDiv+span").addClass("show");//1
+    // $("#myDiv~span").addClass("showk");//4
+
+    // $("#div2+span").addClass("show");//1
+    // $("#div2~span").addClass("show");//2
+    // $("#div1+span").addClass("show");//0
+    // $("#div1~span").addClass("show");//2
+
+    // $("#myDiv span,#myDiv div").addClass("show");
+    $("#myDiv *").addClass("show");
+
+}
+</script>  
+</head>
+    <body>
+        <span>I am a span</span>
+        <div id="myDiv">
+            <span>I am the first span in div</span>
+            <span>I am the second span in div</span>
+            <div id="div1">First div inside div</div>
+            <div id="div2">Second div inside div</div>
+            <span>I am the third span in div</span>
+            <span>I am the fourth span in div</span>
+        </div>
+        <span>I am the first span outside div</span>
+        <span>I am the second span outside div</span>
+		<div>
+            <span>I am the first span in div</span>
+			<span>I am the second span in div</span>
+        </div>
+		<span>I am the first span outside div</span>
+        <span>I am the second span outside div</span>
+    </body>
+</html>

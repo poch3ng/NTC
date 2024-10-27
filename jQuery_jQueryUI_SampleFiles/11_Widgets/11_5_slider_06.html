@@ -1,0 +1,58 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>jQuery UI Example Page</title>
+	<link rel="stylesheet" href="../themes/ui-lightness/jquery-ui.css" />
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../jquery-ui.js"></script>
+	
+	<script type="text/javascript">
+	//補充範例 相片範圍
+	$(document).ready(init);
+	function init(){
+		for (var i=1; i<=8; i++){
+			$("#myPhoto").append("<img src='../images/ch02_05_0"+i+"_l.jpg' />");
+		}
+		$("#mySlider").slider({
+			min:0,
+			max:7,
+			range:true,
+			values: [2,5],
+			change:changeHandler,
+			create:changeHandler
+		});
+	}
+	var speed = 0;
+	function changeHandler(event){
+		var values = $("#mySlider").slider("values");
+		$("#info").text(values);
+		$("img:lt("+values[0]+")").hide(speed);
+		$("img:gt("+values[1]+")").hide(speed);
+		$("img:not(:lt("+values[0]+"),:gt("+values[1]+"))").show(speed);
+		speed= 1000;
+	}
+	</script>
+	<style>
+		#mySlider{
+			width:50%;
+			margin:auto;
+		}
+		img{
+			width:200px;
+		}
+		#myPhoto{
+			width:800px;
+			margin:auto;
+		}
+	</style>
+</head>
+<body>
+<h1>Slider Photos</h1>
+<div id="info">info</div>
+<div id="mySlider"></div>
+<br />
+<div id="myPhoto"></div>
+</body>
+</html>

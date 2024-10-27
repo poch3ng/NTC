@@ -1,0 +1,65 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Siblings demo</title>
+  <style>
+  div,p,span {
+    width: 70px;
+    height: 70px;
+	display:block;
+    background: #abc;
+    border: 2px solid black;
+    margin: 10px;
+    float: left;
+  }
+  .show {
+    border-color: red;
+  }
+  </style>
+<script type="text/javascript" src="../jquery.js"></script>
+<script type="text/javascript">
+	$(document).ready(init);
+	function init(){
+    // $("div:eq(3)").addClass("show");
+
+    // $("div:eq(3)+span").addClass("show");
+    // $("div:eq(3)").next("span").addClass("show");
+    // $("div:eq(3)").next().addClass("show");
+
+    // $("div:eq(3)~span").addClass("show");
+    // $("div:eq(3)").nextAll("span").addClass("show");
+    // $("div:eq(3)").nextAll().addClass("show");
+    // $("div:eq(3)").nextAll(".xyz").addClass("show");
+    // $("div:eq(3)").nextUntil(".def").addClass("show");
+
+    // $("div:eq(3)").prev("span").addClass("show");
+    // $("div:eq(3)").prev().addClass("show");
+    // $("div:eq(3)").prev().prev().addClass("show");
+
+    // $("div:eq(3)").prevAll("span").addClass("show");
+    // $("div:eq(3)").prevAll().addClass("show");
+    // $("div:eq(3)").prevAll(".xyz").addClass("show");
+    // $("div:eq(3)").prevUntil(".def").addClass("show");
+
+    // $("div:eq(3)").siblings().addClass("show");
+    // $("div:eq(3)").siblings("div").addClass("show");
+    $("div:eq(3)").siblings(".xyz").addClass("show");
+  }
+</script>
+</head>
+<body>
+    <div class="abc">div0</div>
+    <span class="def">span1</span>
+    <div class="xyz">div1</div>
+    <div class="abc">div2</div>
+    <span class="xyz">span2</span>
+    <div>DIV3</div>
+    <span class="xyz">span3</span>
+    <div class="abc">div4</div>
+    <div class="xyz">div5</div>
+    <span class="def">span4</span>
+    <div class="abc">div6</div>
+</body>
+</html>

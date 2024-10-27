@@ -1,0 +1,54 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>互動廣告</title>
+  <link type="text/css" rel="stylesheet" href="styles/default.css" />
+  <script type="text/javascript" src="../jquery.js"></script>
+  <script type="text/javascript">
+    $(document).ready(init);
+    function init() {
+        // $("#showin-button").click(inHandler);
+        // $("#showout-button").click(outHandler);
+        $("#aniBanner").click(toggleHandler);
+    }
+    function inHandler(){
+      $("#aniBanner").animate({left: "0px"}, 400);
+    }
+    function outHandler(){
+      $("#aniBanner").animate({left: "-170px"}, 400);
+    }
+    var flag = true;
+    function toggleHandler(){
+      if(flag){
+        $("#aniBanner").animate({left: "0px"}, 400);
+      }else{
+        $("#aniBanner").animate({left: "-170px"}, 400);
+      }
+      flag = !flag;//not
+    }
+    //left:-170px;
+  </script>
+</head>
+
+<body>
+  <div id="aniBanner">
+    <div class="left-side">
+      <div class="prod-img"></div>
+      <h1>Creative Suite 5 Web
+        Premium</h1>
+      <p>Redefine the extraordinary
+        in web design and
+        development.</p>
+    </div>
+    <div class="right-side">
+      <a id="showin-button">banner in</a> 
+      <a id="showout-button">banner out</a>
+    </div>
+  </div>
+</body>
+
+</html>

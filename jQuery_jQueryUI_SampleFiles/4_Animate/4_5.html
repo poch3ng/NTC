@@ -1,0 +1,56 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<title>jQuery stop</title>
+<style type="text/css">
+div{
+    background-color: #999966;
+    font: normal 90% "Arial", "Trebuchet MS", "Lucida Grande", Verdana, Sans-Serif;
+    color: white;
+    width: 100px;
+    height: 40px;
+    border: 1px solid #666633;
+    overflow: hidden;
+}
+button{
+    font: normal 90% "Arial", "Trebuchet MS", "Lucida Grande", Verdana, Sans-Serif;
+}
+</style>
+<script type="text/javascript" src="../jquery.js"></script>
+<script type="text/javascript">
+$(document).ready(init);
+function init()
+{
+	$("#show").click(showHandler);
+	$("#stop").click(stopHandler);
+}
+function showHandler(){
+    $("#myshow").animate({"width":"90%",height:"200px"}, 1200)
+                .delay(200)
+                .animate({fontSize:"10em"}, 1200)
+                .animate({opacity:0.3}, 1200);
+     $("#myshow1").animate({"width":"90%",height:"200px"}, 1200)
+                .delay(200)
+                .animate({opacity:0.3}, 1200)
+                .animate({fontSize:"10em"}, 1200);
+}
+function stopHandler(){
+    // $("#myshow").stop()
+    // $("#myshow").stop(false,false);//clearQuere jumpToEnd
+    // $("#myshow").stop(false, true);
+    
+    // $("#myshow").finish();
+    $(":animated").finish();
+}
+</script>  
+</head>
+<body>
+    <h1>animate</h1>
+    <button id="show">Show</button>
+    <button id="stop">Stop</button>
+    <div id="myshow"> Look </div>
+    <div id="myshow1"> Look </div>
+</body>
+</html>

@@ -1,0 +1,39 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>jQuery UI Example Page</title>
+	<link rel="stylesheet" href="../themes/ui-lightness/jquery-ui.css" />
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../jquery-ui.js"></script>
+	
+	<script type="text/javascript">
+	$(document).ready(init);
+	function init(){
+		$("#myProgressbar").progressbar({
+			disabled: false,
+			value: 50,//number false
+			max: 200
+		})
+	}
+	</script>
+	<style>
+	/*
+		CSS結構：
+		ui-progressbar:進度列元件的外框
+			ui-progressbar-value: 進度列已經完成的部分
+				ui-progressbar-overlay: 不明狀態的動態呈現
+	*/
+		.ui-progressbar{
+			margin:auto;
+			width:50%;
+			position:relative;
+		}
+	</style>
+</head>
+<body>
+<h1>Progressbar</h1>
+<div id="myProgressbar"></div>
+</body>
+</html>

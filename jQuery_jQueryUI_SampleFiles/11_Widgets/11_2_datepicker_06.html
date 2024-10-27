@@ -1,0 +1,88 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>jQuery UI Example Page</title>
+	<link rel="stylesheet" href="../themes/ui-lightness/jquery-ui.css" />
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../jquery-ui.js"></script>
+	
+	<script type="text/javascript">
+	$(document).ready(init);
+	function init(){
+		$("#myDatepicker").datepicker({
+			dateFormat: "yy/mm/dd"
+		});
+		$("button:eq(0)").click(disableHandler);
+		$("button:eq(1)").click(enableHandler);
+		$("button:eq(2)").click(showHandler);
+		$("button:eq(3)").click(hideHandler);
+		$("button:eq(4)").click(optionHandler);
+		$("button:eq(5)").click(getDateHandler);
+		$("button:eq(6)").click(setDateHandler);
+		$("button:eq(7)").click(dialogHandler);
+		$("button:eq(8)").click(destroyHandler);
+		$("button:eq(9)").click(rebuildHandler);
+		$("button:eq(10)").click(isDisabledHandler);
+	};
+	function disableHandler(){
+		$("#myDatepicker").datepicker("disable");
+	}
+	function enableHandler(){
+		$("#myDatepicker").datepicker("enable");
+	}
+	function showHandler(){
+		$("#myDatepicker").datepicker("show");
+	}
+	function hideHandler(){
+		$("#myDatepicker").datepicker("hide");
+	}
+	function optionHandler(){
+		$("#myDatepicker").datepicker("option","numberOfMonths",2);
+		$("#myDatepicker").datepicker("show");
+	}
+	function getDateHandler(){
+		alert($("#myDatepicker").datepicker("getDate"));
+	}
+	function setDateHandler(){
+		$("#myDatepicker").datepicker("setDate","2024/10/12");
+		$("#myDatepicker").datepicker("show");
+	}
+	function dialogHandler(){
+		$("#myDatepicker").datepicker("dialog","2024/10/12");
+	}
+	function destroyHandler(){
+		$("#myDatepicker").datepicker("destroy");
+	}
+	function rebuildHandler(){
+		$("#myDatepicker").datepicker();
+	}
+	function isDisabledHandler(){
+		alert($("#myDatepicker").datepicker("isDisabled"));
+	}
+	//完全沒有event 
+	
+	</script>
+	<style>
+	</style>
+</head>
+<body>
+
+<h1>Datepicker Methods</h1>
+<button>disable</button>
+<button>enable</button>
+<button>show</button>
+<button>hide</button>
+<button>option</button>
+<button>getDate</button>
+<button>setDate</button>
+<button>dialog</button>
+<button>destroy</button>
+<button>rebuild</button>
+<button>isDisabled</button>
+<br />
+
+<p>Date: <input type="text" id="myDatepicker" autocomplete="off"></p>
+</body>
+</html>

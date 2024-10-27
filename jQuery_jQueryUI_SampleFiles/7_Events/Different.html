@@ -1,0 +1,87 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>JavaScript</title>
+<style type="text/css">
+body{
+	margin:0px;
+	font-size: 2em;
+}
+ #myDiv{
+	 position:relative;
+	 width:852px;
+	 height:568px;
+}
+.mask{
+	/* background:orange;
+	background-color:transparent; 
+	opacity:0.5;*/
+	position:absolute;
+	/* top:0px;
+	left:0px;
+	width:100px;
+	height:100px;  */
+}
+.mask1{
+	left:100px;
+	top:327px;
+	width:42px;
+	height:36px;
+}
+.mask2{
+	left:63px;
+	top:452px;
+	width:82px;
+	height:50px;
+}
+.mask3{
+	left:382px;
+	top:286px;
+	width:44px;
+	height:88px;
+}
+.mask4{
+	left:54px;
+	top:316px;
+	width:25px;
+	height:25px;
+}
+.mask5{
+	left:170px;
+	top:244px;
+	width:50px;
+	height:42px;
+}
+</style>
+<script type="text/javascript" src="../jquery.js"></script>
+<script type="text/javascript">
+$(document).ready(init);
+function init(){
+	$(".mask").one("click",countHandler)
+}
+var index = 0;
+function countHandler(){
+	$(this).css("border", "3px solid red");
+	index++;
+	$("#info").text("Your have found "+ index +"/5");
+	if(index == 5) $("#info").text("You complete!");
+}
+
+</script>
+
+</head>
+
+<body>
+<div id="myDiv">
+	<img src="images/different.jpg" />
+    <div class="mask mask1"></div>
+    <div class="mask mask2"></div>
+    <div class="mask mask3"></div>
+    <div class="mask mask4"></div>
+    <div class="mask mask5"></div>
+</div>
+<div id="info">Your have found 0/5</div>
+</body>
+</html>

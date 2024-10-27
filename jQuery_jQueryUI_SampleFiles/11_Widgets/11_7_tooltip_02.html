@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>jQuery UI Example Page</title>
+	<link rel="stylesheet" href="../themes/ui-lightness/jquery-ui.css" />
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../jquery-ui.js"></script>
+	
+	<script type="text/javascript">
+	$(document).ready(init);
+	function init(){
+		$("#outer").tooltip();
+		$("button:eq(0)").click(disableHandler);
+		$("button:eq(1)").click(enableHandler);
+		$("button:eq(2)").click(optionHandler);
+		$("button:eq(3)").click(openHandler);
+		$("button:eq(4)").click(closeHandler);
+		$("button:eq(5)").click(destoryHandler);
+		$("button:eq(6)").click(rebuildHandler);
+	}
+	function disableHandler(){
+		$("#outer").tooltip("disable");
+	}
+	function enableHandler(){
+		$("#outer").tooltip("enable");
+	}
+	function optionHandler(){
+		$("#outer").tooltip("option",{position:{my:"left top",at:"right top"}});
+	}
+	function openHandler(){
+		$("#outer").tooltip("open");
+	}
+	function closeHandler(){
+		$("#outer").tooltip("close");
+	}
+	function destoryHandler(){
+		$("#outer").tooltip("destroy");
+	}
+	function rebuildHandler(){
+		$("#outer").tooltip();
+	}
+	</script>
+	<style>
+	#outer{
+		width:300px;
+		height:300px;
+		margin:auto;
+		border:1px gray dotted;
+	}
+	#myDiv{
+		width:200px;
+		height:200px;
+		background:silver;
+	}
+	.myStyle{
+		background:blue;
+		color:cyan;
+		border:dotted;
+	}
+	</style>
+</head>
+<body>
+<h1>Tooltip Methods</h1>
+<button>disable</button>
+<button>enable</button>
+<button>option</button>
+<button>open</button>
+<button>close</button>
+<button>destroy</button>
+<button>rebuild</button>
+<br><br><br>
+<div id="outer" title="This is a outer div!">
+	<div id="myDiv" title="This is a div!">Div</div>
+	<p>Here is a <a href="http://www.google.com" title="This is a link!">link!</a></p>
+	<p>Here is a <a href="#" title="This is another link!">link!</a></p>
+
+	<p><label for="myInput">Input here:</label><input id="myInput" title="This is an input!"></p>
+</div>	
+</body>
+</html>

@@ -1,0 +1,87 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <title>jQuery Ajax</title>
+        <style type="text/css">
+            body, select {
+                margin: 0;
+                padding: 0;
+                font: 12px / 1.5 Arial, Georgia, Times, "Times New Roman", serif;
+            }
+            
+            .main {
+                width: 800px;
+                margin: 0 auto;
+                margin-top: 100px;
+            }
+            
+            #demo {
+                width: 400px;
+                height: 500px;
+                border: 1px dotted gray;
+                background: #FFFFFF;
+                float: left;
+                padding: 10px;
+                padding-left: 25px;
+				overflow:auto;
+            }
+            
+            input, button {
+                font: 14px / 1.5 Arial, Georgia, Times, "Times New Roman", serif;
+            }
+            
+            .mySelect {
+                background: #c8c8c8;
+                padding: 5px;
+                border: 5px solid #7ca9ec;
+            }
+            ul{
+					font-size:24px;
+					color:pink;
+			}
+            img{
+				width:70%;
+				}
+        </style>
+
+		<script type="text/javascript" src="../jquery.js"></script>
+        <script type="text/javascript">
+            $(document).ready(init);            
+            function init() {
+                $("#button1").click(btn1Handler);
+                $("#button2").click(btn2Handler);
+            }
+            function btn1Handler(){
+                // $("#demo").load("a.htm");
+                $("#demo").load("b.htm img:nth-child(3n+1)");
+            }
+            function btn2Handler(){
+                //$("#demo").load("b.htm");
+                // $("#demo").load("b.htm img");
+                $("#demo").load("b.htm img:nth-child(3n+2)");
+            }
+//AJAX: Asynchrons JavaScript And XML
+        </script>  
+    </head>
+    <body>
+        <div class="main">
+            <h1>Ajax</h1>
+            
+                <p>
+                    <button id="button1">
+                        Click 1
+                    </button>
+                </p>
+                 <p>
+                    <button  id="button2">
+                        Click 2
+                    </button>
+                </p>
+            <div id="demo">
+               
+            </div>
+        </div>
+    </body>
+</html>

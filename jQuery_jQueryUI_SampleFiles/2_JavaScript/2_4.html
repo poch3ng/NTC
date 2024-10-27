@@ -1,0 +1,32 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Comparison</title>
+<style type="text/css">
+</style>
+<script type="text/javascript">
+    var x = 5;
+    var y = "5";
+    var z = 3;
+    document.write((x == z) +"<br>");//false
+    document.write((x > z) +"<br>");//true
+    //< <= == != >= >
+    document.write((x == y) +"<br>");//true
+    document.write((x != y) +"<br>");//false
+
+    document.write((x === y) +"<br>");//false 不轉型
+    document.write((x !== y) +"<br>");//true
+
+    document.write((0 == "") +"<br>");//true 會轉型 string -> number
+    document.write((0 == " ") +"<br>");//true 會轉型 string -> number
+    document.write(("" == " ") +"<br>");//false 兩邊都 string 所以不須轉型，所以比較後為false
+
+
+</script>
+</head>
+
+<body>
+</body>
+</html>

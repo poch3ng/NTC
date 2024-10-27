@@ -1,0 +1,53 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>jQuery Filter</title>
+<style type="text/css">
+div{
+	width:300px;
+	/* height:100px; */
+	border:1px solid gray;
+	padding:10px;
+	background:#666;
+	color:white;
+}
+
+.content{
+	color:red;
+	font-size:16px;
+	font-weight:bold;
+	padding:5px;
+	background:white;
+}
+</style>
+
+<script type="text/javascript" src="../jquery.js"></script>
+<script type="text/javascript">
+$(document).ready(init);
+function init()
+{
+	// $("div").before("<p>before</p>");
+	// $("div").prepend("<p>prepend</p>");
+	// $("div").append("<p>append</p>");
+	// $("div").after("<p>after</p>");
+
+	// $("<p>insertBefore</p>").insertBefore("div");
+	// $("<p>prependTo</p>").prependTo("div");
+	// $("<p>appendTo</p>").appendTo("div");
+	// $("<p>insertAfter</p>").insertAfter("div");
+
+	// $("<p>insertAfter</p>").insertAfter("div").fadeOut(2000);
+	$("div").after("<p>after</p>").fadeOut(2000);
+}
+</script>  
+</head>
+<body>
+
+<div>
+	<p class="content">Content</p>
+</div>
+
+</body>
+</html>

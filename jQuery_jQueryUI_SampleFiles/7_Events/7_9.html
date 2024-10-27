@@ -1,0 +1,49 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <title>triggerHandler</title>
+        <style type="text/css">
+            html {
+                color: white;
+                background-color: #2f2a3e;
+                font: normal 76% "Arial", "Trebuchet MS", "Lucida Grande", Verdana, Sans-Serif;
+            }
+            
+            a {
+                color: white
+            }
+        </style>
+
+        <script type="text/javascript" src="../jquery.js"></script>
+		<script type="text/javascript">
+		$(document).ready(init);
+		function init()
+		{
+			$(":text").focus(focusHandler);
+            $("#aa").click(aaHandler);
+            $("#bb").click(bbHandler);
+		}
+        function aaHandler(){
+            $(":text").trigger("focus");
+        }
+        function bbHandler(){
+            $(":text").triggerHandler("focus");
+        }
+
+function focusHandler(){
+            $("#appendText").remove();
+            $("body").append("<span id='appendText'>Focused!</span>");
+            $("#appendText").fadeOut(2000);
+        }
+		</script>  
+    </head>
+    <body>
+        <a href="#" id="aa">trigger</a>
+        | <a href="#" id="bb">triggerHandler</a>
+        <br/>
+        <br/>
+        Name:<input type="text" size="20" value="I Love jQuery"/>
+    </body>
+</html>

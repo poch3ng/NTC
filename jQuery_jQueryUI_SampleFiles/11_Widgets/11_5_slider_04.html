@@ -1,0 +1,68 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>jQuery UI Example Page</title>
+	<link rel="stylesheet" href="../themes/ui-lightness/jquery-ui.css" />
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../jquery-ui.js"></script>
+	
+	<script type="text/javascript">
+	$(document).ready(init);
+	function init(){
+		$("#mySlider").slider({
+			disabled:false,
+			min:0,
+			max:50,
+			values: [20,30],
+			create:createHandler,
+			start:startHandler,
+			slide:slideHandler,
+			stop:stopHandler,
+			change:changeHandler
+			//create start slide stop change
+		});
+	}
+	var info="";
+	function createHandler(event,ui){
+		var value = $("#mySlider").slider("value");
+		info+="create ";
+		output(info);
+	}
+	function startHandler(event,ui){
+		info+="start ";
+		output(info);
+	}
+	function slideHandler(event,ui){
+		var value = ui.values;
+		$("#info").text("value="+value);
+		info+="slide ";
+		output(info);
+	}
+	function changeHandler(event,ui){
+		info+="change ";
+		output(info);
+	}
+	function stopHandler(event,ui){
+		info+="stop ";
+		output(info);
+	}
+	function output(str){
+		$("#info").text(str);
+	}
+	</script>
+	<style>
+		#mySlider{
+			width:50%;
+			margin:auto;
+		}
+	</style>
+</head>
+<body>
+<h1>Slider Events</h1>
+<br>
+<div id="info">info</div>
+<div id="mySlider"></div>
+</body>
+</html>

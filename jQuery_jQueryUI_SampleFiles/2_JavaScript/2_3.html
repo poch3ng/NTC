@@ -1,0 +1,142 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Operators</title>
+<style type="text/css">
+</style>
+<script type="text/javascript">
+    var a = 1;
+
+    a = a + 1;
+    a += 1;
+    a++;
+    ++a;
+
+    a = a - 1;
+    a -= 1;
+    a--;
+    --a;
+
+    a = a * 2;
+    a *= 2;
+
+    a = a / 2;
+    a /= 2;
+
+    a = a % 2;
+    a %= 2;
+
+    //a = 1;
+    //a = a++ + ++a;//4
+    // a = 1 + (2+1);//4
+    // a = a++ + a--;//3
+    //a = 1 + 2;//3
+
+    a = 3;//number
+    a = 3.3;//number
+    a = -3.3;//number
+
+    // a = Number("3.3");//number 3.3
+    // a = Number("3.3px");//number NaN:Not a Number
+    // a = Number("abc3.3");//number NaN:Not a Number
+    // a = Number(" 3.3 ");//number 3.3
+    // a = Number(" ");//number 0
+    // a = Number("");//number 0
+    // a = Number(null);//number 0
+    // a = Number(undefined);//number NaN:Not a Number
+    // a = Number(true);//number 1
+    // a = Number(false);//number 0
+
+    // a = parseFloat("3.3");//number 3.3
+    // a = parseFloat("3.3px");//number 3.3
+    // a = parseFloat("abc3.3");//number NaN:Not a Number
+    // a = parseFloat(" 3.3 ");//number 3.3
+    // a = parseFloat(" ");//number  NaN:Not a Number
+    // a = parseFloat("");//number  NaN:Not a Number
+    // a = parseFloat(null);//number  NaN:Not a Number
+    // a = parseFloat(undefined);//number NaN:Not a Number
+    // a = parseFloat(true);//number  NaN:Not a Number
+    // a = parseFloat(false);//number  NaN:Not a Number
+
+    // a = parseInt("3.3");//number 3
+    // a = parseInt("3.3px");//number 3
+    // a = parseInt("abc3.3");//number NaN:Not a Number
+    // a = parseInt(" 3.3 ");//number 3
+    // a = parseInt(" ");//number  NaN:Not a Number
+    // a = parseInt("");//number  NaN:Not a Number
+    // a = parseInt(null);//number  NaN:Not a Number
+    // a = parseInt(undefined);//number NaN:Not a Number
+    // a = parseInt(true);//number  NaN:Not a Number
+    // a = parseInt(false);//number  NaN:Not a Number
+
+    // document.write("a="+a+"<br>");
+    // document.write("typeof="+typeof(a)+"<br>");
+
+    var str = "Hello";//string
+    str = 'world';//string
+    str = "Hello" + ' world';
+
+    str = String(3);//string
+    str = String(null);//string "null"
+    // document.write("str="+str+"<br>");
+    // document.write("typeof="+typeof(str)+"<br>");
+
+
+    var bol = true;//boolean
+    bol = false;//boolean
+    bol = !false;//not true
+
+    bol = Boolean(1);//boolean true
+    bol = Boolean(-1);//boolean true
+    bol = Boolean(0);//boolean false
+    bol = Boolean(NaN);//boolean false
+    bol = Boolean("a");//boolean true
+    bol = Boolean(" ");//boolean true
+    bol = Boolean("");//boolean false
+    bol = Boolean(undefined);//boolean false
+    bol = Boolean(null);//boolean false
+    bol = Boolean({});//boolean true
+
+    // document.write("str="+bol+"<br>");
+    // document.write("typeof="+typeof(bol)+"<br>");
+
+
+    // var b;//undefined
+    // document.write("b="+b+"<br>");
+    /*
+    var verylongvariable = 1;
+    var veryLongVariable = 1;
+    veryLongVariable = veryLongVariable + 1;
+    veryLongVariable += 1;
+    veryLongVariable++;
+    //a~z A~Z 0~9 _$
+    document.write(Math.PI+"<br>");
+    */
+
+//    var obj = document.getElementById("s1");//null
+//     document.write(obj)
+</script>
+</head>
+
+<body>
+    <span id="s1">5</span>+<span id="s2">2</span>=<span id="s3">?</span><br>
+    <span id="s4">5</span>-<span id="s5">2</span>=<span id="s6">?</span><br>
+    <script>
+    // var s1 = document.getElementById("s1");//HTMLSpanElement <span id="s1">5</span>
+    var s1 = document.getElementById("s1").innerHTML;//"5"
+    var s2 = document.getElementById("s2").innerHTML;//"2"
+    // document.getElementById("s3").innerHTML= s1 + s2;//"5"+"2"=>"52"
+    document.getElementById("s3").innerHTML= Number(s1) + Number(s2);//7
+    // document.write(s2+"<br>")
+    // document.write("typeof="+typeof(s2)+"<br>");
+
+    var s4 = document.getElementById("s4").innerHTML;//"5"
+    var s5 = document.getElementById("s5").innerHTML;//"2"
+    document.getElementById("s6").innerHTML=s4 - s5;//3
+    // document.getElementById("s6").innerHTML= Number(s4) - Number(s5);//
+
+    </script>
+</body>
+</html>

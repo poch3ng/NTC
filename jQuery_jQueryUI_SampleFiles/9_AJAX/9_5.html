@@ -1,0 +1,82 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>jQuery</title>
+       
+        <style type="text/css">
+            body {
+                background-color: black;
+                color: #ACACB0;
+            }
+        </style>
+
+        <script type="text/javascript" src="../jquery.js">
+        </script>
+        <script type="text/javascript">
+            $(document).ready(init);
+			
+			function init(){
+				$.ajax({
+					type: "GET",
+					url: "books.xml",
+					success: successHandler,
+					error: errorHandler,
+					dataType: "xml"
+				})
+            }
+			function successHandler(data){
+				// alert(data);//XMLDocument
+				// $("div",document);
+				// alert($("book", data).length);//46
+				// $("book", data).each(eachFun);
+				$("book:nth-child(2n+1)", data).each(eachFun);
+			}
+			var bookNum = 1;
+			function eachFun(){
+				var bookTitle = $("title", this).text();
+				var bookAuthor = $("author", this).text();
+				var bookPublisher = $("publisher", this).text();
+				var bookIsbn = $("isbn", this).text();
+				$("body").append(bookNum+".<br>"+bookTitle+"<br>"+bookAuthor+"<br>"+bookPublisher+"<br>"+bookIsbn+"<br>"+"<hr>");
+				bookNum++;
+			}
+			function errorHandler(){
+				alert("Error!");
+			}
+
+	/*
+	<bestsellers>		
+		<book>
+			<title>Shadow Dance: A Novel</title>
+			<author>Julie Garwood</author>
+			<publisher>Ballantine Books</publisher>
+			<isbn>0345453867</isbn>
+		</book>
+		<book>
+			<title>Exile: A Novel</title>
+			<author>Richard North Patterson</author>
+			<publisher>Henry Holt and Co.</publisher>
+			<isbn>0805079475</isbn>
+		</book>
+		<book>
+			<title>Next</title>
+			<author>Michael Crichton</author>
+			<publisher>Henry Holt and Co.</publisher>
+			<isbn>001234678</isbn>
+		</book>
+		<book>
+			<title>Stalemate (Eve Duncan Forensics Thrillers)</title>
+			<author>Iris Johansen</author>
+			<publisher>Bantam</publisher>
+			<isbn>055380345X</isbn>
+		</book>
+	</bestsellers>
+*/
+        </script>
+    </head>
+    <body>
+            <h1>Books XML Test</h1>
+     </body>
+</html>

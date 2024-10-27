@@ -1,0 +1,68 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>jQuery UI Example Page</title>
+	<link rel="stylesheet" href="../themes/ui-lightness/jquery-ui.css" />
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../jquery-ui.js"></script>
+	
+	<script type="text/javascript">
+	var minDate;
+	var maxDate;
+	$(document).ready(init);
+	function init(){
+		$("#fromDatepicker").datepicker({
+			dateFormat: "yy/mm/dd",
+			changeMonth: true,
+			numberOfMonths: 2,
+			onClose: fromOnClose
+		});
+		$("#toDatepicker").datepicker({
+			dateFormat: "yy/mm/dd",
+			changeMonth: true,
+			numberOfMonths: 2,
+			onClose: toOnClose
+		});
+		$("#divDatepicker").datepicker({
+			dateFormat: "yy/mm/dd",
+			numberOfMonths:2
+		});
+		$(":text").focus(focusHandler);
+	}
+	function fromOnClose(date){
+		$("#toDatepicker").datepicker("option","minDate",date);
+		$("#divDatepicker").datepicker("option","minDate",date);
+		minDate = new Date(date).getTime();//1970/1/1/0/0/0
+	}
+	function toOnClose(date){
+		$("#fromDatepicker").datepicker("option","maxDate",date);
+		$("#divDatepicker").datepicker("option","maxDate",date);
+		maxDate = new Date(date).getTime();//1970/1/1/0/0/0
+		var convert = 24*60*60*1000;//86400000
+		$("#info").html((maxDate-minDate)/convert+1);
+		$("#divDatepicker").fadeIn(500);
+	}
+	function focusHandler(){
+		$("#divDatepicker").fadeOut(500);
+	}
+</script>
+	<style>
+	#divDatepicker{
+		position:absolute;
+		top:200px;
+		left:50px;
+		display:none;
+	}
+	</style>
+</head>
+<body>
+
+<h1>Datepicker Options</h1>
+<div id="info">info</div>
+<p>From: <input type="text" id="fromDatepicker" autocomplete="off"></p>
+<p> To : <input type="text" id="toDatepicker" autocomplete="off"></p>
+<div id="divDatepicker"></div>
+</body>
+</html>

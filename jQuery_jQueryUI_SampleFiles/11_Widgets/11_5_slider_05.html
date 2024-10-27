@@ -1,0 +1,64 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>jQuery UI Example Page</title>
+	<link rel="stylesheet" href="../themes/ui-lightness/jquery-ui.css" />
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../jquery-ui.js"></script>
+	
+	<script type="text/javascript">
+	var	red, green, blue;
+	$(document).ready(init);
+	function init(){
+		$("#red,#green,#blue").slider({
+			min: 0,
+			max: 255,
+			value: 0,
+			slide: slideHandler,
+			change: slideHandler
+		})
+	}
+	function slideHandler(event, ui){
+		red = $("#red").slider("value");
+		green = $("#green").slider("value");
+		blue = $("#blue").slider("value");
+
+		$("h1").text("rgb("+red+","+green+","+blue+")");
+		$("#swatch").css("backgroundColor","rgb("+red+","+green+","+blue+")");
+	}
+	</script>
+	<style>
+		#red, #green, #blue {
+			float: left;
+			clear: left;
+			width: 300px;
+			margin: 15px;
+		}
+		#swatch {
+			width: 120px;
+			height: 100px;
+			margin-top: 18px;
+			margin-left: 350px;
+			background-image: none;
+			background-color: rgb( 0, 0, 0);
+		}
+		#red .ui-slider-range { background: red; }
+		#red .ui-slider-handle { border-color: red; }
+		#green .ui-slider-range { background: green; }
+		#green .ui-slider-handle { border-color: green; }
+		#blue .ui-slider-range { background: blue; }
+		#blue .ui-slider-handle { border-color: blue; }
+	</style>
+</head>
+<body>
+<h1>Slider Swatch</h1>
+<br>
+<div id="red"></div>
+<div id="green"></div>
+<div id="blue"></div>
+ 
+<div id="swatch" class="ui-widget-content ui-corner-all"></div>
+</body>
+</html>

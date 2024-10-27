@@ -1,0 +1,93 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<title>jQuery Selector</title>
+<style type="text/css">
+body {
+	margin: 0;
+	padding: 0;
+	font: 12px / 1.5 Arial, Georgia, Times, "Times New Roman", serif;
+}
+.main {
+	width: 800px;
+	margin: 0 auto;
+	margin-top: 50px;
+}
+#demo {
+	width: 250px;
+	height: 20px;
+	border: 1px dotted gray;
+	background: #da9999;
+	float: left;
+	padding: 10px;
+	padding-left: 20px;
+}
+button {
+	font: 14px / 1.5 Arial, Georgia, Times, "Times New Roman", serif;
+}
+.demo1 {
+	width: 50px;
+	height: 50px;
+	border: 1px dotted black;
+	text-align: center;
+	padding: 20px;
+	margin-right: 10px;
+	margin-bottom: 10px;
+	float: left;
+}
+.show {
+	background: black;
+	color: white;
+}
+.hidden {
+	display: none;
+	width: 200px;
+	clear: both;
+}
+.link {
+	width: 200px;
+	clear: both;
+}
+</style>
+<script type="text/javascript" src="../jquery.js"></script>
+<script type="text/javascript">
+$(document).ready(init);
+function init()
+{
+	// $("a").addClass("show");
+	// $("a[id]").addClass("show");
+	// $("a[id='google']").addClass("show");
+	// $("a[id!='google']").add。Class("show");
+	// $("a[href^='http://tw']").addClass("show");
+	// $("a[href$='.pdf']").addClass("show");
+	// $("a[href*='goo']").addClass("show");
+	// $("a[href][id='google']").addClass("show");
+
+	// $("a[id='google']").addClass("show");
+
+	// $("a:not([href^='http://www.google.com'])").addClass("show");
+	$("a:not([href^='http://www.google.com'])").click(checkHandler);
+}
+function checkHandler(e){//event
+	// alert("Not my site!");
+	if(!confirm("Relly want to visit!"))e.preventDefault();
+}
+</script>  
+</head>
+<body>
+<div class="main">
+  <h1>Selector</h1>
+  <br />
+  <div id="demo">
+    <div class="link">
+		<a href="http://www.google.com" id="google">Google</a>
+		<a href="http://www.goog1e.com" id="google">Google</a>
+		<a href="http://tw.yahoo.com" class="yahoo">Yahoo</a>
+		<a href="http://www.google.com/download.pdf" id="download">Download</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

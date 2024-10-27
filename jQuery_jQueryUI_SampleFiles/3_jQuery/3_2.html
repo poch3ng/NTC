@@ -1,0 +1,30 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Ready</title>
+    <style type="text/css">
+    </style>
+    <script type="text/javascript" src="../jquery.js"></script>
+    <script type="text/javascript">
+        // $("target").jQueryFunction(inputValue);
+        alert("A");
+        $(document).ready(init);
+        alert("B");
+        function init(){
+            alert("C");
+            $("#myBtn").click(clickHandler);
+        }
+        alert("D");
+        function clickHandler(){
+            alert("E");
+        }
+        alert("F");
+        //ABDFC   EEE
+    </script>
+</head>
+<body>
+    <input type="button" value="Click me!" id="myBtn">
+</body>
+</html>

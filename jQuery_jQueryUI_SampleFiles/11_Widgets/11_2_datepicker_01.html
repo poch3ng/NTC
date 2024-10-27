@@ -1,0 +1,65 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>jQuery UI Example Page</title>
+	<link rel="stylesheet" href="../themes/ui-lightness/jquery-ui.css" />
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../jquery-ui.js"></script>
+	
+	<script type="text/javascript">
+	$(document).ready(init);
+	function init(){
+		$("#myDatepicker").datepicker({
+			dateFormat: "yy/mm/dd",
+			// dateFormat: "yy-mm:dd/oo",
+			// dateFormat: "yy年mm月dd日",
+
+			firstDay: 0,
+			isRTL: false,
+			constrainInput: true,
+			yearSuffix: " AD"
+		});
+	}
+			/*
+			d - day of month (no leading zero)
+			dd - day of month (two digit)
+			D - day name short
+			DD - day name long
+			m - month of year (no leading zero)
+			mm - month of year (two digit)
+			M - month name short
+			MM - month name long
+			y - year (two digit)
+			yy - year (four digit)
+			o - day of the year (no leading zeros)
+			oo - day of the year (three digit)
+			*/
+	</script>
+	<style>
+	/*
+	CSS結構：
+		ui-datepicker: datepicker的外框物件
+			ui-datepicker-header: datepicker得標頭外框
+				ui-datepicker-title: 含有年與月的標題
+					ui-datepicker-month: 月的文字
+					ui-datepicker-year: 年的文字
+			ui-datepicker-calendar: 下方月曆的外框
+				ui-datepicker-week-end: 包含週末的格子
+				ui-datepicker-other-month: 包含前後月分的格子
+				ui-datepicker-unselectable: 未被選取的格子
+				ui-datepicker-current-day: 被選取的格子
+				ui-datepicker-today: 日期為今天的格子
+			ui-datepicker-buttonpane: 下方按鈕區的外框
+				ui-datepicker-current:下方跳躍到今天的按鈕
+	*/
+	</style>
+</head>
+<body>
+
+<h1>Datepicker</h1>
+<input type="text" id="myDatepicker" autocomplete="off">
+<!-- <input type="date"> -->
+</body>
+</html>
