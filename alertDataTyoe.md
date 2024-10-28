@@ -1,3 +1,83 @@
+如果你在 SQL Server 中遇到 `STRING_SPLIT` 或其他函數無法辨識的錯誤，這可能是由於 SQL Server 版本不支援這些函數。你可以嘗試用另一種方法來分割和聚合字串。以下是處理此需求的另一種方法。
+
+### 方法：手動分割字串和聚合
+
+如果你的 SQL Server 不支援 `STRING_SPLIT` 和 `STRING_AGG`，可以使用遞迴 CTE（Common Table Expression）來手動分割字串。以下是一個範例，將 `ErrorCodes` 中的錯誤代碼手動分割並聚合對應的錯誤名稱。
+
+#### 範例：使用遞迴 CTE 分割和聚合字串
+
+1. **準備資料表**：
+   假設你有 `ErrCodeTable`（包含錯誤代碼和名稱）和 `MainTable`（包含要分割的錯誤代碼列表）。
+
+   ```sql
+   CREATE TABLE ErrCodeTable (
+       ErrCode CHAR(2),
+       ErrName VARCHAR(50)
+   );
+
+   INSERT INTO ErrCodeTable (ErrCode, ErrName)
+   VALUES ('J1', 'Error J1 Description'),
+          ('K3', 'Error K3 Description'),
+          ('L5', 'Error L5 Description');
+
+   CREATE TABLE MainTable (
+       ID INT,
+       Category VARCHAR(20),
+       ErrorCodes VARCHAR(50)
+   );
+
+   INSERT INTO MainTable (ID, Category, ErrorCodes)
+   VALUES (1, 'Category A', 'J1;K3;'),
+          (2, 'Category B', 'L5;J1;'),
+          (3, 'Category A', 'J1;L5;');
+   ```
+
+2. **使用遞迴 CTE 進行字串分割和聚合**：
+
+   ```sql
+   WITH SplitErrors AS (
+       SELECT 
+           ID,
+           Category,
+           LEFT(ErrorCodes, CHARINDEX(';', ErrorCodes + ';') - 1) AS ErrCode,
+           STUFF(ErrorCodes, 1, CHARINDEX(';', ErrorCodes + ';'), '') AS RemainingCodes
+       FROM MainTable
+       WHERE ErrorCodes IS NOT NULL
+       
+       UNION ALL
+       
+       SELECT 
+           ID,
+           Category,
+           LEFT(RemainingCodes, CHARINDEX(';', RemainingCodes + ';') - 1),
+           STUFF(RemainingCodes, 1, CHARINDEX(';', RemainingCodes + ';'), '')
+       FROM SplitErrors
+       WHERE RemainingCodes <> ''
+   )
+
+   SELECT 
+       m.ID,
+       m.Category,
+       m.ErrorCodes,
+       STUFF(
+           (SELECT '; ' + e.ErrName
+            FROM SplitErrors s
+            JOIN ErrCodeTable e ON s.ErrCode = e.ErrCode
+            WHERE s.ID = m.ID
+            FOR XML PATH('')),
+           1, 2, ''
+       ) AS ErrorNames
+   FROM MainTable m
+   GROUP BY m.ID, m.Category, m.ErrorCodes;
+   ```
+
+### 說明
+1. **遞迴 CTE**：`SplitErrors` CTE 使用遞迴方式分割 `ErrorCodes` 中的每個錯誤代碼，直到剩餘的字串為空。
+2. **聚合錯誤名稱**：`STUFF` 和 `FOR XML PATH` 用於將每個錯誤代碼的名稱聚合為單一欄位，並以 `;` 分隔。
+3. **GROUP BY**：對多個欄位進行群組，實現查詢需求。
+
+這個方法在不支援 `STRING_SPLIT` 的 SQL Server 版本中應該可以正常運作。
+
 你可以在 SQL 中使用一個欄位儲存多個錯誤代碼（例如 `J1;K3;`），然後通過查詢將這些錯誤代碼轉換為相應的錯誤名稱。以下是一個解決方案：
 
 ### 1. 建立含錯誤代碼的主資料表
