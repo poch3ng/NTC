@@ -1,3 +1,31 @@
+SQL 本身不支援直接的迴圈語法，但我們可以使用 `WHILE` 迴圈來達成這個需求。以下是在 SQL Server 中使用 `WHILE` 迴圈來複製 `ErrCode = 'J'` 的資料，並生成 `J1` 到 `J9` 的方法：
+
+### 方法：使用 `WHILE` 迴圈與 `INSERT INTO`
+
+```sql
+DECLARE @i INT = 1; -- 初始化計數器
+DECLARE @ErrCodePrefix CHAR(1) = 'J'; -- ErrCode 前綴
+
+WHILE @i <= 9
+BEGIN
+    -- 插入複製資料，並設置 ErrCode 為 'J1' 到 'J9'
+    INSERT INTO ErrCodeTable (ErrCode, ErrName, 其他欄位)
+    SELECT @ErrCodePrefix + CAST(@i AS CHAR(1)), ErrName, 其他欄位
+    FROM ErrCodeTable
+    WHERE ErrCode = 'J';
+
+    SET @i = @i + 1; -- 計數器遞增
+END;
+```
+
+### 說明
+1. `@i` 是計數器，從 `1` 到 `9`。
+2. `@ErrCodePrefix` 是 `ErrCode` 的前綴字母 `'J'`。
+3. 迴圈內的 `INSERT INTO` 語句會將 `ErrCode = 'J'` 的資料複製並修改 `ErrCode` 為 `J1` 到 `J9`。
+4. 每次迴圈執行時，`@i` 增加 1，直到 `@i` 等於 10 時停止。
+
+這樣可以一次性生成 `J1` 到 `J9` 的多筆記錄，無需手動編寫多條 `INSERT` 語句。
+
 如果 `ErrCode` 和 `ErrName` 的值完全相同，並且 SQL Server 無法刪除重複的資料，你可以透過以下方法來刪除這些重複的記錄。
 
 ### 方法 1：使用 `ROW_NUMBER()` 輔助刪除重複資料
