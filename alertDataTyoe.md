@@ -1,3 +1,64 @@
+你可以在 SQL 中使用一個欄位儲存多個錯誤代碼（例如 `J1;K3;`），然後通過查詢將這些錯誤代碼轉換為相應的錯誤名稱。以下是一個解決方案：
+
+### 1. 建立含錯誤代碼的主資料表
+假設你有一個資料表 `ErrCodeTable`，裡面有 `ErrCode` 和 `ErrName` 欄位：
+
+```sql
+CREATE TABLE ErrCodeTable (
+    ErrCode CHAR(2),
+    ErrName VARCHAR(50)
+);
+
+-- 插入一些範例數據
+INSERT INTO ErrCodeTable (ErrCode, ErrName)
+VALUES ('J1', 'Error J1 Description'),
+       ('K3', 'Error K3 Description'),
+       ('L5', 'Error L5 Description');
+```
+
+### 2. 使用含多個錯誤代碼的欄位
+假設你有另一個資料表 `MainTable`，其中 `ErrorCodes` 欄位用來儲存多個錯誤代碼（例如 `J1;K3;`）：
+
+```sql
+CREATE TABLE MainTable (
+    ID INT,
+    ErrorCodes VARCHAR(50) -- 儲存多個錯誤代碼，例如 'J1;K3;'
+);
+
+-- 插入範例數據
+INSERT INTO MainTable (ID, ErrorCodes)
+VALUES (1, 'J1;K3;'),
+       (2, 'L5;J1;');
+```
+
+### 3. 查詢並顯示錯誤名稱
+可以使用 `STRING_SPLIT` 函數將 `ErrorCodes` 欄位中的錯誤代碼分割為獨立的行，然後通過 `JOIN` 對應 `ErrName`。
+
+```sql
+SELECT m.ID,
+       m.ErrorCodes,
+       STRING_AGG(e.ErrName, '; ') AS ErrorNames -- 將所有錯誤名稱合併為一個欄位
+FROM MainTable m
+CROSS APPLY STRING_SPLIT(m.ErrorCodes, ';') AS s -- 將 ErrorCodes 分割成單獨的錯誤代碼
+JOIN ErrCodeTable e ON s.value = e.ErrCode -- 將分割的錯誤代碼與 ErrCodeTable 關聯
+GROUP BY m.ID, m.ErrorCodes;
+```
+
+### 查詢結果範例
+執行這段 SQL 後的結果會如下：
+
+| ID  | ErrorCodes | ErrorNames                        |
+|-----|------------|-----------------------------------|
+| 1   | J1;K3;     | Error J1 Description; Error K3 Description |
+| 2   | L5;J1;     | Error L5 Description; Error J1 Description |
+
+### 說明
+1. `STRING_SPLIT` 用來將 `ErrorCodes` 以分號（`;`）分割成獨立的錯誤代碼。
+2. `JOIN` 將分割後的錯誤代碼與 `ErrCodeTable` 關聯，獲取對應的 `ErrName`。
+3. `STRING_AGG` 將多個錯誤名稱合併成單一欄位，使用分號分隔。
+
+這樣就能夠從一個欄位中提取多個錯誤代碼並顯示相應的錯誤名稱。
+
 SQL 本身不支援直接的迴圈語法，但我們可以使用 `WHILE` 迴圈來達成這個需求。以下是在 SQL Server 中使用 `WHILE` 迴圈來複製 `ErrCode = 'J'` 的資料，並生成 `J1` 到 `J9` 的方法：
 
 ### 方法：使用 `WHILE` 迴圈與 `INSERT INTO`
