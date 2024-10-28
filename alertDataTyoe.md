@@ -1,3 +1,43 @@
+如果 `STRING_SPLIT` 可用但 `STRING_AGG` 不可用，可以使用 `FOR XML PATH` 和 `STUFF` 來模擬 `STRING_AGG` 的效果。以下是如何在 SQL Server 中使用這種方法來聚合分割後的錯誤名稱。
+
+### 方案：使用 `FOR XML PATH` 和 `STUFF` 聚合分割後的錯誤名稱
+
+假設有兩個表格：
+- `MainTable`：包含 `ErrorCodes` 欄位（例如，`J1;K3;`）。
+- `ErrCodeTable`：包含 `ErrCode` 和 `ErrName` 欄位。
+
+```sql
+SELECT 
+    m.ID,
+    m.Category,
+    m.ErrorCodes,
+    STUFF(
+        (SELECT '; ' + e.ErrName
+         FROM STRING_SPLIT(m.ErrorCodes, ';') AS s
+         JOIN ErrCodeTable e ON s.value = e.ErrCode
+         FOR XML PATH('')), 
+        1, 2, ''
+    ) AS ErrorNames
+FROM MainTable m
+GROUP BY m.ID, m.Category, m.ErrorCodes;
+```
+
+### 說明
+
+1. **`STRING_SPLIT`**：將 `ErrorCodes` 欄位中的錯誤代碼分割為多行，使用分號 `;` 作為分隔符。
+2. **`JOIN`**：將分割後的錯誤代碼與 `ErrCodeTable` 關聯，得到每個代碼對應的 `ErrName`。
+3. **`FOR XML PATH('')`**：將 `ErrName` 聚合為一個 XML 字串。
+4. **`STUFF`**：去除開頭多餘的分號和空格。
+
+### 這樣的查詢結果會如下：
+
+| ID  | Category   | ErrorCodes | ErrorNames                        |
+|-----|------------|------------|-----------------------------------|
+| 1   | Category A | J1;K3;     | Error J1 Description; Error K3 Description |
+| 2   | Category B | L5;J1;     | Error L5 Description; Error J1 Description |
+
+這樣可以在不使用 `STRING_AGG` 的情況下，透過 `FOR XML PATH` 與 `STUFF` 來實現類似的聚合效果。
+
 如果你在 SQL Server 中遇到 `STRING_SPLIT` 或其他函數無法辨識的錯誤，這可能是由於 SQL Server 版本不支援這些函數。你可以嘗試用另一種方法來分割和聚合字串。以下是處理此需求的另一種方法。
 
 ### 方法：手動分割字串和聚合
