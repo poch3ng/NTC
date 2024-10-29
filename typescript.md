@@ -1,3 +1,40 @@
+**箭頭函數**主要用在**簡單、短小的功能**或需要**繼承 `this`** 的情況。以下是常見的幾種用法：
+
+### 1. **陣列操作（map、filter、reduce 等）**
+   - 箭頭函數可以簡化陣列處理代碼，讓邏輯更直觀。
+   ```javascript
+   const numbers = [1, 2, 3];
+   const doubled = numbers.map(num => num * 2);
+   console.log(doubled); // [2, 4, 6]
+   ```
+
+### 2. **簡單的匿名函數**
+   - 需要一個小函數但不想寫太多代碼時，比如計算、處理數據等。
+   ```javascript
+   const add = (a, b) => a + b;
+   console.log(add(3, 4)); // 7
+   ```
+
+### 3. **事件處理（綁定 `this`）**
+   - 在事件處理中，箭頭函數不會重新綁定 `this`，可以直接使用外部的 `this`（例如在 React 中）。
+   ```javascript
+   document.getElementById('btn').addEventListener('click', () => {
+     console.log(this); // `this` 指向外部
+   });
+   ```
+
+### 4. **設定定時器**
+   - 在 `setTimeout` 或 `setInterval` 中使用箭頭函數，可以避免 `this` 指向錯誤。
+   ```javascript
+   setTimeout(() => {
+     console.log("This message appears after 1 second.");
+   }, 1000);
+   ```
+
+### 總結
+
+箭頭函數最常用於**陣列操作、簡單計算、事件處理**等情況，因為它的簡潔語法讓代碼更清晰。
+
 **是的，箭頭函數在現代 JavaScript 開發中非常常用**，因為它的語法簡潔，並且能避免 `this` 的混淆。尤其在以下情況，箭頭函數非常適合使用：
 
 ### 常見使用情況
