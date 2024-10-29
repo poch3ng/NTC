@@ -1,3 +1,29 @@
+**模板字串**是一種簡化字串拼接的方式，用反引號 `` (backtick) 包起來，方便插入變量和換行。
+
+### 功能
+- **插入變量**：使用 `${變量}` 來插入變量。
+- **多行字串**：直接用 Enter 換行，不需要特殊符號。
+
+### 用法範例
+
+1. **插入變量**
+   ```javascript
+   const name = "John";
+   const message = `Hello, ${name}!`;
+   console.log(message); // 輸出 "Hello, John!"
+   ```
+
+2. **多行字串**
+   ```javascript
+   const text = `這是第一行
+   這是第二行`;
+   console.log(text);
+   ```
+
+### 總結
+
+模板字串讓字串拼接更簡單，尤其是插入變量和換行的時候。
+
 簡單來說，**箭頭函數是 JavaScript 簡化函數的寫法**，讓代碼更短，適合簡單操作。
 
 ### 簡單範例
