@@ -1,3 +1,34 @@
+**箭頭函數**是 JavaScript 的一種簡化寫法，可以讓函數更簡短、語法更簡潔。
+
+### 基本語法
+
+```javascript
+// 一般函數寫法
+function add(a, b) {
+  return a + b;
+}
+
+// 箭頭函數寫法
+const add = (a, b) => a + b;
+```
+
+### 特點
+
+1. **更簡短**：省略 `function` 關鍵字，只有一行可以省略 `{}` 和 `return`。
+2. **不綁定 `this`**：箭頭函數不會有自己的 `this`，會繼承外層的 `this`。
+
+### 範例
+
+```javascript
+const greet = name => `Hello, ${name}!`;
+console.log(greet("John")); // 輸出 "Hello, John!"
+```
+
+### 總結
+
+- **語法簡潔**：適合簡單函數。
+- **不綁定 `this`**：適合避免 `this` 混淆的情況。
+
 **在 `for` 迴圈中使用 `var` 宣告的變量，的確是全域（或函數）範圍的**，而不是只在 `for` 迴圈內有效。
 
 ### 例子
