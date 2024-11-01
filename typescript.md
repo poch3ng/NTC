@@ -18,23 +18,24 @@
 
 (1) 陣列合併
 
+```
 const arr1 = [1, 2];
 const arr2 = [3, 4];
 const mergedArray = [...arr1, ...arr2];
 console.log(mergedArray); // [1, 2, 3, 4]
-
+```
 (2) 複製物件
-
+```
 const person = { name: "Alice", age: 25 };
 const copiedPerson = { ...person };
 console.log(copiedPerson); // { name: "Alice", age: 25 }
-
+```
 (3) 加入新屬性
-
+```
 const person = { name: "Alice", age: 25 };
 const updatedPerson = { ...person, city: "New York" };
 console.log(updatedPerson); // { name: "Alice", age: 25, city: "New York" }
-
+```
 
 ---
 
@@ -50,19 +51,19 @@ console.log(updatedPerson); // { name: "Alice", age: 25, city: "New York" }
 範例
 
 (1) 函數接收多個參數
-
+```
 function sum(...numbers) {
   return numbers.reduce((total, num) => total + num, 0);
 }
 
 console.log(sum(1, 2, 3, 4)); // 10
-
+```
 (2) 解構賦值中使用剩餘參數
-
+```
 const [first, ...rest] = [10, 20, 30, 40];
 console.log(first); // 10
 console.log(rest);  // [20, 30, 40]
-
+```
 
 ---
 
