@@ -1,3 +1,58 @@
+map、filter 和 reduce 是 JavaScript 陣列常用的三個方法，它們各有不同的用途，讓代碼更簡潔高效。
+
+
+---
+
+1. map - 對每個元素進行操作，回傳新陣列
+
+用途：對陣列中的每個元素進行操作，回傳一個新陣列，元素數量與原陣列相同。
+
+範例： 將每個數字乘以 2，生成新陣列。
+
+const numbers = [1, 2, 3];
+const doubled = numbers.map(num => num * 2);
+console.log(doubled); // [2, 4, 6]
+
+
+---
+
+2. filter - 篩選符合條件的元素，回傳新陣列
+
+用途：從陣列中篩選出符合條件的元素，回傳新陣列，元素數量可能比原陣列少。
+
+範例： 篩選出所有偶數，生成新陣列。
+
+const numbers = [1, 2, 3, 4];
+const evenNumbers = numbers.filter(num => num % 2 === 0);
+console.log(evenNumbers); // [2, 4]
+
+
+---
+
+3. reduce - 將所有元素累加或合併成單一結果
+
+用途：將陣列中的所有元素進行累加、合併，生成單一結果（如和、乘積或物件合併）。
+
+範例： 計算陣列中所有數字的總和。
+
+const numbers = [1, 2, 3, 4];
+const sum = numbers.reduce((accumulator, current) => accumulator + current, 0);
+console.log(sum); // 10
+
+
+---
+
+總結
+
+map：每個元素處理後回傳新陣列，常用於數據轉換。
+
+filter：篩選符合條件的元素，回傳新陣列，常用於數據篩選。
+
+reduce：將所有元素合併為單一結果，常用於累加、統計等。
+
+
+
+
 **展開運算符（Spread Operator）和剩餘參數（Rest Parameter）**是 JavaScript 中 ... 的兩種不同用法。它們的功能和使用情境不同，但都可以簡化操作。
 
 
