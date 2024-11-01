@@ -1,3 +1,52 @@
+展開運算符（Spread Operator）和 剩餘參數（Rest Parameter）是 JavaScript 中使用 ... 這個符號來處理陣列或物件的一種方式，但它們的功能不同：
+
+
+---
+
+1. 展開運算符（Spread Operator）
+
+功能：展開陣列或物件中的每個元素，用於組合或複製資料。
+
+用在陣列中：將一個陣列展開成個別元素。
+
+const arr1 = [1, 2, 3];
+const arr2 = [...arr1, 4, 5];
+console.log(arr2); // [1, 2, 3, 4, 5]
+
+用在物件中：將一個物件的屬性展開出來，常用於合併物件。
+
+const person = { name: "Alice", age: 25 };
+const newPerson = { ...person, city: "New York" };
+console.log(newPerson); // { name: "Alice", age: 25, city: "New York" }
+
+
+
+---
+
+2. 剩餘參數（Rest Parameter）
+
+功能：在函數參數中使用，將不確定數量的參數收集成一個陣列，方便處理。
+
+用在函數中：將多個參數收集成陣列，適合處理未知數量的參數。
+
+function sum(...numbers) {
+  return numbers.reduce((acc, curr) => acc + curr, 0);
+}
+console.log(sum(1, 2, 3, 4)); // 10
+
+
+
+---
+
+簡單記憶方式
+
+展開運算符：把陣列或物件「展開」成個別元素。
+
+剩餘參數：把多個參數「收集」成一個陣列。
+
+
+
+
 **解構賦值**在 JavaScript 中非常常見，主要用於簡化代碼，尤其在以下情境中非常方便：
 
 ---
