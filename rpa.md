@@ -1,3 +1,57 @@
+為了讓 Series.XValues 動態根據月份的天數調整資料數量，您可以在程式中先檢查當前月份的天數，然後根據該天數動態設定對應的 XValues 和資料範圍。這樣，您就不需要額外添加日期或數據。
+
+以下是這種方式的實現程式碼，這段程式碼會根據當月天數自動調整 XValues 和資料的範圍：
+
+Sub AdjustSeriesXValuesAndValues()
+    Dim ws As Worksheet
+    Dim chartObj As ChartObject
+    Dim srs As Series
+    Dim lastDay As Integer
+    Dim endColumn As String
+    Dim xValuesRange As Range
+    Dim valuesRange As Range
+
+    ' 設定工作表與圖表
+    Set ws = ThisWorkbook.Sheets("Sheet1") ' 請更改為你的工作表名稱
+    Set chartObj = ws.ChartObjects("Chart1") ' 請更改為你的圖表名稱
+    Set srs = chartObj.Chart.SeriesCollection(1) ' 假設是第一個系列
+
+    ' 取得當前月份的最後一天
+    lastDay = Day(DateSerial(Year(Date), Month(Date) + 1, 0))
+
+    ' 根據當月天數計算結束欄位 (例如從D1開始)
+    endColumn = Split(ws.Cells(1, 4 + lastDay - 1).Address, "$")(1)
+
+    ' 設定 XValues 的範圍為當月的天數 (例如 D1 到對應的結束欄位)
+    Set xValuesRange = ws.Range("D1:" & endColumn & "1")
+    srs.XValues = xValuesRange
+
+    ' 設定資料的範圍，與 XValues 範圍相同 (假設資料在 D2 開始對應日期)
+    Set valuesRange = ws.Range("D2:" & endColumn & "2")
+    srs.Values = valuesRange
+
+    MsgBox "XValues 和資料範圍已根據當月天數自動調整至 " & endColumn & "！"
+End Sub
+
+說明：
+
+1. lastDay 根據當前月份自動取得最後一天的日期，這樣可以適應每個月不同的天數。
+
+
+2. endColumn 動態計算 X 軸的範圍結束位置，根據天數自動調整結束欄位。
+
+
+3. xValuesRange 和 valuesRange 都根據 endColumn 自動擴展或縮短，確保 XValues 和資料的長度一致，避免錯誤。
+
+
+4. srs.Values 將資料範圍設為與 XValues 相同的天數範圍。
+
+
+
+這樣的設定可以保證程式每月自動調整，不需要手動修改範圍。
+
+
+
 如果日期是從 D1 到 AH1（例如十月有 31 天），那麼在不同月份根據當月天數， XValues 的範圍就需要從 D1 開始，並延伸到相對應的欄位。
 
 可以用以下的 VBA 程式碼來動態設定橫向日期範圍：
