@@ -1,3 +1,40 @@
+如果日期是從 D1, E1 等橫向排列（例如一行中的不同欄位代表每天的日期），可以稍微調整程式碼，讓它根據當前月份的天數動態調整 XValues 的橫向範圍。以下是針對橫向日期的範例程式碼：
+
+Sub AdjustSeriesXValuesHorizontal()
+    Dim ws As Worksheet
+    Dim chartObj As ChartObject
+    Dim srs As Series
+    Dim lastDay As Integer
+    Dim xValuesRange As Range
+
+    ' 設定工作表與圖表
+    Set ws = ThisWorkbook.Sheets("Sheet1") ' 更改為你的工作表名稱
+    Set chartObj = ws.ChartObjects("Chart1") ' 更改為你的圖表名稱
+    Set srs = chartObj.Chart.SeriesCollection(1) ' 假設是第一個系列
+
+    ' 取得當前月份的最後一天
+    lastDay = Day(DateSerial(Year(Date), Month(Date) + 1, 0))
+
+    ' 設定XValues的範圍，根據當月天數橫向調整
+    Set xValuesRange = ws.Range("D1").Resize(1, lastDay) ' 假設日期從D1橫向排列
+    srs.XValues = xValuesRange
+
+    MsgBox "XValues已根據當月天數自動調整！"
+End Sub
+
+說明：
+
+1. lastDay 計算當月的天數，以便設定範圍。
+
+
+2. xValuesRange 使用 Range("D1").Resize(1, lastDay) 動態擴展範圍，從 D1 開始並橫向擴展至當月的最後一天，這樣無論月份天數變動，XValues 都會自動調整範圍。
+
+
+
+這樣可以針對橫向排列的日期自動適應每月的不同天數。
+
+
+
 若使用VBA來讀取 SeriesCollection.XValues，且不同月份的天數造成XValues的長度不一致，可能導致程式錯誤。解決方法之一是動態調整 XValues 的範圍，讓其自動適應每個月份的長度。
 
 以下是處理這種情況的步驟：
