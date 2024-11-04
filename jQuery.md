@@ -1,3 +1,560 @@
+jQuery 操作元素的簡單介紹與範例
+
+
+---
+
+jQuery 提供了強大的方法來操作網頁中的元素，使我們能夠輕鬆地修改內容、屬性、樣式，甚至是結構。本指南將以簡單直接的方式介紹常用的操作元素的方法，並提供範例程式碼。
+
+
+---
+
+1. 操作元素內容
+
+1.1 text() 方法
+
+功能： 獲取或設定元素的文字內容（不包含 HTML 標籤）。
+
+語法：
+
+獲取文字內容： var text = $('selector').text();
+
+設定文字內容： $('selector').text('新文字內容');
+
+
+
+範例：
+
+<!-- HTML -->
+<p id="paragraph">這是一段文字。</p>
+
+<!-- jQuery -->
+<script>
+$(document).ready(function(){
+    // 獲取文字內容
+    var content = $('#paragraph').text();
+    console.log(content); // 輸出：這是一段文字。
+
+    // 設定新的文字內容
+    $('#paragraph').text('文字已被更新。');
+});
+</script>
+
+
+---
+
+1.2 html() 方法
+
+功能： 獲取或設定元素的 HTML 內容（包含 HTML 標籤）。
+
+語法：
+
+獲取 HTML 內容： var html = $('selector').html();
+
+設定 HTML 內容： $('selector').html('<strong>新內容</strong>');
+
+
+
+範例：
+
+<!-- HTML -->
+<div id="content">
+    <p>原始內容。</p>
+</div>
+
+<!-- jQuery -->
+<script>
+$(document).ready(function(){
+    // 獲取 HTML 內容
+    var htmlContent = $('#content').html();
+    console.log(htmlContent); // 輸出：<p>原始內容。</p>
+
+    // 設定新的 HTML 內容
+    $('#content').html('<p><em>內容已更新。</em></p>');
+});
+</script>
+
+
+---
+
+1.3 val() 方法
+
+功能： 獲取或設定表單元素的值。
+
+語法：
+
+獲取值： var value = $('selector').val();
+
+設定值： $('selector').val('新值');
+
+
+
+範例：
+
+<!-- HTML -->
+<input type="text" id="username" value="使用者名稱">
+
+<!-- jQuery -->
+<script>
+$(document).ready(function(){
+    // 獲取輸入框的值
+    var username = $('#username').val();
+    console.log(username); // 輸出：使用者名稱
+
+    // 設定新的值
+    $('#username').val('新使用者');
+});
+</script>
+
+
+---
+
+2. 操作元素屬性
+
+2.1 attr() 方法
+
+功能： 獲取或設定元素的屬性值。
+
+語法：
+
+獲取屬性值： var value = $('selector').attr('屬性名稱');
+
+設定屬性值： $('selector').attr('屬性名稱', '新值');
+
+
+
+範例：
+
+<!-- HTML -->
+<img id="logo" src="logo.png" alt="網站標誌">
+
+<!-- jQuery -->
+<script>
+$(document).ready(function(){
+    // 獲取圖片的 src 屬性
+    var src = $('#logo').attr('src');
+    console.log(src); // 輸出：logo.png
+
+    // 更改圖片的 src 屬性
+    $('#logo').attr('src', 'new-logo.png');
+});
+</script>
+
+
+---
+
+2.2 prop() 方法
+
+功能： 獲取或設定元素的固有屬性（如選中狀態）。
+
+語法：
+
+獲取屬性值： var value = $('selector').prop('屬性名稱');
+
+設定屬性值： $('selector').prop('屬性名稱', 值);
+
+
+
+範例：
+
+<!-- HTML -->
+<input type="checkbox" id="agree" checked>
+
+<!-- jQuery -->
+<script>
+$(document).ready(function(){
+    // 獲取勾選框的選中狀態
+    var isChecked = $('#agree').prop('checked');
+    console.log(isChecked); // 輸出：true
+
+    // 取消選中狀態
+    $('#agree').prop('checked', false);
+});
+</script>
+
+
+---
+
+3. 操作元素的樣式
+
+3.1 css() 方法
+
+功能： 獲取或設定元素的 CSS 樣式。
+
+語法：
+
+獲取樣式值： var value = $('selector').css('屬性名稱');
+
+設定樣式值： $('selector').css('屬性名稱', '值');
+
+
+
+範例：
+
+<!-- HTML -->
+<div id="box" style="width:100px; height:100px; background-color:red;"></div>
+
+<!-- jQuery -->
+<script>
+$(document).ready(function(){
+    // 獲取背景色
+    var bgColor = $('#box').css('background-color');
+    console.log(bgColor); // 輸出：rgb(255, 0, 0)
+
+    // 設定新的背景色
+    $('#box').css('background-color', 'blue');
+});
+</script>
+
+
+---
+
+3.2 addClass()、removeClass()、toggleClass() 方法
+
+功能： 操作元素的 CSS 類別，以控制樣式。
+
+
+範例：
+
+<!-- HTML -->
+<p id="message">這是一則訊息。</p>
+
+<!-- CSS -->
+<style>
+.success {
+    color: green;
+    font-weight: bold;
+}
+.error {
+    color: red;
+    font-weight: bold;
+}
+</style>
+
+<!-- jQuery -->
+<script>
+$(document).ready(function(){
+    // 添加類別
+    $('#message').addClass('success');
+
+    // 移除類別
+    $('#message').removeClass('success');
+
+    // 切換類別
+    $('#message').toggleClass('error');
+});
+</script>
+
+
+---
+
+4. 操作 DOM 結構
+
+4.1 新增元素
+
+append() 和 prepend() 方法
+
+append()： 在選取的元素內部，最後面新增內容。
+
+prepend()： 在選取的元素內部，最前面新增內容。
+
+
+範例：
+
+<!-- HTML -->
+<ul id="list">
+    <li>項目一</li>
+    <li>項目二</li>
+</ul>
+
+<!-- jQuery -->
+<script>
+$(document).ready(function(){
+    // 在清單最後新增一個項目
+    $('#list').append('<li>項目三</li>');
+
+    // 在清單最前新增一個項目
+    $('#list').prepend('<li>項目零</li>');
+});
+</script>
+
+
+---
+
+after() 和 before() 方法
+
+after()： 在選取的元素之後插入內容。
+
+before()： 在選取的元素之前插入內容。
+
+
+範例：
+
+<!-- HTML -->
+<p id="para1">段落一。</p>
+
+<!-- jQuery -->
+<script>
+$(document).ready(function(){
+    // 在段落一之後插入段落二
+    $('#para1').after('<p id="para2">段落二。</p>');
+
+    // 在段落一之前插入標題
+    $('#para1').before('<h2>文章標題</h2>');
+});
+</script>
+
+
+---
+
+4.2 移除元素
+
+remove() 和 empty() 方法
+
+remove()： 移除選取的元素（包含其子元素）。
+
+empty()： 清空選取的元素內容，但保留元素本身。
+
+
+範例：
+
+<!-- HTML -->
+<div id="container">
+    <p>這是一個段落。</p>
+    <p>這是另一個段落。</p>
+</div>
+
+<!-- jQuery -->
+<script>
+$(document).ready(function(){
+    // 移除整個容器
+    $('#container').remove();
+
+    // 或者清空容器內容，但保留容器本身
+    // $('#container').empty();
+});
+</script>
+
+
+---
+
+4.3 複製和替換元素
+
+clone() 方法
+
+功能： 複製選取的元素（可選擇是否包含事件處理器）。
+
+語法： var newElement = $('selector').clone([withDataAndEvents]);
+
+
+範例：
+
+<!-- HTML -->
+<div id="original">
+    <p>原始內容。</p>
+</div>
+
+<!-- jQuery -->
+<script>
+$(document).ready(function(){
+    // 複製元素
+    var copy = $('#original').clone();
+
+    // 將複製的元素添加到頁面中
+    $('body').append(copy);
+});
+</script>
+
+
+---
+
+replaceWith() 方法
+
+功能： 用新的內容替換選取的元素。
+
+語法： $('selector').replaceWith('新內容');
+
+
+範例：
+
+<!-- HTML -->
+<p id="old">這是舊的段落。</p>
+
+<!-- jQuery -->
+<script>
+$(document).ready(function(){
+    // 用新的段落替換舊的段落
+    $('#old').replaceWith('<p id="new">這是新的段落。</p>');
+});
+</script>
+
+
+---
+
+5. 操作元素的尺寸與位置
+
+5.1 width() 和 height() 方法
+
+功能： 獲取或設定元素的寬度和高度（不包含內邊距、邊框和外邊距）。
+
+語法：
+
+獲取值： var w = $('selector').width();
+
+設定值： $('selector').width(數值);
+
+
+
+範例：
+
+<!-- HTML -->
+<div id="box" style="width:200px; height:100px;"></div>
+
+<!-- jQuery -->
+<script>
+$(document).ready(function(){
+    // 獲取寬度和高度
+    var w = $('#box').width();
+    var h = $('#box').height();
+    console.log('寬度：' + w + '，高度：' + h);
+
+    // 設定新的尺寸
+    $('#box').width(300).height(150);
+});
+</script>
+
+
+---
+
+5.2 position() 和 offset() 方法
+
+position()： 獲取元素相對於父元素的位置（top 和 left）。
+
+offset()： 獲取元素相對於文檔的位置。
+
+
+範例：
+
+<!-- HTML -->
+<div id="container" style="position: relative;">
+    <div id="child" style="position: absolute; top:50px; left:100px;"></div>
+</div>
+
+<!-- jQuery -->
+<script>
+$(document).ready(function(){
+    // 獲取相對於父元素的位置
+    var pos = $('#child').position();
+    console.log('相對位置 - 上：' + pos.top + '，左：' + pos.left);
+
+    // 獲取相對於文檔的位置
+    var offset = $('#child').offset();
+    console.log('絕對位置 - 上：' + offset.top + '，左：' + offset.left);
+});
+</script>
+
+
+---
+
+6. 範例：綜合運用
+
+範例：
+
+<!-- HTML -->
+<ul id="todoList">
+    <li>學習 HTML</li>
+    <li>學習 CSS</li>
+</ul>
+<input type="text" id="newItem" placeholder="新增待辦事項">
+<button id="addButton">新增</button>
+
+<!-- jQuery -->
+<script>
+$(document).ready(function(){
+    // 新增待辦事項
+    $('#addButton').click(function(){
+        var itemText = $('#newItem').val();
+        if(itemText !== ''){
+            $('#todoList').append('<li>' + itemText + '</li>');
+            $('#newItem').val('');
+        }
+    });
+
+    // 點擊項目時劃掉
+    $('#todoList').on('click', 'li', function(){
+        $(this).toggleClass('completed');
+    });
+});
+
+</script>
+
+<!-- CSS -->
+<style>
+.completed {
+    text-decoration: line-through;
+    color: gray;
+}
+</style>
+
+解釋：
+
+新增功能：
+
+使用 append() 方法在清單中新增項目。
+
+使用 val() 方法獲取和清空輸入框的值。
+
+
+劃掉項目：
+
+使用事件委派 on('click', 'li', function(){...}) 綁定事件。
+
+使用 toggleClass() 方法切換類別。
+
+定義 .completed 類別的樣式，達到劃掉效果。
+
+
+
+
+---
+
+總結
+
+操作元素內容： 使用 text()、html()、val() 來獲取或設定內容。
+
+操作元素屬性： 使用 attr()、prop() 來獲取或設定屬性值。
+
+操作元素樣式： 使用 css()、addClass()、removeClass()、toggleClass() 來修改樣式。
+
+操作 DOM 結構： 使用 append()、prepend()、after()、before()、remove()、empty()、clone()、replaceWith() 來新增、移除或替換元素。
+
+操作尺寸與位置： 使用 width()、height()、position()、offset() 來獲取或設定元素的尺寸和位置。
+
+
+
+---
+
+建議：
+
+多實踐： 嘗試在實際項目中運用這些方法，增強理解。
+
+查閱文件： jQuery 官方網站提供了詳細的 API 參考。
+
+
+參考資源：
+
+jQuery API 文件
+
+jQuery 教程（繁體中文）
+
+
+
+---
+
+希望這些簡單直接的介紹和範例程式碼能夠幫助您快速掌握 jQuery 操作元素的方法！
+
+
+
+
 jQuery 選擇器簡介與範例
 
 
