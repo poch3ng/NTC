@@ -1,3 +1,71 @@
+Attribute 和 Property 的主要差別在於：
+
+1. 靜態 vs 動態：
+
+Attribute 是 HTML 中的靜態屬性，定義了元素的初始值或配置。例如：<input type="text" value="Hello"> 中的 value="Hello" 是 attribute，這是元素的初始值。
+
+Property 是 JavaScript 中的 DOM 屬性，反映了元素在頁面當前的狀態或值。當 JavaScript 代碼改變 input 的值時，這只會影響 DOM 的 property 而不會更新 HTML 中的 attribute。
+
+
+
+2. 同步行為：
+
+在元素載入時，attribute 的值會被同步到 property。例如 <input value="Hello"> 在載入後，input.value 也會是 "Hello"。
+
+不過，之後的變化並非雙向同步。如果修改 property（如 input.value = "Goodbye"），HTML 的 attribute 值（value="Hello") 不會變更。而直接改變 HTML 的 attribute（如用 JavaScript 設定 input.setAttribute("value", "Hi")），此時 DOM 的 property 也會更新為新的值。
+
+
+
+3. 使用時機：
+
+Attribute 主要用來設定元素的預設狀態（在 HTML 文件中）。
+
+Property 主要用於操作或讀取元素的當前狀態（在 JavaScript 中）。
+
+
+
+
+簡單範例
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attribute vs Property</title>
+</head>
+<body>
+  <input id="myInput" type="text" value="Hello">
+
+  <script>
+    const inputElement = document.getElementById("myInput");
+
+    // 讀取 attribute 和 property
+    console.log(inputElement.getAttribute("value")); // 輸出: "Hello"（HTML 的靜態屬性）
+    console.log(inputElement.value);                 // 輸出: "Hello"（DOM 的初始屬性）
+
+    // 修改 property（不會改變 HTML 的 attribute）
+    inputElement.value = "Goodbye";
+    console.log(inputElement.getAttribute("value")); // 仍輸出: "Hello"
+    console.log(inputElement.value);                 // 輸出: "Goodbye"（DOM 當前值）
+
+    // 修改 attribute（會同步更新 DOM 的 property）
+    inputElement.setAttribute("value", "Hi");
+    console.log(inputElement.getAttribute("value")); // 輸出: "Hi"
+    console.log(inputElement.value);                 // 輸出: "Hi"
+  </script>
+</body>
+</html>
+
+總結
+
+修改 Property 只影響當前 DOM 的狀態，不會改變原始 HTML 的 Attribute。
+
+修改 Attribute 時會同步更新 Property，但反過來不會。
+
+
+
+
 jQuery 操作元素的簡單介紹與範例
 
 
