@@ -1,3 +1,413 @@
+jQuery 事件處理的簡單介紹與範例
+
+
+---
+
+jQuery 提供了簡單易用的方法來處理事件，使我們能夠輕鬆地為網頁元素添加互動功能。本指南將以簡單直接的方式介紹 jQuery 的事件處理，並提供範例程式碼。
+
+
+---
+
+1. 什麼是事件？
+
+事件是用來描述瀏覽器或使用者與網頁互動時發生的行為，例如：
+
+使用者點擊按鈕
+
+滑鼠移動到元素上
+
+表單提交
+
+鍵盤按鍵被按下
+
+
+
+---
+
+2. jQuery 事件處理的基本語法
+
+2.1 使用簡單事件方法
+
+語法： $('selector').eventName(handlerFunction);
+
+說明：
+
+selector：要綁定事件的元素選擇器。
+
+eventName：事件名稱，如 click、mouseover 等。
+
+handlerFunction：事件觸發時要執行的函數。
+
+
+
+範例：
+
+<!-- HTML -->
+<button id="myButton">點擊我</button>
+
+<!-- jQuery -->
+<script>
+$(document).ready(function(){
+    $('#myButton').click(function(){
+        alert('按鈕被點擊了！');
+    });
+});
+</script>
+
+
+---
+
+2.2 使用 on() 方法
+
+語法： $('selector').on(event, handlerFunction);
+
+說明：
+
+event：事件名稱，可以是單個事件或多個事件（以空格分隔）。
+
+handlerFunction：事件觸發時要執行的函數。
+
+
+
+範例：
+
+$('#myButton').on('click', function(){
+    alert('按鈕被點擊了！');
+});
+
+
+---
+
+3. 常用事件類型
+
+3.1 滑鼠事件
+
+click：單擊事件
+
+dblclick：雙擊事件
+
+mouseenter：滑鼠進入元素區域
+
+mouseleave：滑鼠離開元素區域
+
+mousemove：滑鼠在元素上移動
+
+
+範例：
+
+<div id="box" style="width:100px; height:100px; background-color:gray;"></div>
+
+<script>
+$(document).ready(function(){
+    $('#box').mouseenter(function(){
+        $(this).css('background-color', 'blue');
+    });
+    $('#box').mouseleave(function(){
+        $(this).css('background-color', 'gray');
+    });
+});
+</script>
+
+
+---
+
+3.2 鍵盤事件
+
+keydown：按下鍵盤按鍵
+
+keyup：釋放鍵盤按鍵
+
+keypress：按下並持續按住鍵盤按鍵
+
+
+範例：
+
+<input type="text" id="inputBox">
+
+<script>
+$(document).ready(function(){
+    $('#inputBox').keydown(function(event){
+        console.log('按下了鍵：' + event.key);
+    });
+});
+</script>
+
+
+---
+
+3.3 表單事件
+
+submit：表單提交
+
+change：表單元素的值改變
+
+focus：元素獲得焦點
+
+blur：元素失去焦點
+
+
+範例：
+
+<form id="myForm">
+    <input type="text" name="username">
+    <input type="submit" value="提交">
+</form>
+
+<script>
+$(document).ready(function(){
+    $('#myForm').submit(function(event){
+        event.preventDefault(); // 防止表單實際提交
+        alert('表單已提交！');
+    });
+});
+</script>
+
+
+---
+
+4. 事件物件
+
+事件處理函數可以接收一個事件物件，提供有關事件的詳細資訊。
+
+語法： function(event){ ... }
+
+
+範例：
+
+$('#myButton').click(function(event){
+    console.log('事件類型：' + event.type);
+    console.log('觸發事件的元素：', event.target);
+});
+
+
+---
+
+5. 事件委派
+
+當你需要為動態生成的元素綁定事件時，可以使用事件委派。
+
+5.1 為未來的元素綁定事件
+
+語法： $(parentSelector).on(event, childSelector, handlerFunction);
+
+
+範例：
+
+<ul id="itemList">
+    <li>項目一</li>
+    <li>項目二</li>
+</ul>
+<button id="addItem">新增項目</button>
+
+<script>
+$(document).ready(function(){
+    // 為未來的 li 元素綁定點擊事件
+    $('#itemList').on('click', 'li', function(){
+        $(this).toggleClass('selected');
+    });
+
+    // 動態新增項目
+    $('#addItem').click(function(){
+        $('#itemList').append('<li>新項目</li>');
+    });
+});
+</script>
+
+<!-- CSS -->
+<style>
+.selected {
+    color: red;
+    text-decoration: underline;
+}
+</style>
+
+
+---
+
+6. 一次性事件
+
+6.1 使用 one() 方法
+
+功能： 事件處理器只執行一次，執行後自動解除綁定。
+
+
+範例：
+
+$('#myButton').one('click', function(){
+    alert('這個訊息只會顯示一次。');
+});
+
+
+---
+
+7. 解除事件處理器
+
+7.1 使用 off() 方法
+
+語法： $('selector').off(event, handlerFunction);
+
+
+範例：
+
+function clickHandler(){
+    alert('按鈕被點擊了！');
+}
+
+// 綁定事件
+$('#myButton').on('click', clickHandler);
+
+// 解除事件
+$('#removeHandler').click(function(){
+    $('#myButton').off('click', clickHandler);
+});
+
+
+---
+
+8. 常用事件輔助方法
+
+8.1 hover() 方法
+
+功能： 簡化了 mouseenter 和 mouseleave 的寫法。
+
+語法： $('selector').hover(handlerIn, handlerOut);
+
+
+範例：
+
+$('#box').hover(
+    function(){
+        $(this).css('background-color', 'green');
+    },
+    function(){
+        $(this).css('background-color', 'gray');
+    }
+);
+
+
+---
+
+8.2 focus() 和 blur() 方法
+
+功能： 簡化了對 focus 和 blur 事件的處理。
+
+
+範例：
+
+$('input').focus(function(){
+    $(this).css('background-color', '#ffffcc');
+});
+
+$('input').blur(function(){
+    $(this).css('background-color', '#ffffff');
+});
+
+
+---
+
+9. 事件預防與傳播控制
+
+9.1 阻止事件的預設行為
+
+使用 event.preventDefault()
+
+
+範例：
+
+$('a').click(function(event){
+    event.preventDefault(); // 阻止連結的預設行為（跳轉）
+    alert('連結被點擊，但不會跳轉。');
+});
+
+
+---
+
+9.2 停止事件傳播
+
+使用 event.stopPropagation()
+
+
+範例：
+
+<div id="parent">
+    <button id="childButton">點擊我</button>
+</div>
+
+<script>
+$(document).ready(function(){
+    $('#parent').click(function(){
+        alert('父元素被點擊');
+    });
+
+    $('#childButton').click(function(event){
+        event.stopPropagation(); // 阻止事件冒泡
+        alert('子按鈕被點擊');
+    });
+});
+</script>
+
+
+---
+
+10. 綜合範例：建立一個簡單的互動效果
+
+範例：點擊按鈕，切換顯示一段文字
+
+<button id="toggleButton">顯示/隱藏文字</button>
+<p id="text" style="display:none;">這是一段可顯示或隱藏的文字。</p>
+
+<script>
+$(document).ready(function(){
+    $('#toggleButton').click(function(){
+        $('#text').toggle();
+    });
+});
+</script>
+
+
+---
+
+總結
+
+事件綁定方法： 使用簡單事件方法或 on() 方法來綁定事件。
+
+常用事件類型： 滑鼠事件、鍵盤事件、表單事件等。
+
+事件物件： 提供有關事件的詳細資訊，可在事件處理函數中使用。
+
+事件委派： 使用 on() 方法為動態生成的元素綁定事件。
+
+一次性事件： 使用 one() 方法讓事件處理器只執行一次。
+
+解除事件： 使用 off() 方法解除事件處理器。
+
+預防與傳播控制： 使用 preventDefault() 和 stopPropagation()。
+
+
+
+---
+
+建議：
+
+多練習： 嘗試在實際項目中運用這些事件處理方法。
+
+查閱文件： jQuery 官方網站提供了詳細的事件 API 參考。
+
+
+參考資源：
+
+jQuery 事件 API 文件
+
+jQuery 教程（繁體中文）
+
+
+
+---
+
+希望這些簡單直接的介紹和範例程式碼能夠幫助您快速掌握 jQuery 的事件處理！
+
+
+
 Attribute 和 Property 的主要差別在於：
 
 1. 靜態 vs 動態：
