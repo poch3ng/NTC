@@ -1,3 +1,50 @@
+以下是標準的 UiPath 專案資料夾結構，您可以依照這個結構自己建立：
+
+UiPath_Project_Template
+├── Main
+│   └── Main.xaml
+├── Workflows
+├── Data
+│   ├── Input
+│   └── Output
+├── Screenshots
+├── Logs
+├── Exceptions
+├── Config
+│   └── Config.xlsx
+├── Libraries
+└── Temp
+
+資料夾說明
+
+Main：主流程的 .xaml 檔案（例如 Main.xaml），是專案的進入點。
+
+Workflows：放置子流程或模組化的工作流程。
+
+Data
+
+Input：放置輸入資料檔案（如 Excel、CSV 等）。
+
+Output：放置輸出結果檔案。
+
+
+Screenshots：存放截圖或錯誤紀錄的影像。
+
+Logs：自定義日誌檔案，追蹤執行狀況。
+
+Exceptions：記錄例外錯誤的檔案。
+
+Config：專案的設定檔案，如 Config.xlsx。
+
+Libraries：自定義函式庫，用於存放可重複使用的元件。
+
+Temp：暫存資料夾，用於存放臨時檔案，流程結束後可以刪除。
+
+
+依照這個結構建立您的專案資料夾，有助於維持專案的條理性與易用性。
+
+
+
 為了讓 Series.XValues 動態根據月份的天數調整資料數量，您可以在程式中先檢查當前月份的天數，然後根據該天數動態設定對應的 XValues 和資料範圍。這樣，您就不需要額外添加日期或數據。
 
 以下是這種方式的實現程式碼，這段程式碼會根據當月天數自動調整 XValues 和資料的範圍：
