@@ -1,3 +1,100 @@
+要實現根據網頁上某個元素的大小自動調整縮放比例，可以使用 UiPath 結合 JavaScript 來獲取元素的大小，並自動縮小或調整網頁顯示比例。這裡是一個分步指南來完成這個需求：
+
+方法概述
+
+1. 檢查元素的大小：使用 Inject JS Script 活動來獲取網頁中某個元素的寬高。
+
+
+2. 計算縮放比例：根據獲取的元素大小和螢幕顯示區域大小計算合適的縮放比例。
+
+
+3. 自動調整縮放：如果元素超出螢幕顯示區域，就調整網頁縮放比例至合適大小。
+
+
+
+詳細步驟
+
+步驟 1：使用 Inject JS Script 獲取元素大小
+
+1. 在 UiPath 中添加 Inject JS Script 活動。
+
+
+2. 編寫 JavaScript 代碼來獲取指定元素的大小，並將其返回給 UiPath。
+
+
+3. 在 UiPath 中創建變數來接收元素的寬度和高度。
+
+
+
+JavaScript 代碼範例
+
+假設目標元素的 id 為 "targetElement"，以下 JavaScript 代碼可以獲取元素的寬度和高度：
+
+// 獲取目標元素
+var element = document.getElementById("targetElement");
+
+// 獲取元素的寬高
+var width = element.offsetWidth;
+var height = element.offsetHeight;
+
+// 返回寬度和高度
+return { width: width, height: height };
+
+將這段代碼放入 Inject JS Script 的 ScriptCode 屬性中，並設置輸出引數（例如 elementSize）來接收這個返回值。
+
+步驟 2：計算適當的縮放比例
+
+1. 使用 Invoke Code 活動，將 JavaScript 返回的元素大小和螢幕顯示區域的大小進行比較。
+
+
+2. 如果元素寬度或高度超過螢幕顯示區域，計算適合的縮放比例。
+
+
+3. 縮放比例可以這樣計算：
+
+Dim screenWidth As Integer = 1920 ' 螢幕寬度（根據您的螢幕調整）
+Dim screenHeight As Integer = 1080 ' 螢幕高度（根據您的螢幕調整）
+Dim elementWidth As Integer = elementSize("width")
+Dim elementHeight As Integer = elementSize("height")
+Dim scale As Double = Math.Min(screenWidth / elementWidth, screenHeight / elementHeight)
+
+' 限制縮放比例
+If scale > 1 Then
+    scale = 1
+End If
+
+
+
+步驟 3：根據計算結果調整網頁縮放
+
+1. 使用 Inject JS Script 將縮放比例應用到網頁。
+
+
+2. 使用以下 JavaScript 代碼來設置縮放比例：
+
+document.body.style.zoom = "<縮放比例>";
+
+
+3. 將縮放比例以引數傳遞至 Inject JS Script 中，並替換 "<縮放比例>" 為計算出的比例值。
+
+
+
+整體流程
+
+1. Step 1：使用 Inject JS Script 獲取元素大小，儲存在變數 elementSize 中。
+
+
+2. Step 2：在 Invoke Code 活動中計算縮放比例 scale。
+
+
+3. Step 3：再次使用 Inject JS Script，將 scale 應用到網頁縮放。
+
+
+
+這樣，您可以根據元素大小自動縮放網頁顯示比例，確保元素在螢幕上顯示完整而不超出邊界。
+
+
+
 以下是標準的 UiPath 專案資料夾結構，您可以依照這個結構自己建立：
 
 UiPath_Project_Template
