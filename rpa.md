@@ -1,3 +1,87 @@
+您可以將所有步驟都寫入一段 JavaScript 代碼，並使用 Inject JS Script 在 UiPath 中一次性執行，這樣就能在 JavaScript 中獲取視窗大小、目標元素大小，計算所需的縮放比例並直接應用到網頁上。以下是完整的 JavaScript 代碼：
+
+完整的 JavaScript 代碼範例
+
+這段代碼將根據目標元素的大小與視窗大小進行比較，並自動縮放頁面，以便目標元素在視窗內完全可見。
+
+// 設定目標元素的 ID
+var elementId = "targetElement";
+
+// 獲取視窗大小
+var windowWidth = window.innerWidth;
+var windowHeight = window.innerHeight;
+
+// 獲取目標元素
+var element = document.getElementById(elementId);
+
+// 確認元素存在
+if (element) {
+    // 獲取元素的寬高
+    var elementWidth = element.offsetWidth;
+    var elementHeight = element.offsetHeight;
+
+    // 計算所需的縮放比例
+    var scaleWidth = windowWidth / elementWidth;
+    var scaleHeight = windowHeight / elementHeight;
+    var scale = Math.min(scaleWidth, scaleHeight);
+
+    // 限制縮放比例最大為 1（即 100%）
+    if (scale > 1) {
+        scale = 1;
+    }
+
+    // 應用縮放比例到頁面
+    document.body.style.zoom = scale;
+    
+    // 回傳縮放比例，方便 UiPath 檢查結果
+    return scale;
+} else {
+    // 如果元素不存在，回傳錯誤訊息
+    return "Element not found";
+}
+
+說明
+
+1. 目標元素 ID：修改 elementId 變數的值為您目標元素的 ID，例如 "targetElement"。
+
+
+2. 視窗大小：使用 window.innerWidth 和 window.innerHeight 獲取當前視窗的寬度和高度。
+
+
+3. 元素大小：使用 element.offsetWidth 和 element.offsetHeight 獲取元素的寬高。
+
+
+4. 計算縮放比例：比較視窗和元素大小的比例，選擇最小的比例作為縮放比例，確保元素完全顯示在視窗中。
+
+
+5. 應用縮放：將計算出的 scale 應用到 document.body.style.zoom，縮放整個頁面。
+
+
+6. 回傳結果：如果元素找到並成功縮放，返回縮放比例 scale；如果找不到元素，返回 "Element not found" 以便 UiPath 判斷是否成功。
+
+
+
+使用方法
+
+1. 在 UiPath 中拖入 Inject JS Script 活動。
+
+
+2. 將以上 JavaScript 代碼貼入 ScriptCode 欄位。
+
+
+3. 設置一個 Output 變數（例如 zoomScale）來接收返回值。
+
+若返回值為縮放比例數字，表示成功。
+
+若返回 "Element not found"，則表示目標元素不存在。
+
+
+
+
+這段代碼能夠在 UiPath 中一次性完成所有操作，根據視窗大小自動調整目標元素的顯示比例。
+
+
+
 要實現根據網頁上某個元素的大小自動調整縮放比例，可以使用 UiPath 結合 JavaScript 來獲取元素的大小，並自動縮小或調整網頁顯示比例。這裡是一個分步指南來完成這個需求：
 
 方法概述
