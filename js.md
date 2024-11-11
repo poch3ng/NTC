@@ -1,3 +1,61 @@
+要在 JavaScript 中導入 utils.js 模組，可以使用 ES6 模組語法 import，前提是需要透過伺服器提供資源（不能直接從 file:// 協議開啟 HTML 文件）。以下是具體範例：
+
+假設你有以下的檔案結構：
+
+project/
+├── index.html
+└── utils.js
+
+1. utils.js 檔案
+
+在 utils.js 中，定義一些函式或變數並將它們導出：
+
+// utils.js
+
+export function add(a, b) {
+  return a + b;
+}
+
+export function subtract(a, b) {
+  return a - b;
+}
+
+// 或者將多個函式作為物件導出
+// export { add, subtract };
+
+2. index.html 檔案
+
+在 index.html 中，導入 utils.js 並使用其中的函式。記得在 <script> 標籤中加上 type="module"，以啟用 ES6 模組特性：
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Import Module Example</title>
+</head>
+<body>
+  <h1>Import Module Example</h1>
+  <script type="module">
+    import { add, subtract } from './utils.js';
+
+    console.log(add(3, 4));       // 輸出：7
+    console.log(subtract(10, 5)); // 輸出：5
+  </script>
+</body>
+</html>
+
+注意事項
+
+必須透過伺服器提供文件：不要直接使用 file:// 開啟 index.html，必須透過伺服器（例如 http://localhost:8000）來提供資源，否則會遇到 CORS 問題。
+
+確認檔案路徑：在 import 語句中使用相對路徑 ./utils.js。如果 utils.js 在子資料夾中，路徑可能需要改為 ./folder/utils.js。
+
+確認模組文件格式：utils.js 檔案必須是以 .js 結尾，並且在瀏覽器中被設定為模組格式。
+
+
+
+
 匿名函式（Anonymous Function）是沒有名稱的函式，在 JavaScript 中可以直接用來傳遞或執行，通常作為回呼函式（callback function）使用。匿名函式常用於一次性的操作，不需要在程式中重複引用。以下是一些匿名函式的常見應用範例：
 
 1. 基本匿名函式
