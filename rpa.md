@@ -1,3 +1,70 @@
+在 UiPath 中使用 Invoke Code 活動時，確保 Imports System.Drawing 能夠正常使用圖像處理功能，有時可能需要手動在編碼區域中指定類的完整命名空間。如果 Image 模棱兩可，可能是由於 System.Web.UI.WebControls 或其他命名空間中的 Image 類造成的命名衝突。
+
+以下是具體的解決方法：
+
+方法 1：在代碼中指定完整的命名空間
+
+當遇到 Image 模棱兩可的情況時，可以在代碼中明確指定 System.Drawing.Image，這樣可以避免命名衝突。
+
+代碼範例
+
+Imports System.Drawing
+
+' 定義圖片路徑
+Dim inputImagePath As String = "C:\Images\P3Chart.png" ' 原始圖片路徑
+Dim outputImagePath As String = "C:\Images\P3Chart_cropped.png" ' 裁切後圖片的保存路徑
+
+' 裁切範圍的設定（從 x=0 到 x=910 的區域，保留原始高度）
+Dim cropWidth As Integer = 910
+Dim cropHeight As Integer
+
+' 加載原始圖片，使用 System.Drawing.Image 來避免模棱兩可
+Using originalImage As System.Drawing.Image = System.Drawing.Image.FromFile(inputImagePath)
+    ' 設置裁切高度為圖片的原始高度
+    cropHeight = originalImage.Height
+
+    ' 設置裁切區域
+    Dim cropArea As New Rectangle(0, 0, cropWidth, cropHeight)
+
+    ' 創建新的位圖，用於存儲裁切後的圖片
+    Using croppedImage As New Bitmap(cropWidth, cropHeight)
+        Using g As Graphics = Graphics.FromImage(croppedImage)
+            ' 裁切圖片，僅保留指定範圍
+            g.DrawImage(originalImage, New Rectangle(0, 0, cropWidth, cropHeight), cropArea, GraphicsUnit.Pixel)
+        End Using
+
+        ' 保存裁切後的圖片
+        croppedImage.Save(outputImagePath)
+    End Using
+End Using
+
+方法 2：在 Imports 中指定完整命名空間
+
+在 Invoke Code 活動的 Imports 部分中，明確導入 System.Drawing，以確保正確使用 System.Drawing.Image 類：
+
+1. 在 UiPath 的 Invoke Code 活動中，找到 Imports 屬性。
+
+
+2. 在 Imports 中添加 System.Drawing，這樣可以使 Image 類默認為 System.Drawing.Image。
+
+
+3. 如果仍有衝突，可以在代碼中使用 System.Drawing.Image。
+
+
+
+方法 3：只使用 System.Drawing.Bitmap
+
+如果您只需使用 Bitmap 類，可以直接用 Bitmap，並避免使用 Image。這樣可以避免命名衝突：
+
+' 使用 Bitmap 類直接加載圖片
+Using originalImage As New Bitmap(inputImagePath)
+    ' 其他代碼與之前一致
+End Using
+
+這樣可以避免 Image 的模棱兩可問題，並使代碼更加簡潔。
+
+
+
 如果您希望截取圖片 P3Chart.png 中寬度的 0 到 910 像素這一段（即對圖片進行裁切，而不是縮放），可以使用 UiPath 的 Invoke Code 活動，並編寫 VB.NET 代碼來裁切圖片。以下是具體操作步驟：
 
 步驟 1：截圖並保存圖片
