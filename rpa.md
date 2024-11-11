@@ -1,3 +1,52 @@
+在 UiPath 的 Invoke Code 活動中，確實有時候會遇到 Imports 無法正常使用的限制。如果無法直接使用 Imports System.Drawing，可以通過完整限定名稱來解決這個問題。以下是具體的解決方案：
+
+方法：在代碼中使用完整限定名稱
+
+既然無法使用 Imports，我們可以直接在代碼中使用 System.Drawing 命名空間的完整名稱。這樣可以避免需要導入 System.Drawing，並且仍然可以使用圖片處理功能。
+
+完整限定名稱代碼示例
+
+以下代碼直接使用 System.Drawing.Bitmap 和 System.Drawing.Rectangle 的完整名稱，無需 Imports。
+
+' 定義圖片路徑
+Dim inputImagePath As String = "C:\Images\P3Chart.png" ' 原始圖片路徑
+Dim outputImagePath As String = "C:\Images\P3Chart_cropped.png" ' 裁切後圖片的保存路徑
+
+' 裁切範圍的設定（從 x=0 到 x=910 的區域，保留原始高度）
+Dim cropWidth As Integer = 910
+Dim cropHeight As Integer
+
+' 加載原始圖片，直接使用 System.Drawing.Bitmap 類
+Using originalImage As New System.Drawing.Bitmap(inputImagePath)
+    ' 設置裁切高度為圖片的原始高度
+    cropHeight = originalImage.Height
+
+    ' 設置裁切區域，使用完整的 System.Drawing.Rectangle
+    Dim cropArea As New System.Drawing.Rectangle(0, 0, cropWidth, cropHeight)
+
+    ' 創建新的位圖，用於存儲裁切後的圖片
+    Using croppedImage As New System.Drawing.Bitmap(cropWidth, cropHeight)
+        Using g As System.Drawing.Graphics = System.Drawing.Graphics.FromImage(croppedImage)
+            ' 裁切圖片，僅保留指定範圍
+            g.DrawImage(originalImage, New System.Drawing.Rectangle(0, 0, cropWidth, cropHeight), cropArea, System.Drawing.GraphicsUnit.Pixel)
+        End Using
+
+        ' 保存裁切後的圖片
+        croppedImage.Save(outputImagePath, System.Drawing.Imaging.ImageFormat.Png)
+    End Using
+End Using
+
+說明
+
+System.Drawing.Bitmap 和 System.Drawing.Rectangle：在代碼中直接使用完整名稱，以避免 Imports 限制。
+
+System.Drawing.Graphics 和 System.Drawing.Imaging.ImageFormat：同樣使用完整名稱，確保在沒有 Imports 的情況下可以正確引用。
+
+
+這段代碼應該可以在 Invoke Code 中正常運行，並裁切圖片的寬度從 0 到 910 像素的部分，並保留圖片的原始高度。
+
+
+
 在 UiPath 中使用 Invoke Code 活動時，確保 Imports System.Drawing 能夠正常使用圖像處理功能，有時可能需要手動在編碼區域中指定類的完整命名空間。如果 Image 模棱兩可，可能是由於 System.Web.UI.WebControls 或其他命名空間中的 Image 類造成的命名衝突。
 
 以下是具體的解決方法：
