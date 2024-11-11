@@ -1,3 +1,57 @@
+是的，在 HTML 中的 <script type="module"> 標籤中，每個 <script> 標籤都是獨立的作用域。如果在 <script> A 中匯入了一個模組，那麼在 <script> B 中是無法直接使用 A 中的匯入內容的，除非 B 也明確地匯入相同的模組。
+
+這是因為每個 <script type="module"> 具備獨立的模組作用域，變數和函式不會在 <script> 標籤間共享。因此，在每個需要使用模組的 <script> 標籤中都必須明確地進行匯入。
+
+範例
+
+以下範例展示了這個特性：
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module Scope Example</title>
+</head>
+<body>
+  <h1>Module Import Scope</h1>
+
+  <!-- Script A: 匯入模組 -->
+  <script type="module">
+    import { add } from './utils.js';
+    console.log("3 + 4 =", add(3, 4)); // 輸出：3 + 4 = 7
+  </script>
+
+  <!-- Script B: 未匯入模組 -->
+  <script type="module">
+    // 嘗試直接使用 add 函式（會產生錯誤）
+    console.log("10 - 5 =", add(10, 5)); // 會報錯：add is not defined
+  </script>
+</body>
+</html>
+
+解決方案
+
+如果需要在多個 <script> 標籤中使用相同的模組，則必須在每個 <script> 標籤中進行匯入：
+
+<!-- Script A: 匯入模組 -->
+<script type="module">
+  import { add } from './utils.js';
+  console.log("3 + 4 =", add(3, 4)); // 輸出：3 + 4 = 7
+</script>
+
+<!-- Script B: 再次匯入模組 -->
+<script type="module">
+  import { add, subtract } from './utils.js';
+  console.log("10 - 5 =", subtract(10, 5)); // 輸出：10 - 5 = 5
+</script>
+
+總結
+
+每個 <script type="module"> 標籤都是獨立的執行環境，無法直接引用另一個 <script> 中的變數或函式。若要在多個 <script> 標籤中使用模組的內容，必須在每個 <script> 中明確地重新匯入模組。
+
+
+
 要在 JavaScript 中導入 utils.js 模組，可以使用 ES6 模組語法 import，前提是需要透過伺服器提供資源（不能直接從 file:// 協議開啟 HTML 文件）。以下是具體範例：
 
 假設你有以下的檔案結構：
