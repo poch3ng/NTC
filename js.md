@@ -1,3 +1,55 @@
+匿名函式（Anonymous Function）是沒有名稱的函式，在 JavaScript 中可以直接用來傳遞或執行，通常作為回呼函式（callback function）使用。匿名函式常用於一次性的操作，不需要在程式中重複引用。以下是一些匿名函式的常見應用範例：
+
+1. 基本匿名函式
+
+一個最簡單的匿名函式如下，它不需要名稱，可以直接執行：
+
+(function() {
+  console.log("這是一個匿名函式");
+})();
+
+在這個例子中，函式定義後立即執行（IIFE，即 Immediately Invoked Function Expression），適用於一些一次性初始化的情況。
+
+2. 以匿名函式作為回呼函式
+
+在 JavaScript 中，匿名函式經常用於回呼函式中，比如 map、filter、reduce 等陣列方法中：
+
+const numbers = [1, 2, 3, 4, 5];
+const doubledNumbers = numbers.map(function(number) {
+  return number * 2;
+});
+
+console.log(doubledNumbers); // 輸出：[2, 4, 6, 8, 10]
+
+這裡的 function(number) { return number * 2; } 就是匿名函式，因為不需要重複使用，所以沒有名稱。
+
+3. 箭頭函式（Arrow Function）也是匿名函式
+
+ES6 引入的箭頭函式語法也是一種匿名函式的形式，更加簡潔：
+
+const numbers = [1, 2, 3, 4, 5];
+const doubledNumbers = numbers.map(number => number * 2);
+
+console.log(doubledNumbers); // 輸出：[2, 4, 6, 8, 10]
+
+在這個例子中，number => number * 2 就是一個箭頭函式的匿名函式，用於 map 的回呼函式。
+
+4. 事件處理中的匿名函式
+
+匿名函式也常用於事件處理，比如按鈕的點擊事件：
+
+document.getElementById("myButton").addEventListener("click", function() {
+  console.log("按鈕被點擊了！");
+});
+
+這裡的 function() { console.log("按鈕被點擊了！"); } 就是匿名函式，用於處理點擊事件。
+
+總結
+
+匿名函式的優點是簡潔，可以快速編寫一次性的程式碼，尤其在回呼函式和事件處理時非常常用。不過，因為匿名函式沒有名稱，通常不適合在需要多次調用的情況下使用。
+
+
+
 以下是 JavaScript reduce 方法的範例，展示如何使用它來累積數字和組合陣列中的物件屬性值：
 
 1. 累加數字
