@@ -1,3 +1,64 @@
+如果您希望截取圖片 P3Chart.png 中寬度的 0 到 910 像素這一段（即對圖片進行裁切，而不是縮放），可以使用 UiPath 的 Invoke Code 活動，並編寫 VB.NET 代碼來裁切圖片。以下是具體操作步驟：
+
+步驟 1：截圖並保存圖片
+
+使用 Take Screenshot 和 Save Image 活動將網頁上的圖表保存為 P3Chart.png。
+
+步驟 2：使用 Invoke Code 活動裁切圖片
+
+在 Invoke Code 活動中使用 VB.NET 的 System.Drawing 命名空間來裁切圖片的指定區域。以下是完整的 VB.NET 代碼：
+
+Imports System.Drawing
+
+' 定義圖片路徑
+Dim inputImagePath As String = "C:\Images\P3Chart.png" ' 原始圖片路徑
+Dim outputImagePath As String = "C:\Images\P3Chart_cropped.png" ' 裁切後圖片的保存路徑
+
+' 裁切範圍的設定（從 x=0 到 x=910 的區域，保留原始高度）
+Dim cropWidth As Integer = 910
+Dim cropHeight As Integer
+
+' 加載原始圖片
+Using originalImage As Image = Image.FromFile(inputImagePath)
+    ' 設置裁切高度為圖片的原始高度
+    cropHeight = originalImage.Height
+
+    ' 設置裁切區域
+    Dim cropArea As New Rectangle(0, 0, cropWidth, cropHeight)
+
+    ' 創建新的位圖，用於存儲裁切後的圖片
+    Using croppedImage As New Bitmap(cropWidth, cropHeight)
+        Using g As Graphics = Graphics.FromImage(croppedImage)
+            ' 裁切圖片，僅保留指定範圍
+            g.DrawImage(originalImage, New Rectangle(0, 0, cropWidth, cropHeight), cropArea, GraphicsUnit.Pixel)
+        End Using
+
+        ' 保存裁切後的圖片
+        croppedImage.Save(outputImagePath)
+    End Using
+End Using
+
+代碼說明
+
+1. inputImagePath 和 outputImagePath：分別是原始圖片路徑和裁切後圖片的保存路徑。請根據您的文件夾路徑修改這些值。
+
+
+2. cropWidth 和 cropHeight：cropWidth 設置為 910，cropHeight 設置為原始圖片的高度。這樣可以確保裁切區域僅保留圖片的左側 0 到 910 像素。
+
+
+3. cropArea：使用 Rectangle 類來指定裁切區域，從 (0, 0) 開始，寬度為 910，並保留整個高度。
+
+
+4. 使用 Graphics 物件將圖片的指定區域繪製到新圖片上，並保存裁切後的圖片。
+
+
+
+操作結果
+
+執行這段代碼後，您將得到一張寬度為 910 像素的裁切圖片，從原始圖片的左側開始，保留圖片的整個高度。裁切後的圖片將保存為 P3Chart_cropped.png，存儲在您指定的路徑下。
+
+
+
 您可以將所有步驟都寫入一段 JavaScript 代碼，並使用 Inject JS Script 在 UiPath 中一次性執行，這樣就能在 JavaScript 中獲取視窗大小、目標元素大小，計算所需的縮放比例並直接應用到網頁上。以下是完整的 JavaScript 代碼：
 
 完整的 JavaScript 代碼範例
