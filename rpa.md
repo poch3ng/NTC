@@ -1,3 +1,78 @@
+若您希望表格的方向改為「欄位名稱在左側，對應的值在右側」，可以將表格設計為垂直排列，如下所示：
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>網址擷取工具</title>
+</head>
+<body>
+    <h2>網址擷取工具</h2>
+    <p>請輸入網址（格式：https://ntcoaap43/OA_Collection/系統名/_versionControl?path=%24/系統名/）</p>
+    <input type="text" id="urlInput" placeholder="貼上網址">
+    <button onclick="extractPaths()">擷取</button>
+
+    <table border="1" style="margin-top: 20px; width: 100%; text-align: left;">
+        <tbody id="resultTable">
+            <!-- 擷取結果將顯示在此 -->
+            <tr>
+                <th>Website</th>
+                <td id="websiteCell"></td>
+            </tr>
+            <tr>
+                <th>System Name</th>
+                <td id="systemNameCell"></td>
+            </tr>
+            <tr>
+                <th>DevOpsPath</th>
+                <td id="devOpsPathCell"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        function extractPaths() {
+            const url = document.getElementById('urlInput').value;
+            const urlPattern = /^https:\/\/ntcoaap43\/OA_Collection\/([^\/]+)\/_versionControl\?path=(.+)$/;
+
+            // 清空先前的結果
+            document.getElementById('websiteCell').textContent = "";
+            document.getElementById('systemNameCell').textContent = "";
+            document.getElementById('devOpsPathCell').textContent = "";
+
+            const match = url.match(urlPattern);
+            if (match) {
+                const systemName = match[1];
+                const devOpsPath = decodeURIComponent(match[2]);
+                const website = `https://ntcoaap43/OA_Collection/${systemName}`;
+
+                // 顯示擷取結果
+                document.getElementById('websiteCell').textContent = website;
+                document.getElementById('systemNameCell').textContent = systemName;
+                document.getElementById('devOpsPathCell').textContent = devOpsPath;
+            } else {
+                // 若格式錯誤，顯示錯誤提示
+                document.getElementById('websiteCell').textContent = "請輸入符合格式的網址！";
+            }
+        }
+    </script>
+</body>
+</html>
+
+更新說明
+
+1. 垂直排列：表格的每一列分別顯示 Website、System Name 和 DevOpsPath，欄位名稱在左側，對應的值在右側。
+
+
+2. 擷取結果顯示：若網址符合格式，對應的欄位會顯示相應的值。若格式不正確，則 Website 欄位顯示錯誤訊息。
+
+
+
+這種方式更適合垂直顯示，讓每個欄位的名稱和數據對齊排列。
+
+
+
 以下是更新後的程式碼，它將顯示一個表格，包含 Website、System Name 和 DevOpsPath：
 
 <!DOCTYPE html>
