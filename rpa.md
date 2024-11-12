@@ -1,3 +1,118 @@
+如果希望在複製後貼上電子郵件或其他支援 HTML 的應用中仍保留表格樣式，可以將表格內容轉換為 HTML 格式並複製。以下是更新後的程式碼，新增 copyTable() 函數會將表格轉為 HTML 格式進行複製：
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>網址擷取工具</title>
+    <style>
+        /* 設定表格樣式 */
+        table {
+            width: 400px;
+            border-collapse: collapse;
+            border: 2px solid black;
+            margin-top: 20px;
+        }
+
+        /* 設定表格欄位固定高度和寬度 */
+        th, td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: left;
+            width: 200px;
+            height: 50px;
+        }
+
+        th {
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <h2>網址擷取工具</h2>
+    <p>請輸入網址（格式：https://ntcoaap43/OA_Collection/系統名/_versionControl?path=%24/系統名/）</p>
+    <input type="text" id="urlInput" placeholder="貼上網址">
+    <button onclick="extractPaths()">擷取</button>
+    <button onclick="copyTable()">複製表格</button>
+
+    <table>
+        <tbody id="resultTable">
+            <!-- 擷取結果將顯示在此 -->
+            <tr>
+                <th>Website</th>
+                <td id="websiteCell"></td>
+            </tr>
+            <tr>
+                <th>System Name</th>
+                <td id="systemNameCell"></td>
+            </tr>
+            <tr>
+                <th>DevOpsPath</th>
+                <td id="devOpsPathCell"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        function extractPaths() {
+            const url = document.getElementById('urlInput').value;
+            const urlPattern = /^https:\/\/ntcoaap43\/OA_Collection\/([^\/]+)\/_versionControl\?path=(.+)$/;
+
+            // 清空先前的結果
+            document.getElementById('websiteCell').textContent = "";
+            document.getElementById('systemNameCell').textContent = "";
+            document.getElementById('devOpsPathCell').textContent = "";
+
+            const match = url.match(urlPattern);
+            if (match) {
+                const website = `https://ntcoaap43/OA_Collection/${match[1]}`;
+                const devOpsPath = decodeURIComponent(match[2]);
+                const pathParts = devOpsPath.split('/');
+                const systemName = pathParts[pathParts.length - 1];
+
+                // 顯示擷取結果
+                document.getElementById('websiteCell').textContent = website;
+                document.getElementById('systemNameCell').textContent = systemName;
+                document.getElementById('devOpsPathCell').textContent = devOpsPath;
+            } else {
+                // 若格式錯誤，顯示錯誤提示
+                document.getElementById('websiteCell').textContent = "請輸入符合格式的網址！";
+            }
+        }
+
+        function copyTable() {
+            // 取得表格的 HTML 結構
+            const table = document.getElementById('resultTable').parentNode.outerHTML;
+
+            // 使用 Clipboard API 複製 HTML
+            navigator.clipboard.writeText(table)
+                .then(() => {
+                    alert('表格內容已複製，可貼到電子郵件中');
+                })
+                .catch(err => {
+                    console.error('無法複製內容', err);
+                });
+        }
+    </script>
+</body>
+</html>
+
+功能說明
+
+1. 複製表格為 HTML：copyTable() 函數會取得表格的 HTML 結構，並將其存儲到剪貼簿。
+
+
+2. Clipboard API 支援 HTML 格式：navigator.clipboard.writeText 支援複製 HTML，確保貼上時保留表格樣式。
+
+
+
+> 注意：某些電子郵件應用程式可能會處理剪貼簿內容，導致格式不完全相同。此程式碼應在支援 HTML 的應用中正常工作。
+
+
+
+
+
 以下是更新後的程式碼，新增了一個「複製表格」按鈕，讓您可以將表格內容複製到剪貼簿，然後可以方便地貼到電子郵件中：
 
 <!DOCTYPE html>
