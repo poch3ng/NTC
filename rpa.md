@@ -1,3 +1,123 @@
+以下是更新後的程式碼，新增了一個「複製表格」按鈕，讓您可以將表格內容複製到剪貼簿，然後可以方便地貼到電子郵件中：
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>網址擷取工具</title>
+    <style>
+        /* 設定表格樣式 */
+        table {
+            width: 400px;
+            border-collapse: collapse;
+            border: 2px solid black;
+            margin-top: 20px;
+        }
+
+        /* 設定表格欄位固定高度和寬度 */
+        th, td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: left;
+            width: 200px;
+            height: 50px;
+        }
+
+        th {
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <h2>網址擷取工具</h2>
+    <p>請輸入網址（格式：https://ntcoaap43/OA_Collection/系統名/_versionControl?path=%24/系統名/）</p>
+    <input type="text" id="urlInput" placeholder="貼上網址">
+    <button onclick="extractPaths()">擷取</button>
+    <button onclick="copyTable()">複製表格</button>
+
+    <table>
+        <tbody id="resultTable">
+            <!-- 擷取結果將顯示在此 -->
+            <tr>
+                <th>Website</th>
+                <td id="websiteCell"></td>
+            </tr>
+            <tr>
+                <th>System Name</th>
+                <td id="systemNameCell"></td>
+            </tr>
+            <tr>
+                <th>DevOpsPath</th>
+                <td id="devOpsPathCell"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        function extractPaths() {
+            const url = document.getElementById('urlInput').value;
+            const urlPattern = /^https:\/\/ntcoaap43\/OA_Collection\/([^\/]+)\/_versionControl\?path=(.+)$/;
+
+            // 清空先前的結果
+            document.getElementById('websiteCell').textContent = "";
+            document.getElementById('systemNameCell').textContent = "";
+            document.getElementById('devOpsPathCell').textContent = "";
+
+            const match = url.match(urlPattern);
+            if (match) {
+                const website = `https://ntcoaap43/OA_Collection/${match[1]}`;
+                const devOpsPath = decodeURIComponent(match[2]);
+                const pathParts = devOpsPath.split('/');
+                const systemName = pathParts[pathParts.length - 1];
+
+                // 顯示擷取結果
+                document.getElementById('websiteCell').textContent = website;
+                document.getElementById('systemNameCell').textContent = systemName;
+                document.getElementById('devOpsPathCell').textContent = devOpsPath;
+            } else {
+                // 若格式錯誤，顯示錯誤提示
+                document.getElementById('websiteCell').textContent = "請輸入符合格式的網址！";
+            }
+        }
+
+        function copyTable() {
+            // 取得表格的內容
+            const table = document.getElementById('resultTable');
+            let textToCopy = '';
+            for (let row of table.rows) {
+                textToCopy += row.cells[0].textContent + ': ' + row.cells[1].textContent + '\n';
+            }
+
+            // 將內容複製到剪貼簿
+            navigator.clipboard.writeText(textToCopy)
+                .then(() => {
+                    alert('表格內容已複製，可貼到電子郵件中');
+                })
+                .catch(err => {
+                    console.error('無法複製內容', err);
+                });
+        }
+    </script>
+</body>
+</html>
+
+功能說明
+
+1. 複製表格 按鈕：新增了 copyTable() 函數，將表格內容以文字形式複製到剪貼簿。
+
+
+2. 複製表格內容：copyTable() 函數遍歷表格的每一行，將 th 和 td 的內容組成文字格式，每行顯示為「欄位名稱: 值」的格式，並複製到剪貼簿中。
+
+
+3. 成功通知：複製成功後會顯示提示，讓您知道已經可以將內容貼到電子郵件中。
+
+
+
+此方式確保您可以快速複製並貼到任何支援純文字的應用，例如電子郵件。
+
+
+
 了解！以下是更新後的程式碼，Website 保持原始的網址結構，只修改 System Name 顯示為 DevOpsPath 最後的名稱部分：
 
 <!DOCTYPE html>
