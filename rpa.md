@@ -1,3 +1,101 @@
+了解！以下是更新後的程式碼，Website 保持原始的網址結構，只修改 System Name 顯示為 DevOpsPath 最後的名稱部分：
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>網址擷取工具</title>
+    <style>
+        /* 設定表格樣式 */
+        table {
+            width: 400px;
+            border-collapse: collapse;
+            border: 2px solid black;
+            margin-top: 20px;
+        }
+
+        /* 設定表格欄位固定高度和寬度 */
+        th, td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: left;
+            width: 200px;
+            height: 50px;
+        }
+
+        th {
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <h2>網址擷取工具</h2>
+    <p>請輸入網址（格式：https://ntcoaap43/OA_Collection/系統名/_versionControl?path=%24/系統名/）</p>
+    <input type="text" id="urlInput" placeholder="貼上網址">
+    <button onclick="extractPaths()">擷取</button>
+
+    <table>
+        <tbody id="resultTable">
+            <!-- 擷取結果將顯示在此 -->
+            <tr>
+                <th>Website</th>
+                <td id="websiteCell"></td>
+            </tr>
+            <tr>
+                <th>System Name</th>
+                <td id="systemNameCell"></td>
+            </tr>
+            <tr>
+                <th>DevOpsPath</th>
+                <td id="devOpsPathCell"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        function extractPaths() {
+            const url = document.getElementById('urlInput').value;
+            const urlPattern = /^https:\/\/ntcoaap43\/OA_Collection\/([^\/]+)\/_versionControl\?path=(.+)$/;
+
+            // 清空先前的結果
+            document.getElementById('websiteCell').textContent = "";
+            document.getElementById('systemNameCell').textContent = "";
+            document.getElementById('devOpsPathCell').textContent = "";
+
+            const match = url.match(urlPattern);
+            if (match) {
+                const website = `https://ntcoaap43/OA_Collection/${match[1]}`;
+                const devOpsPath = decodeURIComponent(match[2]);
+                const pathParts = devOpsPath.split('/');
+                const systemName = pathParts[pathParts.length - 1];
+
+                // 顯示擷取結果
+                document.getElementById('websiteCell').textContent = website;
+                document.getElementById('systemNameCell').textContent = systemName;
+                document.getElementById('devOpsPathCell').textContent = devOpsPath;
+            } else {
+                // 若格式錯誤，顯示錯誤提示
+                document.getElementById('websiteCell').textContent = "請輸入符合格式的網址！";
+            }
+        }
+    </script>
+</body>
+</html>
+
+更新說明
+
+1. 保持原始 Website：Website 部分顯示原始的 https://ntcoaap43/OA_Collection/系統名。
+
+
+2. System Name 的取得：從 DevOpsPath 中擷取最後一段作為 System Name，無需改動 Website。
+
+
+
+此程式碼確保 Website 為原始結構，System Name 為 DevOpsPath 的最後部分。
+
+
+
 明白了！以下是更新後的程式碼，System Name 將會顯示 DevOpsPath 最後的名稱部分：
 
 <!DOCTYPE html>
