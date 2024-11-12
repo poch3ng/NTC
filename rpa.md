@@ -1,3 +1,64 @@
+以下是一個 HTML 和 JavaScript 的範例程式碼，能讓使用者貼上指定格式的網址並按下按鈕後自動擷取出 website 和 DevOpsPath，並顯示在頁面上：
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>網址擷取工具</title>
+</head>
+<body>
+    <h2>網址擷取工具</h2>
+    <p>請輸入網址（格式：https://ntcoaap43/OA_Collection/系統名/_versionControl?path=%24/系統名/）</p>
+    <input type="text" id="urlInput" placeholder="貼上網址">
+    <button onclick="extractPaths()">擷取</button>
+    <p id="result"></p>
+
+    <script>
+        function extractPaths() {
+            const url = document.getElementById('urlInput').value;
+            const urlPattern = /^https:\/\/ntcoaap43\/OA_Collection\/([^\/]+)\/_versionControl\?path=(.+)$/;
+            const result = document.getElementById('result');
+
+            // 清空結果區域
+            result.textContent = "";
+
+            const match = url.match(urlPattern);
+            if (match) {
+                const systemName = match[1];
+                const devOpsPath = match[2];
+
+                const website = `https://ntcoaap43/OA_Collection/${systemName}`;
+                const DevOpsPath = decodeURIComponent(devOpsPath);
+
+                result.innerHTML = `website: ${website}<br>DevOpsPath: ${DevOpsPath}`;
+            } else {
+                result.textContent = "請輸入符合格式的網址！";
+            }
+        }
+    </script>
+</body>
+</html>
+
+說明
+
+1. 使用者輸入指定格式的網址在 input 欄位中。
+
+
+2. 點擊「擷取」按鈕後，JavaScript 函數 extractPaths() 會根據正則表達式解析出 website 和 DevOpsPath。
+
+
+3. 如果格式正確，會在頁面上顯示擷取出的 website 和 DevOpsPath。
+
+
+4. 若格式不符，則顯示錯誤訊息。
+
+
+
+此範例假設網址格式始終符合所描述的格式（如有變動需求，可調整正則表達式）。
+
+
+
 在 UiPath 中寄送郵件時，如果希望內文中的文字呈現藍色，可以使用 HTML 標籤來設定字體顏色。以下是具體做法：
 
 1. 使用 <span> 或 <font> 標籤設定字體顏色
