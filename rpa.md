@@ -1,3 +1,25 @@
+在 UiPath 中寄送郵件時，如果希望內文中的文字呈現藍色，可以使用 HTML 標籤來設定字體顏色。以下是具體做法：
+
+1. 使用 <span> 或 <font> 標籤設定字體顏色
+使用 HTML 的 <span> 或 <font> 標籤設定字體顏色，設定 style="color:blue;" 來將文字變成藍色。
+
+範例如下：
+
+"<html><body><p>這是一般文字。</p><p><span style='color:blue;'>這是藍色文字。</span></p></body></html>"
+
+
+2. 確保 IsBodyHtml 選項為 True 在 Send Outlook Mail Message 或 Send SMTP Mail Message 活動中，勾選 IsBodyHtml 以啟用 HTML 格式。
+
+
+
+完整範例代碼：
+
+"<html><body><p>這是一般文字。</p><p><span style='color:blue;'>這是藍色文字。</span></p></body></html>"
+
+這樣寄出後，收件人會看到指定的文字以藍色顯示在內文中。
+
+
+
 在 UiPath 的 Invoke Code 活動中，確實有時候會遇到 Imports 無法正常使用的限制。如果無法直接使用 Imports System.Drawing，可以通過完整限定名稱來解決這個問題。以下是具體的解決方案：
 
 方法：在代碼中使用完整限定名稱
