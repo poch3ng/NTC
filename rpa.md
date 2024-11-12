@@ -1,3 +1,104 @@
+明白了！以下是更新後的程式碼，System Name 將會顯示 DevOpsPath 最後的名稱部分：
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>網址擷取工具</title>
+    <style>
+        /* 設定表格樣式 */
+        table {
+            width: 400px;
+            border-collapse: collapse;
+            border: 2px solid black;
+            margin-top: 20px;
+        }
+
+        /* 設定表格欄位固定高度和寬度 */
+        th, td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: left;
+            width: 200px;
+            height: 50px;
+        }
+
+        th {
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <h2>網址擷取工具</h2>
+    <p>請輸入網址（格式：https://ntcoaap43/OA_Collection/系統名/_versionControl?path=%24/系統名/）</p>
+    <input type="text" id="urlInput" placeholder="貼上網址">
+    <button onclick="extractPaths()">擷取</button>
+
+    <table>
+        <tbody id="resultTable">
+            <!-- 擷取結果將顯示在此 -->
+            <tr>
+                <th>Website</th>
+                <td id="websiteCell"></td>
+            </tr>
+            <tr>
+                <th>System Name</th>
+                <td id="systemNameCell"></td>
+            </tr>
+            <tr>
+                <th>DevOpsPath</th>
+                <td id="devOpsPathCell"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        function extractPaths() {
+            const url = document.getElementById('urlInput').value;
+            const urlPattern = /^https:\/\/ntcoaap43\/OA_Collection\/([^\/]+)\/_versionControl\?path=(.+)$/;
+
+            // 清空先前的結果
+            document.getElementById('websiteCell').textContent = "";
+            document.getElementById('systemNameCell').textContent = "";
+            document.getElementById('devOpsPathCell').textContent = "";
+
+            const match = url.match(urlPattern);
+            if (match) {
+                const devOpsPath = decodeURIComponent(match[2]);
+                const pathParts = devOpsPath.split('/');
+                const systemName = pathParts[pathParts.length - 1];
+                const website = `https://ntcoaap43/OA_Collection/${systemName}`;
+
+                // 顯示擷取結果
+                document.getElementById('websiteCell').textContent = website;
+                document.getElementById('systemNameCell').textContent = systemName;
+                document.getElementById('devOpsPathCell').textContent = devOpsPath;
+            } else {
+                // 若格式錯誤，顯示錯誤提示
+                document.getElementById('websiteCell').textContent = "請輸入符合格式的網址！";
+            }
+        }
+    </script>
+</body>
+</html>
+
+更新說明
+
+1. System Name 的取得方式：從 DevOpsPath 中擷取最後一段作為 System Name。
+
+devOpsPath.split('/') 將 DevOpsPath 分割為多段，取最後一段作為 System Name。
+
+
+
+2. 顯示結果：Website 使用擷取出的 System Name 組成，並在表格中顯示。
+
+
+
+此程式碼確保 System Name 為 DevOpsPath 最後的名稱部分。
+
+
+
 若您希望表格的方向改為「欄位名稱在左側，對應的值在右側」，可以將表格設計為垂直排列，如下所示：
 
 <!DOCTYPE html>
