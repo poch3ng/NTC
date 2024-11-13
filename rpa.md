@@ -1,3 +1,203 @@
+抱歉造成不便，讓我們改進一下 JavaScript 邏輯，確保每次點擊圖片時都能正確顯示放大效果。這裡修改了放大邏輯，讓每次點擊圖片時都可以正常放大顯示。
+
+以下是改良後的程式碼：
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevOps URL Extractor</title>
+    <style>
+        /* 設定表格樣式 */
+        table {
+            width: 400px;
+            border-collapse: collapse;
+            border: 2px solid black;
+            margin-top: 20px;
+        }
+
+        /* 設定表格欄位固定高度和寬度 */
+        th, td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: left;
+            width: 200px;
+            height: 50px;
+        }
+
+        th {
+            background-color: #f0f0f0;
+        }
+
+        /* 操作步驟樣式 */
+        .instructions {
+            margin-top: 30px;
+        }
+
+        .step {
+            margin-bottom: 20px;
+        }
+
+        .step img {
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid #ddd;
+            padding: 5px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        /* 放大圖片的樣式 */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .overlay img {
+            max-width: 90%;
+            max-height: 90%;
+        }
+    </style>
+</head>
+<body>
+    <h2>DevOps URL Extractor</h2>
+    <p>請輸入網址（格式：https://ntcoaap43/OA_Collection/系統名/_versionControl?path=%24/系統名/）</p>
+    <input type="text" id="urlInput" placeholder="貼上網址">
+    <button onclick="extractPaths()">擷取</button>
+    <button onclick="copyTable()">複製表格</button>
+
+    <table>
+        <tbody id="resultTable">
+            <tr>
+                <th>Website</th>
+                <td id="websiteCell"></td>
+            </tr>
+            <tr>
+                <th>System Name</th>
+                <td id="systemNameCell"></td>
+            </tr>
+            <tr>
+                <th>DevOpsPath</th>
+                <td id="devOpsPathCell"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="instructions">
+        <h3>操作步驟</h3>
+        <div class="step">
+            <p><strong>步驟 1:</strong> 將 DevOps URL 貼到上方的輸入框。</p>
+            <img src="images/step1.png" alt="步驟 1 - 貼上 URL" onclick="showOverlay('images/step1.png')">
+        </div>
+        <div class="step">
+            <p><strong>步驟 2:</strong> 點擊「擷取」按鈕，解析並顯示 Website、System Name 和 DevOpsPath。</p>
+            <img src="images/step2.png" alt="步驟 2 - 點擊擷取" onclick="showOverlay('images/step2.png')">
+        </div>
+        <div class="step">
+            <p><strong>步驟 3:</strong> 若需要將表格貼到 Excel，點擊「複製表格」按鈕，然後在 Excel 中貼上。</p>
+            <img src="images/step3.png" alt="步驟 3 - 複製表格" onclick="showOverlay('images/step3.png')">
+        </div>
+    </div>
+
+    <!-- 放大圖片的 overlay -->
+    <div id="overlay" class="overlay" onclick="hideOverlay()">
+        <img id="overlayImage" src="" alt="放大圖片">
+    </div>
+
+    <script>
+        function extractPaths() {
+            const url = document.getElementById('urlInput').value;
+            const urlPattern = /^https:\/\/ntcoaap43\/OA_Collection\/([^\/]+)\/_versionControl\?path=(.+)$/;
+
+            document.getElementById('websiteCell').textContent = "";
+            document.getElementById('systemNameCell').textContent = "";
+            document.getElementById('devOpsPathCell').textContent = "";
+
+            const match = url.match(urlPattern);
+            if (match) {
+                const website = `https://ntcoaap43/OA_Collection/${match[1]}`;
+                const devOpsPath = decodeURIComponent(match[2]);
+                const pathParts = devOpsPath.split('/');
+                const systemName = pathParts[pathParts.length - 1];
+
+                document.getElementById('websiteCell').textContent = website;
+                document.getElementById('systemNameCell').textContent = systemName;
+                document.getElementById('devOpsPathCell').textContent = devOpsPath;
+            } else {
+                document.getElementById('websiteCell').textContent = "請輸入符合格式的網址！";
+            }
+        }
+
+        function copyTable() {
+            const table = document.getElementById('resultTable');
+            let textToCopy = '';
+            for (let row of table.rows) {
+                const cells = Array.from(row.cells).map(cell => cell.textContent);
+                textToCopy += cells.join('\t') + '\n';
+            }
+
+            navigator.clipboard.writeText(textToCopy)
+                .then(() => {
+                    alert('表格內容已複製，可貼到 Excel 中');
+                })
+                .catch(err => {
+                    console.error('無法複製內容', err);
+                });
+        }
+
+        // 顯示 overlay 圖片
+        function showOverlay(src) {
+            const overlay = document.getElementById('overlay');
+            const overlayImage = document.getElementById('overlayImage');
+            overlayImage.src = src;
+            overlay.style.display = 'flex';
+        }
+
+        // 隱藏 overlay 圖片
+        function hideOverlay() {
+            const overlay = document.getElementById('overlay');
+            overlay.style.display = 'none';
+        }
+    </script>
+</body>
+</html>
+
+功能說明
+
+1. 放大顯示功能更新：
+
+使用 showOverlay(src) 函數來動態設定圖片的來源 src，並顯示放大的圖片。
+
+點擊圖片時會呼叫 showOverlay，並傳入圖片的路徑作為參數。
+
+
+
+2. 多次點擊顯示支持：
+
+showOverlay 每次都會將新的圖片路徑設置給 overlayImage，確保每次點擊不同圖片時，顯示的圖片來源會更新。
+
+
+
+3. 隱藏放大圖片：
+
+點擊 overlay 時觸發 hideOverlay() 函數，將 overlay 的 display 設為 none，實現點擊關閉放大圖片的效果。
+
+
+
+
+這樣設計可以多次點擊圖片，並正確顯示對應的放大圖片。
+
+
+
 要實現點擊圖片時放大顯示，可以使用簡單的 JavaScript 和 CSS，讓圖片點擊後以全螢幕模式顯示。以下是改良後的程式碼，添加了點擊圖片放大顯示的功能：
 
 <!DOCTYPE html>
