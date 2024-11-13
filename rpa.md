@@ -1,3 +1,150 @@
+在頁面下方新增操作步驟和圖片可以更直觀地指導使用者。以下是添加操作步驟和圖片展示區的程式碼示例：
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevOps URL Extractor</title>
+    <style>
+        /* 設定表格樣式 */
+        table {
+            width: 400px;
+            border-collapse: collapse;
+            border: 2px solid black;
+            margin-top: 20px;
+        }
+
+        /* 設定表格欄位固定高度和寬度 */
+        th, td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: left;
+            width: 200px;
+            height: 50px;
+        }
+
+        th {
+            background-color: #f0f0f0;
+        }
+
+        /* 操作步驟樣式 */
+        .instructions {
+            margin-top: 30px;
+        }
+
+        .step {
+            margin-bottom: 20px;
+        }
+
+        .step img {
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid #ddd;
+            padding: 5px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h2>DevOps URL Extractor</h2>
+    <p>請輸入網址（格式：https://ntcoaap43/OA_Collection/系統名/_versionControl?path=%24/系統名/）</p>
+    <input type="text" id="urlInput" placeholder="貼上網址">
+    <button onclick="extractPaths()">擷取</button>
+    <button onclick="copyTable()">複製表格</button>
+
+    <table>
+        <tbody id="resultTable">
+            <!-- 擷取結果將顯示在此 -->
+            <tr>
+                <th>Website</th>
+                <td id="websiteCell"></td>
+            </tr>
+            <tr>
+                <th>System Name</th>
+                <td id="systemNameCell"></td>
+            </tr>
+            <tr>
+                <th>DevOpsPath</th>
+                <td id="devOpsPathCell"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="instructions">
+        <h3>操作步驟</h3>
+        <div class="step">
+            <p><strong>步驟 1:</strong> 將 DevOps URL 貼到上方的輸入框。</p>
+            <img src="images/step1.png" alt="步驟 1 - 貼上 URL">
+        </div>
+        <div class="step">
+            <p><strong>步驟 2:</strong> 點擊「擷取」按鈕，解析並顯示 Website、System Name 和 DevOpsPath。</p>
+            <img src="images/step2.png" alt="步驟 2 - 點擊擷取">
+        </div>
+        <div class="step">
+            <p><strong>步驟 3:</strong> 若需要將表格貼到 Excel，點擊「複製表格」按鈕，然後在 Excel 中貼上。</p>
+            <img src="images/step3.png" alt="步驟 3 - 複製表格">
+        </div>
+    </div>
+
+    <script>
+        function extractPaths() {
+            const url = document.getElementById('urlInput').value;
+            const urlPattern = /^https:\/\/ntcoaap43\/OA_Collection\/([^\/]+)\/_versionControl\?path=(.+)$/;
+
+            // 清空先前的結果
+            document.getElementById('websiteCell').textContent = "";
+            document.getElementById('systemNameCell').textContent = "";
+            document.getElementById('devOpsPathCell').textContent = "";
+
+            const match = url.match(urlPattern);
+            if (match) {
+                const website = `https://ntcoaap43/OA_Collection/${match[1]}`;
+                const devOpsPath = decodeURIComponent(match[2]);
+                const pathParts = devOpsPath.split('/');
+                const systemName = pathParts[pathParts.length - 1];
+
+                // 顯示擷取結果
+                document.getElementById('websiteCell').textContent = website;
+                document.getElementById('systemNameCell').textContent = systemName;
+                document.getElementById('devOpsPathCell').textContent = devOpsPath;
+            } else {
+                // 若格式錯誤，顯示錯誤提示
+                document.getElementById('websiteCell').textContent = "請輸入符合格式的網址！";
+            }
+        }
+
+        function copyTable() {
+            const table = document.getElementById('resultTable');
+            let textToCopy = '';
+            for (let row of table.rows) {
+                const cells = Array.from(row.cells).map(cell => cell.textContent);
+                textToCopy += cells.join('\t') + '\n';
+            }
+
+            navigator.clipboard.writeText(textToCopy)
+                .then(() => {
+                    alert('表格內容已複製，可貼到 Excel 中');
+                })
+                .catch(err => {
+                    console.error('無法複製內容', err);
+                });
+        }
+    </script>
+</body>
+</html>
+
+說明
+
+操作步驟區域：新增了一個 .instructions 區塊，包含三個步驟，每個步驟包含簡單說明文字和一張對應圖片（預留圖片路徑為 images/step1.png、images/step2.png、images/step3.png）。
+
+圖片：請將圖片放在 images 資料夾中，並命名為 step1.png、step2.png 和 step3.png，以符合 HTML 中的 src 路徑設定。
+
+
+這樣的設計能讓使用者快速了解操作流程，並透過圖片輔助提升使用體驗。
+
+
+
 如果您希望複製後貼到 Excel 中，可以將表格內容轉換為帶有分隔符的純文字格式，這樣 Excel 能夠識別並將其解析成多列多欄的表格。下面的程式碼更新了 copyTable() 函數，將表格內容轉換為制表符（Tab）分隔的格式，方便貼到 Excel 中：
 
 <!DOCTYPE html>
