@@ -1,3 +1,121 @@
+如果您希望複製後貼到 Excel 中，可以將表格內容轉換為帶有分隔符的純文字格式，這樣 Excel 能夠識別並將其解析成多列多欄的表格。下面的程式碼更新了 copyTable() 函數，將表格內容轉換為制表符（Tab）分隔的格式，方便貼到 Excel 中：
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>網址擷取工具</title>
+    <style>
+        /* 設定表格樣式 */
+        table {
+            width: 400px;
+            border-collapse: collapse;
+            border: 2px solid black;
+            margin-top: 20px;
+        }
+
+        /* 設定表格欄位固定高度和寬度 */
+        th, td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: left;
+            width: 200px;
+            height: 50px;
+        }
+
+        th {
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <h2>網址擷取工具</h2>
+    <p>請輸入網址（格式：https://ntcoaap43/OA_Collection/系統名/_versionControl?path=%24/系統名/）</p>
+    <input type="text" id="urlInput" placeholder="貼上網址">
+    <button onclick="extractPaths()">擷取</button>
+    <button onclick="copyTable()">複製表格</button>
+
+    <table>
+        <tbody id="resultTable">
+            <!-- 擷取結果將顯示在此 -->
+            <tr>
+                <th>Website</th>
+                <td id="websiteCell"></td>
+            </tr>
+            <tr>
+                <th>System Name</th>
+                <td id="systemNameCell"></td>
+            </tr>
+            <tr>
+                <th>DevOpsPath</th>
+                <td id="devOpsPathCell"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        function extractPaths() {
+            const url = document.getElementById('urlInput').value;
+            const urlPattern = /^https:\/\/ntcoaap43\/OA_Collection\/([^\/]+)\/_versionControl\?path=(.+)$/;
+
+            // 清空先前的結果
+            document.getElementById('websiteCell').textContent = "";
+            document.getElementById('systemNameCell').textContent = "";
+            document.getElementById('devOpsPathCell').textContent = "";
+
+            const match = url.match(urlPattern);
+            if (match) {
+                const website = `https://ntcoaap43/OA_Collection/${match[1]}`;
+                const devOpsPath = decodeURIComponent(match[2]);
+                const pathParts = devOpsPath.split('/');
+                const systemName = pathParts[pathParts.length - 1];
+
+                // 顯示擷取結果
+                document.getElementById('websiteCell').textContent = website;
+                document.getElementById('systemNameCell').textContent = systemName;
+                document.getElementById('devOpsPathCell').textContent = devOpsPath;
+            } else {
+                // 若格式錯誤，顯示錯誤提示
+                document.getElementById('websiteCell').textContent = "請輸入符合格式的網址！";
+            }
+        }
+
+        function copyTable() {
+            // 取得表格的內容，將每一行格式化為制表符分隔的字串
+            const table = document.getElementById('resultTable');
+            let textToCopy = '';
+            for (let row of table.rows) {
+                const cells = Array.from(row.cells).map(cell => cell.textContent);
+                textToCopy += cells.join('\t') + '\n';  // 使用 Tab 分隔並換行
+            }
+
+            // 複製到剪貼簿
+            navigator.clipboard.writeText(textToCopy)
+                .then(() => {
+                    alert('表格內容已複製，可貼到 Excel 中');
+                })
+                .catch(err => {
+                    console.error('無法複製內容', err);
+                });
+        }
+    </script>
+</body>
+</html>
+
+功能說明
+
+1. 制表符分隔格式：copyTable() 函數將表格的每一行轉換為以 \t（Tab）分隔的文字格式，每行以 \n 結尾。這樣在 Excel 中貼上時會自動分配到不同的儲存格。
+
+
+2. 複製後貼到 Excel：將表格內容複製後，在 Excel 中直接貼上即可看到每個欄位正確地對應到表格欄位中。
+
+
+
+這樣就能夠確保貼到 Excel 時，資料會自動解析為表格形式。
+
+
+
 如果希望在複製後貼上電子郵件或其他支援 HTML 的應用中仍保留表格樣式，可以將表格內容轉換為 HTML 格式並複製。以下是更新後的程式碼，新增 copyTable() 函數會將表格轉為 HTML 格式進行複製：
 
 <!DOCTYPE html>
