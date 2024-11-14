@@ -1,3 +1,29 @@
+如果從 Excel 取出的值是 107.13222 並希望將其轉換為 107.1%，可以按照以下步驟來進行處理：
+
+1. 讀取 Excel 數據：使用 Read Cell 或 Read Range 活動，將該數值讀取到一個變量中，例如 originalValue。
+
+
+2. 格式化為百分比：
+
+使用 Assign 活動將 formattedPercentage 設置為：
+
+formattedPercentage = Math.Round(CDbl(originalValue), 1).ToString() & "%"
+
+這樣會將數值四捨五入到小數點後一位，並且添加 % 符號。
+
+
+
+3. 顯示結果或寫回 Excel：
+
+如果需要將此格式化後的百分比寫回到 Excel，可以使用 Write Cell 活動，將 formattedPercentage 值寫回到指定的單元格。
+
+
+
+
+這樣處理後，你的 107.13222 就會變成 107.1%。
+
+
+
 抱歉造成不便，讓我們改進一下 JavaScript 邏輯，確保每次點擊圖片時都能正確顯示放大效果。這裡修改了放大邏輯，讓每次點擊圖片時都可以正常放大顯示。
 
 以下是改良後的程式碼：
