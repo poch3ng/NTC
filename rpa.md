@@ -1,3 +1,103 @@
+如果您希望生成多組高強度密碼並將其存成 .txt 檔案，可以在程式中新增迴圈來生成多個密碼，並將結果寫入 .txt 檔案中。以下是改良後的程式碼範例：
+
+修改程式碼
+
+Imports System
+Imports System.Text
+Imports System.IO
+
+Module PasswordGenerator
+    Sub Main()
+        Console.WriteLine("請輸入密碼長度：")
+        Dim length As Integer
+        If Not Integer.TryParse(Console.ReadLine(), length) OrElse length <= 0 Then
+            Console.WriteLine("請輸入有效的正整數！")
+            Return
+        End If
+
+        Console.WriteLine("請輸入要生成的密碼數量：")
+        Dim count As Integer
+        If Not Integer.TryParse(Console.ReadLine(), count) OrElse count <= 0 Then
+            Console.WriteLine("請輸入有效的正整數！")
+            Return
+        End If
+
+        ' 設定輸出檔案路徑
+        Dim filePath As String = "GeneratedPasswords.txt"
+
+        ' 開始生成並儲存密碼
+        Using writer As New StreamWriter(filePath)
+            For i As Integer = 1 To count
+                Dim password As String = GeneratePassword(length)
+                writer.WriteLine(password)
+            Next
+        End Using
+
+        Console.WriteLine($"成功生成 {count} 個密碼，並已儲存至 {filePath}")
+        Console.ReadLine()
+    End Sub
+
+    Function GeneratePassword(length As Integer) As String
+        Dim upperCase As String = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        Dim lowerCase As String = "abcdefghijklmnopqrstuvwxyz"
+        Dim digits As String = "0123456789"
+        Dim specialChars As String = "!@#$%^&*()-_=+[]{}|;:',.<>?/`~"
+
+        ' 將所有字符集合併
+        Dim allChars As String = upperCase & lowerCase & digits & specialChars
+
+        ' 確保密碼至少包含一個大寫字母、小寫字母、數字和特殊符號
+        Dim rand As New Random()
+        Dim password As New StringBuilder()
+
+        password.Append(upperCase(rand.Next(upperCase.Length)))
+        password.Append(lowerCase(rand.Next(lowerCase.Length)))
+        password.Append(digits(rand.Next(digits.Length)))
+        password.Append(specialChars(rand.Next(specialChars.Length)))
+
+        ' 生成其餘的隨機字符
+        For i As Integer = 4 To length - 1
+            password.Append(allChars(rand.Next(allChars.Length)))
+        Next
+
+        ' 打亂密碼順序
+        Return New String(password.ToString().ToCharArray().OrderBy(Function(c) rand.Next()).ToArray())
+    End Function
+End Module
+
+程式說明
+
+1. 輸入密碼長度和數量：
+
+程式將提示您輸入每個密碼的長度及要生成的密碼數量。
+
+
+
+2. 生成多個密碼：
+
+使用迴圈生成指定數量的密碼。
+
+
+
+3. 將密碼存成 .txt 檔案：
+
+使用 StreamWriter 將每組密碼寫入 GeneratedPasswords.txt 檔案，檔案將儲存在程式執行的目錄下。
+
+
+
+4. 執行結果：
+
+程式會顯示生成密碼的成功訊息，並提示您密碼已存儲至 GeneratedPasswords.txt 檔案。
+
+
+
+
+生成執行檔
+
+按照之前的步驟將此程式碼在 Visual Studio 中編譯，生成的 .exe 檔將可以生成多個密碼並儲存成 .txt。
+
+
+
 以下是用 VB.NET 編寫的高強度密碼生成器範例。該程式允許您自定義密碼長度並生成包含大小寫字母、數字和特殊符號的隨機密碼：
 
 程式碼範例
