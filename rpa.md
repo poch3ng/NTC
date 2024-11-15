@@ -1,3 +1,82 @@
+在 UiPath 中，如果無法下載外部套件，也無內建支援直接將 SVG 轉換為 PNG 的功能，可以考慮以下替代方法來實現此需求。
+
+方案：利用 Windows Paint 自動轉換 SVG 為 PNG
+
+由於 UiPath 無法直接轉換 SVG 為 PNG，您可以使用 UiPath 自動化 Windows Paint 來完成此轉換過程。以下是具體步驟：
+
+1. 開啟 Windows Paint 並載入 SVG 文件
+
+使用 UiPath 的 Start Process 活動來打開 Paint 並指定要打開的 SVG 文件。
+
+設定 FileName 為 "mspaint.exe"，Arguments 為 SVG 文件的路徑，例如：
+
+"C:\path\to\your\file.svg"
+
+
+
+2. 自動另存為 PNG
+
+使用 UiPath 的 Send Hotkey 活動模擬鍵盤操作：
+
+F12：開啟「另存為」窗口。
+
+
+使用 Type Into 活動輸入保存的檔案名稱，例如 "output.png"。
+
+選擇「PNG (*.png)」格式，可以透過 Type Into 或 Click 活動選擇格式選項。
+
+使用 Send Hotkey 按下 Enter 來保存。
+
+
+
+3. 關閉 Paint
+
+使用 Send Hotkey (Alt+F4) 關閉 Paint。
+
+
+
+
+UiPath 工作流程範例
+
+這是實現此過程的簡化流程：
+
+1. 開啟 Paint 並載入 SVG
+
+Start Process:
+- FileName: "mspaint.exe"
+- Arguments: "C:\path\to\your\file.svg"
+
+
+2. 另存為 PNG 格式
+
+Send Hotkey: F12（打開另存為窗口）
+
+Type Into: 輸入檔名，例如 "output.png"
+
+使用 Click 或 Type Into 選擇 PNG 格式
+
+Send Hotkey: Enter（儲存檔案）
+
+
+
+3. 關閉 Paint
+
+Send Hotkey: Alt+F4
+
+
+
+
+注意事項
+
+請確保 Windows 系統上已安裝 Microsoft Paint，並且 SVG 格式可以在 Paint 中正常打開。
+
+此方法適合用於少量文件的自動轉換，若要處理大量文件，效率可能會較低。
+
+
+透過這個方法，您可以在不安裝其他外部套件的情況下，完成 SVG 到 PNG 的轉換並在 UiPath 中自動化該流程。
+
+
+
 如果從 Excel 取出的值是 107.13222 並希望將其轉換為 107.1%，可以按照以下步驟來進行處理：
 
 1. 讀取 Excel 數據：使用 Read Cell 或 Read Range 活動，將該數值讀取到一個變量中，例如 originalValue。
