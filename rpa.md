@@ -1,3 +1,76 @@
+以下是用 VB.NET 編寫的高強度密碼生成器範例。該程式允許您自定義密碼長度並生成包含大小寫字母、數字和特殊符號的隨機密碼：
+
+程式碼範例
+
+Imports System
+Imports System.Text
+
+Module PasswordGenerator
+    Sub Main()
+        Console.WriteLine("請輸入密碼長度：")
+        Dim length As Integer
+        If Integer.TryParse(Console.ReadLine(), length) AndAlso length > 0 Then
+            Dim password As String = GeneratePassword(length)
+            Console.WriteLine($"生成的密碼為：{password}")
+        Else
+            Console.WriteLine("請輸入有效的正整數！")
+        End If
+        Console.ReadLine()
+    End Sub
+
+    Function GeneratePassword(length As Integer) As String
+        Dim upperCase As String = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        Dim lowerCase As String = "abcdefghijklmnopqrstuvwxyz"
+        Dim digits As String = "0123456789"
+        Dim specialChars As String = "!@#$%^&*()-_=+[]{}|;:',.<>?/`~"
+
+        ' 將所有字符集合併
+        Dim allChars As String = upperCase & lowerCase & digits & specialChars
+
+        ' 確保密碼至少包含一個大寫字母、小寫字母、數字和特殊符號
+        Dim rand As New Random()
+        Dim password As New StringBuilder()
+
+        password.Append(upperCase(rand.Next(upperCase.Length)))
+        password.Append(lowerCase(rand.Next(lowerCase.Length)))
+        password.Append(digits(rand.Next(digits.Length)))
+        password.Append(specialChars(rand.Next(specialChars.Length)))
+
+        ' 生成其餘的隨機字符
+        For i As Integer = 4 To length - 1
+            password.Append(allChars(rand.Next(allChars.Length)))
+        Next
+
+        ' 打亂密碼順序
+        Return New String(password.ToString().ToCharArray().OrderBy(Function(c) rand.Next()).ToArray())
+    End Function
+End Module
+
+使用說明
+
+1. 將程式碼貼到一個 VB.NET IDE，例如 Visual Studio 中的新專案內。
+
+
+2. 編譯並運行程式。
+
+
+3. 輸入您需要的密碼長度，程式會生成一個高強度密碼。
+
+
+
+功能特點
+
+密碼包含大小寫字母、數字和特殊符號。
+
+確保至少包含一個大寫字母、小寫字母、數字和特殊符號。
+
+支援自定義密碼長度。
+
+
+如果您需要進一步的修改或優化，請告訴我！
+
+
+
 在 UiPath 中，如果無法下載外部套件，也無內建支援直接將 SVG 轉換為 PNG 的功能，可以考慮以下替代方法來實現此需求。
 
 方案：利用 Windows Paint 自動轉換 SVG 為 PNG
