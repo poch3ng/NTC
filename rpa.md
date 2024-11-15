@@ -1,3 +1,91 @@
+如果您發現每組生成的密碼都一樣，原因可能是 Random 物件在短時間內重複初始化，導致生成的隨機數相同。可以透過將 Random 物件移到程式的模組層級來解決這個問題，確保只初始化一次 Random 物件。以下是修正過的程式碼：
+
+修改程式碼
+
+Imports System
+Imports System.Text
+Imports System.IO
+
+Module PasswordGenerator
+    ' 將 Random 物件設為模組層級，確保只初始化一次
+    Private rand As New Random()
+
+    Sub Main()
+        Console.WriteLine("請輸入密碼長度：")
+        Dim length As Integer
+        If Not Integer.TryParse(Console.ReadLine(), length) OrElse length <= 0 Then
+            Console.WriteLine("請輸入有效的正整數！")
+            Return
+        End If
+
+        Console.WriteLine("請輸入要生成的密碼數量：")
+        Dim count As Integer
+        If Not Integer.TryParse(Console.ReadLine(), count) OrElse count <= 0 Then
+            Console.WriteLine("請輸入有效的正整數！")
+            Return
+        End If
+
+        ' 設定輸出檔案路徑
+        Dim filePath As String = "GeneratedPasswords.txt"
+
+        ' 開始生成並儲存密碼
+        Using writer As New StreamWriter(filePath)
+            For i As Integer = 1 To count
+                Dim password As String = GeneratePassword(length)
+                writer.WriteLine(password)
+            Next
+        End Using
+
+        Console.WriteLine($"成功生成 {count} 個密碼，並已儲存至 {filePath}")
+        Console.ReadLine()
+    End Sub
+
+    Function GeneratePassword(length As Integer) As String
+        Dim upperCase As String = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        Dim lowerCase As String = "abcdefghijklmnopqrstuvwxyz"
+        Dim digits As String = "0123456789"
+        Dim specialChars As String = "!@#$%^&*()-_=+[]{}|;:',.<>?/`~"
+
+        ' 將所有字符集合併
+        Dim allChars As String = upperCase & lowerCase & digits & specialChars
+
+        ' 確保密碼至少包含一個大寫字母、小寫字母、數字和特殊符號
+        Dim password As New StringBuilder()
+
+        password.Append(upperCase(rand.Next(upperCase.Length)))
+        password.Append(lowerCase(rand.Next(lowerCase.Length)))
+        password.Append(digits(rand.Next(digits.Length)))
+        password.Append(specialChars(rand.Next(specialChars.Length)))
+
+        ' 生成其餘的隨機字符
+        For i As Integer = 4 To length - 1
+            password.Append(allChars(rand.Next(allChars.Length)))
+        Next
+
+        ' 打亂密碼順序
+        Return New String(password.ToString().ToCharArray().OrderBy(Function(c) rand.Next()).ToArray())
+    End Function
+End Module
+
+修正說明
+
+1. 固定 Random 物件：
+
+Random 物件被設置為模組層級的私有變數，確保在整個程式運行期間只初始化一次。這樣可以防止在短時間內多次初始化 Random 導致的相同隨機值。
+
+
+
+2. 確認獨特密碼生成：
+
+每次呼叫 GeneratePassword 函數時，因為 rand 的種子值不會重複，會生成唯一的密碼。
+
+
+
+
+這樣修改後，每次生成的密碼都應該是隨機且不重複的。
+
+
+
 如果您希望生成多組高強度密碼並將其存成 .txt 檔案，可以在程式中新增迴圈來生成多個密碼，並將結果寫入 .txt 檔案中。以下是改良後的程式碼範例：
 
 修改程式碼
