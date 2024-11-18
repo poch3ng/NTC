@@ -1,3 +1,156 @@
+以下是實現您的需求的完整解決方案。VBA 宏會檢查 T 欄位是否為負數，如果為負數，則將該行的 T 欄和 R 欄 設為紅字。
+
+
+---
+
+1. 編寫 VBA 宏
+
+1. 在 Excel 中按 Alt + F11 進入 VBA 編輯器。
+
+
+2. 新增一個模組，將以下代碼貼入其中：
+
+
+
+Sub HighlightRowBasedOnTColumn()
+    Dim ws As Worksheet
+    Dim rngT As Range
+    Dim cell As Range
+    
+    ' 獲取當前工作表
+    Set ws = ActiveSheet
+    
+    ' 獲取 T 欄的有效數據範圍
+    On Error Resume Next
+    Set rngT = ws.Columns("T").SpecialCells(xlCellTypeConstants, xlNumbers)
+    On Error GoTo 0
+    
+    ' 如果 T 欄沒有數字，直接退出
+    If rngT Is Nothing Then Exit Sub
+    
+    ' 遍歷 T 欄的數據
+    For Each cell In rngT
+        If cell.Value < 0 Then
+            ' 將 T 欄和同一行的 R 欄設為紅字
+            cell.Font.Color = RGB(255, 0, 0) ' T 欄
+            ws.Cells(cell.Row, "R").Font.Color = RGB(255, 0, 0) ' R 欄
+        End If
+    Next cell
+End Sub
+
+
+---
+
+2. 保存 VBA 宏
+
+1. 在 VBA 編輯器中，選擇 File > Export File，保存為 .bas 文件，例如：HighlightRowBasedOnTColumn.bas。
+
+
+2. 確認保存的文件路徑。
+
+
+
+
+---
+
+3. 在 UiPath 中使用 VBA 宏
+
+步驟 1：設置 Excel Application Scope
+
+1. 添加 Excel Application Scope 活動。
+
+
+2. 在 WorkbookPath 中指定目標 Excel 文件。
+
+
+
+
+---
+
+步驟 2：執行 VBA 宏
+
+1. 在 Excel Application Scope 內，添加 Invoke VBA 活動。
+
+
+2. 設置以下屬性：
+
+ScriptCode：選擇保存的 .bas 文件。
+
+Entry Method Name：填入 HighlightRowBasedOnTColumn（與 VBA 宏名稱一致）。
+
+
+
+3. Entry Method Parameters：
+
+此函式無需傳入參數，保持空白即可。
+
+
+
+
+
+---
+
+步驟 3：保存結果
+
+1. 添加 Save Workbook 活動，保存 Excel 文件的修改。
+
+
+
+
+---
+
+流程範例圖
+
+1. Excel Application Scope
+
+打開 Excel 文件。
+
+
+
+2. Invoke VBA
+
+執行 HighlightRowBasedOnTColumn 宏。
+
+
+
+3. Save Workbook
+
+保存修改後的文件。
+
+
+
+
+
+---
+
+注意事項
+
+1. T 欄和 R 欄的有效範圍：
+
+宏會自動跳過空白或非數字單元格。
+
+
+
+2. 紅色字體設定：
+
+使用 RGB(255, 0, 0) 設置字體顏色為紅色，可以根據需求修改顏色值。
+
+
+
+3. 空範圍處理：
+
+如果 T 欄內無數據或無負數，宏會直接退出，不會報錯。
+
+
+
+
+
+---
+
+如果需要對流程進一步優化或整合其他條件，請告訴我！
+
+
+
 以下是通過 VBA 方法來實現 E、J、N 欄位負數文字設為紅色的完整解決方案，包括編寫 VBA 和在 UiPath 中使用的步驟。
 
 
