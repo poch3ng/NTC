@@ -1,3 +1,151 @@
+以下是通過 VBA 方法來實現 E、J、N 欄位負數文字設為紅色的完整解決方案，包括編寫 VBA 和在 UiPath 中使用的步驟。
+
+
+---
+
+1. 編寫 VBA 宏
+
+1. 打開 Excel，按 Alt + F11 進入 VBA 編輯器。
+
+
+2. 選擇 Insert > Module，新增一個模組。
+
+
+3. 複製並貼上以下 VBA 代碼：
+
+
+
+Sub HighlightNegativeValues(columnsToCheck As String)
+    Dim ws As Worksheet
+    Dim colArray() As String
+    Dim col As String
+    Dim rng As Range
+    Dim cell As Range
+    
+    ' 獲取當前工作表
+    Set ws = ActiveSheet
+    
+    ' 將傳入的列分割為陣列
+    colArray = Split(columnsToCheck, ",")
+    
+    ' 遍歷指定的列
+    For Each col In colArray
+        ' 獲取每列的數據範圍
+        Set rng = ws.Columns(col).SpecialCells(xlCellTypeConstants)
+        
+        ' 遍歷單元格並檢查是否為負數
+        For Each cell In rng
+            If IsNumeric(cell.Value) And cell.Value < 0 Then
+                cell.Font.Color = RGB(255, 0, 0) ' 設置文字顏色為紅色
+            End If
+        Next cell
+    Next col
+End Sub
+
+
+---
+
+2. 保存 VBA 宏
+
+1. 在 VBA 編輯器中選擇 File > Export File，將模組導出為 .bas 文件（例如：HighlightNegativeValues.bas）。
+
+
+2. 確保保存的文件路徑清晰可用。
+
+
+
+
+---
+
+3. 在 UiPath 中調用 VBA
+
+步驟 1：設置 Excel Application Scope
+
+1. 添加 Excel Application Scope 活動。
+
+
+2. 在 WorkbookPath 中填入目標 Excel 文件的路徑。
+
+
+
+步驟 2：Invoke VBA 活動
+
+1. 添加 Invoke VBA 活動。
+
+
+2. 設置以下屬性：
+
+ScriptCode：選擇保存的 .bas 文件。
+
+Entry Method Name：填入 HighlightNegativeValues（與 VBA 宏名稱一致）。
+
+
+
+3. 設置 Entry Method Parameters：
+
+點擊右側 ... 按鈕。
+
+添加一個參數：
+
+Direction：選擇 In。
+
+Type：選擇 String。
+
+Value：輸入 "E,J,N"（表示需要檢查的列）。
+
+
+
+
+
+步驟 3：保存結果
+
+1. 在 Excel Application Scope 結束前添加 Save Workbook 活動，保存文件修改。
+
+
+
+
+---
+
+完整邏輯示例
+
+1. Excel Application Scope
+
+打開目標文件。
+
+
+
+2. Invoke VBA
+
+執行 HighlightNegativeValues，傳入列 "E,J,N"。
+
+
+
+3. Save Workbook
+
+保存 Excel 文件。
+
+
+
+
+
+---
+
+注意事項
+
+1. 傳遞參數格式：列名必須以逗號分隔，例如 "E,J,N"。
+
+
+2. 列範圍檢查：VBA 宏假設所有列都包含數據，若列中有空值或非數字內容，會自動忽略。
+
+
+3. VBA 文件保存位置：確保 .bas 文件路徑正確，且該文件始終可用。
+
+
+
+如需更詳細的流程設計圖或實施細節，請告訴我！
+
+
+
 如果您發現每組生成的密碼都一樣，原因可能是 Random 物件在短時間內重複初始化，導致生成的隨機數相同。可以透過將 Random 物件移到程式的模組層級來解決這個問題，確保只初始化一次 Random 物件。以下是修正過的程式碼：
 
 修改程式碼
