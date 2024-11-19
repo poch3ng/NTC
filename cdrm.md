@@ -1,3 +1,134 @@
+要在資料庫中新增一個欄位來記錄 IP 地址，請按照以下步驟進行操作：
+
+
+---
+
+1. 確認資料庫設計
+
+選擇要修改的資料表（例如 Users 或 Logs），新增一個欄位來存儲 IP 地址。
+
+
+---
+
+2. 執行 SQL 語法新增欄位
+
+假設資料表名稱為 Users，新增一個名為 IPAddress 的欄位：
+
+SQL 語法
+
+ALTER TABLE Users ADD IPAddress VARCHAR(45);
+
+
+---
+
+3. 說明
+
+資料型別：
+
+VARCHAR(45)：足夠存儲 IPv4 (最多15個字元) 和 IPv6 (最多45個字元) 的地址。
+
+
+默認值（可選）： 若需要為新欄位設定預設值，可以加上 DEFAULT，例如：
+
+ALTER TABLE Users ADD IPAddress VARCHAR(45) DEFAULT NULL;
+
+
+
+---
+
+4. 在 VB 中更新 IP 地址
+
+將 IP 地址儲存到資料庫中。假設您使用的是 SQL Server，以下是範例程式碼：
+
+建立資料庫連線與更新程式
+
+Imports System.Data.SqlClient
+
+Partial Class Default
+    Inherits System.Web.UI.Page
+
+    Protected Sub Page_Load(ByVal sender As Object, ByVal e As EventArgs) Handles Me.Load
+        Dim userIP As String = GetUserIPAddress()
+
+        ' 更新資料庫中的 IP 地址
+        UpdateUserIPAddress(1, userIP) ' 假設使用者 ID 為 1
+    End Sub
+
+    ' 取得使用者 IP 地址
+    Private Function GetUserIPAddress() As String
+        Dim ip As String = Request.ServerVariables("HTTP_X_FORWARDED_FOR")
+        If String.IsNullOrEmpty(ip) Then
+            ip = Request.ServerVariables("REMOTE_ADDR")
+        End If
+        Return ip
+    End Function
+
+    ' 更新資料庫中的 IP 地址
+    Private Sub UpdateUserIPAddress(ByVal userId As Integer, ByVal ipAddress As String)
+        Dim connectionString As String = "Your_Connection_String_Here"
+        Dim query As String = "UPDATE Users SET IPAddress = @IPAddress WHERE UserID = @UserID"
+
+        Using connection As New SqlConnection(connectionString)
+            Using command As New SqlCommand(query, connection)
+                command.Parameters.AddWithValue("@IPAddress", ipAddress)
+                command.Parameters.AddWithValue("@UserID", userId)
+
+                connection.Open()
+                command.ExecuteNonQuery()
+            End Using
+        End Using
+    End Sub
+End Class
+
+
+---
+
+5. 使用者 IP 更新邏輯
+
+@IPAddress：透過參數化查詢防止 SQL Injection。
+
+UserID：確保使用者的唯一性，用主鍵或其他辨識欄位來更新 IP。
+
+
+
+---
+
+6. 驗證與測試
+
+1. 確保資料庫欄位正確新增。
+
+
+2. 測試程式是否能成功記錄和更新 IP 地址。
+
+
+3. 檢查資料庫中的資料是否正確。
+
+
+
+
+---
+
+7. 完整應用情境
+
+若需將多次登入的 IP 地址記錄到 Logs 表（非覆蓋），可以建立新的表格：
+
+新增 Logs 表
+
+CREATE TABLE Logs (
+    LogID INT IDENTITY(1,1) PRIMARY KEY,
+    UserID INT NOT NULL,
+    IPAddress VARCHAR(45),
+    AccessTime DATETIME DEFAULT GETDATE()
+);
+
+插入記錄程式碼
+
+Dim query As String = "INSERT INTO Logs (UserID, IPAddress) VALUES (@UserID, @IPAddress)"
+
+如此可保留完整的使用者行為紀錄。
+
+
+
 在 VB Web Form 中記錄使用者的 IP 地址，可以使用以下步驟：
 
 1. 取得使用者 IP 地址
