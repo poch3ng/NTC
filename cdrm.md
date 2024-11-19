@@ -1,3 +1,41 @@
+在 SSMS（SQL Server Management Studio）中，你可以透過以下 SQL 語法新增一個 char(1) 的欄位，並將預設值設為 N：
+
+SQL 語法
+
+ALTER TABLE YourTableName
+ADD NewColumnName CHAR(1) NOT NULL DEFAULT 'N';
+
+步驟說明
+
+1. 替換 YourTableName：
+
+將 YourTableName 替換為你要新增欄位的資料表名稱。
+
+
+
+2. 替換 NewColumnName：
+
+將 NewColumnName 替換為你要新增的欄位名稱。
+
+
+
+3. 執行 SQL：
+
+在 SSMS 的查詢視窗中執行上述語法。
+
+
+
+4. 驗證：
+
+執行 SELECT * FROM YourTableName，確認新的欄位已新增且預設值為 N。
+
+
+
+
+完成後，新插入的資料若未指定該欄位的值，將自動填入 N。
+
+
+
 以下是針對該報告的建議內容：
 
 ---
