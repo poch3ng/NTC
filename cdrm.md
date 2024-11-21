@@ -1,3 +1,94 @@
+在 VB Web Forms 中實現這樣的功能，可以根據 showTermsAndConditions 欄位的值進行邏輯判斷，並在需要時顯示同意頁面。以下是實現的步驟：
+
+
+---
+
+1. 前端設計
+
+在頁面中設計一個隱藏的宣告視窗，當需要用戶同意時顯示：
+
+<div id="termsModal" runat="server" style="display:none;">
+    <p>請先同意條款與條件才能下載。</p>
+    <button id="agreeButton" runat="server" onclick="agreeTerms">同意並下載</button>
+</div>
+
+
+---
+
+2. 後端程式碼實作
+
+在後端程式碼中處理 showTermsAndConditions 的邏輯：
+
+2.1 後端檢查欄位值
+
+檢查該欄位值並決定動作：
+
+Protected Sub DownloadFile()
+    Dim showTerms As String = GetUserTermsCondition() ' 從資料庫或來源取得值
+
+    If showTerms = "Y" Then
+        ' 顯示條款視窗
+        termsModal.Style("display") = "block"
+    Else
+        ' 直接下載檔案
+        Download()
+    End If
+End Sub
+
+Private Function GetUserTermsCondition() As String
+    ' 取得 showTermsAndConditions 的值，從資料庫或其他來源
+    Return "Y" ' 假設測試值
+End Function
+
+Private Sub Download()
+    ' 設定下載檔案
+    Dim filePath As String = Server.MapPath("~/path/to/your/file.txt")
+    Response.ContentType = "application/octet-stream"
+    Response.AppendHeader("Content-Disposition", "attachment; filename=file.txt")
+    Response.TransmitFile(filePath)
+    Response.End()
+End Sub
+
+2.2 處理同意按鈕
+
+當用戶同意條款後，再觸發下載：
+
+Protected Sub agreeTerms(sender As Object, e As EventArgs)
+    ' 使用者同意條款
+    termsModal.Style("display") = "none" ' 隱藏條款視窗
+    Download() ' 開始下載檔案
+End Sub
+
+
+---
+
+3. 下載按鈕程式碼
+
+將下載按鈕連結至 DownloadFile：
+
+<asp:Button ID="btnDownload" runat="server" Text="下載檔案" OnClick="DownloadFile" />
+
+
+---
+
+工作流程：
+
+1. 使用者點擊下載按鈕：
+
+若 showTermsAndConditions = "Y"：彈出條款頁面，要求同意。
+
+若 showTermsAndConditions = "N"：直接下載檔案。
+
+
+
+2. 如果需要同意條款，用戶點擊 "同意並下載" 後觸發下載邏輯。
+
+
+
+這樣可以確保只有在用戶同意條款的情況下才進行下載操作。
+
+
+
 要在資料庫中新增一個欄位來記錄 IP 地址，請按照以下步驟進行操作：
 
 
