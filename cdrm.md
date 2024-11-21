@@ -1,3 +1,203 @@
+如果你沒有用到 window.open，而是透過 Response.Redirect 或直接跳轉頁面來實現條款邏輯，以下是更適合的解決方案：
+
+
+---
+
+需求分析
+
+1. 條款頁面是直接跳轉而非彈窗。
+
+
+2. 使用者在條款頁面點擊「同意」後：
+
+條款頁面需要通知下載檔案。
+
+條款頁面可以手動關閉，但必須確保下載功能正常。
+
+
+
+
+
+---
+
+解決方案：條款頁面用 Response.Redirect 返回主頁，並觸發檔案下載
+
+
+---
+
+1. 條款頁面設計 (termsPage.aspx)
+
+條款頁面不需要嘗試自動關閉，而是通過 Response.Redirect 導向下載頁面或通知主頁下載檔案。
+
+條款頁面 HTML：
+
+<html>
+<head>
+    <title>條款與條件</title>
+</head>
+<body>
+    <p>請先閱讀並同意條款與條件：</p>
+    <ul>
+        <li>您同意不將檔案用於非法用途。</li>
+        <li>您同意遵守相關法律和規範。</li>
+    </ul>
+    <!-- 點擊按鈕後導向下載 -->
+    <form method="get" action="download.aspx">
+        <input type="hidden" name="FileId" value="123" />
+        <button type="submit">同意並下載</button>
+    </form>
+</body>
+</html>
+
+
+---
+
+2. 條款頁面直接跳轉下載邏輯
+
+如果條款頁面不需要表單提交，可以直接使用後端進行跳轉處理。
+
+修改條款頁面 (termsPage.aspx.vb)：
+
+Protected Sub Page_Load(ByVal sender As Object, ByVal e As EventArgs) Handles Me.Load
+    Dim fileId As String = Request.QueryString("FileId")
+
+    If String.IsNullOrEmpty(fileId) Then
+        Response.Write("檔案 ID 無效。")
+        Response.End()
+    End If
+
+    ' 用戶點擊同意後直接跳轉下載頁面
+    Response.Redirect($"download.aspx?FileId={fileId}")
+End Sub
+
+
+---
+
+3. 下載頁面 (download.aspx)
+
+download.aspx 負責處理檔案下載，無需更改原有邏輯。
+
+下載邏輯：
+
+Protected Sub Page_Load(ByVal sender As Object, ByVal e As EventArgs) Handles Me.Load
+    Dim fileId As String = Request.QueryString("FileId")
+
+    If String.IsNullOrEmpty(fileId) Then
+        Response.StatusCode = 400 ' 錯誤請求
+        Response.Write("檔案不存在！")
+        Response.End()
+        Return
+    End If
+
+    ' 進行檔案下載
+    DownloadFile(fileId)
+End Sub
+
+Private Sub DownloadFile(ByVal fileId As String)
+    Dim filePath As String = GetFilePath(fileId)
+
+    If String.IsNullOrEmpty(filePath) OrElse Not System.IO.File.Exists(filePath) Then
+        Response.StatusCode = 404 ' 找不到檔案
+        Response.Write("檔案不存在！")
+        Response.End()
+        Return
+    End If
+
+    ' 設定檔案下載
+    Response.Clear()
+    Response.ContentType = "application/octet-stream"
+    Response.AppendHeader("Content-Disposition", "attachment; filename=" & System.IO.Path.GetFileName(filePath))
+    Response.TransmitFile(filePath)
+    Response.End()
+End Sub
+
+
+---
+
+4. checkTerms.aspx 判斷條款邏輯
+
+保留原有判斷，若條款必要則跳轉到 termsPage.aspx，否則直接跳轉到 download.aspx。
+
+修改 checkTerms.aspx：
+
+Protected Sub Page_Load(ByVal sender As Object, ByVal e As EventArgs) Handles Me.Load
+    Dim fileId As String = Request.QueryString("FileId")
+    Dim showTerms As String = GetUserTermsCondition(fileId)
+
+    If String.IsNullOrEmpty(fileId) Then
+        Response.Write("檔案不存在！")
+        Response.End()
+        Return
+    End If
+
+    If showTerms = "Y" Then
+        ' 跳轉到條款頁面
+        Response.Redirect($"termsPage.aspx?FileId={fileId}")
+    Else
+        ' 直接跳轉到下載頁面
+        Response.Redirect($"download.aspx?FileId={fileId}")
+    End If
+End Sub
+
+Private Function GetUserTermsCondition(ByVal fileId As String) As String
+    ' 模擬從資料庫取得 showTermsAndConditions 的值
+    ' 假設 FileId = 123 時需要條款
+    If fileId = "123" Then
+        Return "Y" ' 需要條款
+    Else
+        Return "N" ' 不需要條款
+    End If
+End Function
+
+
+---
+
+最終工作流程
+
+1. 用戶訪問 checkTerms.aspx?FileId=123：
+
+後端檢查 showTermsAndConditions 的值。
+
+若需要條款 (Y)，跳轉到 termsPage.aspx。
+
+若不需要條款 (N)，直接跳轉到 download.aspx。
+
+
+
+2. 條款頁面 (termsPage.aspx)：
+
+用戶查看條款，點擊 同意並下載 按鈕，跳轉到下載頁面。
+
+用戶可以手動關閉條款頁面。
+
+
+
+3. 下載頁面 (download.aspx)：
+
+負責處理檔案下載，無需顯示任何內容。
+
+
+
+
+
+---
+
+優勢
+
+1. 完全避免 window.close() 限制： 條款頁面不再嘗試自動關閉，確保功能不被瀏覽器安全限制影響。
+
+
+2. 簡化邏輯： 條款確認與下載分離，前端和後端責任清晰。
+
+
+3. 兼容性更好： 直接使用標準的 Response.Redirect 進行頁面跳轉，適用於所有瀏覽器。
+
+
+
+如果還有問題，請告訴我具體執行情況，我將進一步協助！
+
+
+
 如果你的按鈕是用 HyperLinkField，可以通過動態改變 NavigateUrl 來實現條件跳轉，根據 showTermsAndConditions 的值決定是否需要跳轉到條款頁面或直接下載。
 
 
