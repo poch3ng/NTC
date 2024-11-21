@@ -1,3 +1,234 @@
+以下是條款頁面全部改為英文的版本，包含標題、介紹、條款內容以及按鈕的功能描述，適配全英文需求。
+
+
+---
+
+條款頁面 (英文版 HTML)
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LPDDR5/DDR5 VIP OEM Terms and Conditions</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        /* Content */
+        .content {
+            padding: 20px;
+        }
+
+        .content h2 {
+            margin-top: 0;
+            font-size: 20px;
+            color: #007bff;
+        }
+
+        .content p {
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        /* Terms Section */
+        .terms {
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            padding: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+        }
+
+        .terms p {
+            margin: 0;
+        }
+
+        /* Button Section */
+        .actions {
+            text-align: center;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-top: 1px solid #ccc;
+        }
+
+        .actions button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 0 10px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .actions .agree {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .actions .agree:hover {
+            background-color: #218838;
+        }
+
+        .actions .cancel {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .actions .cancel:hover {
+            background-color: #c82333;
+        }
+    </style>
+    <script>
+        // Agree button function
+        function agreeAndDownload(fileId) {
+            // Trigger file download
+            window.location.href = 'download.aspx?FileId=' + fileId;
+
+            // Delay to ensure download starts before closing
+            setTimeout(function () {
+                window.close();
+            }, 1000);
+        }
+
+        // Cancel button function
+        function cancel() {
+            window.close();
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>LPDDR5/DDR5 VIP OEM Terms and Conditions</h1>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <h2>Introduction</h2>
+            <p>
+                By clicking the <strong>"I Agree"</strong> button, you represent yourself and the company you represent that will use the LPDDR5/DDR5 VIP OEM product. 
+                You acknowledge that you accept the terms described below. The effective date of these terms is the date you click the <strong>"I Agree"</strong> button.
+            </p>
+
+            <h2>Terms</h2>
+            <div class="terms">
+                <p>1. The software is for legal use only. Unauthorized distribution or modification is strictly prohibited.</p>
+                <p>2. By using this software, you agree to comply with all applicable laws and regulations.</p>
+                <p>3. The company reserves the right to interpret and modify these terms.</p>
+                <p>4. The company is not responsible for any losses resulting from a breach of these terms.</p>
+                <p>5. These terms are effective from the date you download or use the software.</p>
+            </div>
+        </div>
+
+        <!-- Button Section -->
+        <div class="actions">
+            <button class="agree" onclick="agreeAndDownload('123')">I Agree</button>
+            <button class="cancel" onclick="cancel()">Cancel</button>
+        </div>
+    </div>
+</body>
+</html>
+
+
+---
+
+功能點解釋
+
+1. 標題部分：
+
+顯示條款標題 "LPDDR5/DDR5 VIP OEM Terms and Conditions"，放置在頁面頂部，清晰直觀。
+
+
+
+2. 介紹部分：
+
+說明條款的法律效力，包含點擊 "I Agree" 後即代表用戶及其公司接受條款，並強調條款的生效日期。
+
+
+
+3. 條款內容：
+
+條款主要內容放在滾動區域內（max-height: 200px），避免因條款過長影響頁面佈局。
+
+條款內容包括合法用途、法律遵守、公司解釋權等。
+
+
+
+4. 按鈕功能：
+
+I Agree 按鈕：點擊後觸發 agreeAndDownload('123')，進行檔案下載並在 1 秒後自動關閉條款頁面。
+
+Cancel 按鈕：用戶可隨時取消並立即關閉條款頁面。
+
+
+
+
+
+---
+
+測試方式
+
+1. 訪問條款頁面：
+
+打開 termsPage.aspx?FileId=123。
+
+
+
+2. 檢查視覺效果：
+
+確認標題、介紹、條款內容和按鈕是否顯示正確。
+
+
+
+3. 點擊按鈕測試：
+
+I Agree：確認是否正常觸發下載，條款頁面是否自動關閉。
+
+Cancel：確認是否立即關閉條款頁面。
+
+
+
+
+
+---
+
+改進點
+
+如果需要添加更多樣式或交互功能，可以進一步細化按鈕樣式或增加其他提示訊息。需要更多幫助的話，隨時提出！
+
+
+
 以下是根據你的需求設計的條款頁面，並確保具有更好的視覺效果，結構清晰，包含標題、介紹、條款內容以及按鈕選項（I Agree 和 Cancel）。
 
 
