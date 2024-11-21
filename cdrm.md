@@ -1,3 +1,248 @@
+以下是根據你的需求設計的條款頁面，並確保具有更好的視覺效果，結構清晰，包含標題、介紹、條款內容以及按鈕選項（I Agree 和 Cancel）。
+
+
+---
+
+條款頁面 HTML 與 CSS
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LPDDR5/DDR5 VIP OEM Terms and Conditions</title>
+    <style>
+        /* 全局樣式 */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        /* 容器 */
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        /* 標題 */
+        .header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        /* 內容 */
+        .content {
+            padding: 20px;
+        }
+
+        .content h2 {
+            margin-top: 0;
+            font-size: 20px;
+            color: #007bff;
+        }
+
+        .content p {
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        /* 條款內容 */
+        .terms {
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            padding: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+        }
+
+        .terms p {
+            margin: 0;
+        }
+
+        /* 按鈕區域 */
+        .actions {
+            text-align: center;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-top: 1px solid #ccc;
+        }
+
+        .actions button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 0 10px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .actions .agree {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .actions .agree:hover {
+            background-color: #218838;
+        }
+
+        .actions .cancel {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .actions .cancel:hover {
+            background-color: #c82333;
+        }
+    </style>
+    <script>
+        // 同意條款
+        function agreeAndDownload(fileId) {
+            // 觸發下載
+            window.location.href = 'download.aspx?FileId=' + fileId;
+
+            // 延遲後關閉視窗
+            setTimeout(function () {
+                window.close();
+            }, 1000);
+        }
+
+        // 取消按鈕
+        function cancel() {
+            window.close();
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <!-- 標題 -->
+        <div class="header">
+            <h1>LPDDR5/DDR5 VIP OEM Terms and Conditions</h1>
+        </div>
+
+        <!-- 內容 -->
+        <div class="content">
+            <h2>介紹條款</h2>
+            <p>感謝您選擇我們的產品。在下載之前，請閱讀以下條款與條件，這些條款對於確保我們之間的合作透明且合法至關重要。</p>
+            <p>條款的主要目的是確保您的合法使用，並規範相關的責任與權利。</p>
+
+            <h2>條款內容</h2>
+            <div class="terms">
+                <p>1. 本軟體僅限於合法用途，禁止任何形式的未經授權的分發或修改。</p>
+                <p>2. 使用本軟體表示您同意遵守所有適用法律和規範。</p>
+                <p>3. 本公司保留對條款的最終解釋權和修改權。</p>
+                <p>4. 任何因違反條款導致的損失，本公司概不負責。</p>
+                <p>5. 本條款自您下載或使用本軟體之日起生效。</p>
+            </div>
+        </div>
+
+        <!-- 按鈕區域 -->
+        <div class="actions">
+            <button class="agree" onclick="agreeAndDownload('123')">I Agree</button>
+            <button class="cancel" onclick="cancel()">Cancel</button>
+        </div>
+    </div>
+</body>
+</html>
+
+
+---
+
+功能說明
+
+1. 樣式改進：
+
+使用清晰的標題和結構化內容，提升條款頁面的可讀性。
+
+添加背景色、圓角和陰影，提升頁面視覺效果。
+
+
+
+2. 條款滾動： 條款內容超過一定高度時，區域內滾動（max-height 和 overflow-y）。
+
+
+3. 按鈕功能：
+
+I Agree：
+
+點擊後執行 agreeAndDownload(fileId)，觸發檔案下載，並延遲 1 秒後關閉視窗。
+
+
+Cancel：
+
+點擊後執行 cancel()，立即關閉視窗。
+
+
+
+
+4. 標題與介紹：
+
+提供條款的背景介紹，讓用戶明白條款的意圖與目的。
+
+
+
+
+
+---
+
+效果預覽
+
+1. 標題： 顯示頁面名稱 LPDDR5/DDR5 VIP OEM Terms and Conditions。
+
+
+2. 介紹條款： 使用簡短段落說明條款的背景和重要性。
+
+
+3. 條款內容： 顯示詳細條款，帶有滾動功能。
+
+
+4. 按鈕操作：
+
+點擊 I Agree：下載檔案並關閉視窗。
+
+點擊 Cancel：關閉視窗。
+
+
+
+
+
+---
+
+測試流程
+
+1. 打開條款頁面 URL，例如：
+
+termsPage.aspx?FileId=123
+
+
+2. 確認條款頁面的視覺效果與內容結構。
+
+
+3. 點擊 I Agree，檢查是否正常觸發下載，並在 1 秒後自動關閉視窗。
+
+
+4. 點擊 Cancel，檢查是否立即關閉視窗。
+
+
+
+如果還有其他特別需求，可以再進一步優化！
+
+
+
 如果你沒有用到 window.open，而是透過 Response.Redirect 或直接跳轉頁面來實現條款邏輯，以下是更適合的解決方案：
 
 
