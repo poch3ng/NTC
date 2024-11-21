@@ -1,3 +1,208 @@
+根據 showTermsAndConditions 的值來決定是否需要跳出條款頁面，你可以在後端進行判斷，並在前端執行對應的行為。以下是完整實現方式：
+
+
+---
+
+實現邏輯
+
+1. 當按下下載按鈕時，呼叫後端檢查 showTermsAndConditions 的值。
+
+
+2. 根據判斷：
+
+若為 Y：跳出條款頁面。
+
+若為 N：直接下載檔案。
+
+
+
+
+
+---
+
+完整實現步驟
+
+1. 前端頁面 (MainPage.aspx)
+
+在下載按鈕中，通過 AJAX 請求後端判斷是否需要條款確認。
+
+HTML 按鈕與 JavaScript：
+
+<asp:Button ID="btnDownload" runat="server" Text="下載檔案" OnClientClick="checkTermsAndDownload(); return false;" />
+<script>
+    function checkTermsAndDownload() {
+        // AJAX 請求後端檢查 showTermsAndConditions
+        fetch('checkTerms.aspx?FileId=123')
+            .then(response => response.json())
+            .then(data => {
+                if (data.showTerms === 'Y') {
+                    // 跳出條款頁面
+                    window.open('termsPage.aspx?FileId=123', '_blank', 'width=600,height=400');
+                } else {
+                    // 直接下載檔案
+                    window.location.href = 'download.aspx?FileId=123';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+</script>
+
+
+---
+
+2. 後端檢查條款 (checkTerms.aspx)
+
+在 checkTerms.aspx 中根據 FileId 查詢 showTermsAndConditions 的值，返回 JSON 結果。
+
+checkTerms.aspx.vb：
+
+Protected Sub Page_Load(ByVal sender As Object, ByVal e As EventArgs) Handles Me.Load
+    Dim fileId As String = Request.QueryString("FileId")
+    Dim showTerms As String = GetUserTermsCondition(fileId) ' 根據 FileId 查詢值
+
+    Response.ContentType = "application/json"
+    Response.Write("{""showTerms"":""" & showTerms & """}")
+    Response.End()
+End Sub
+
+Private Function GetUserTermsCondition(ByVal fileId As String) As String
+    ' 模擬從資料庫查詢 showTermsAndConditions 的值
+    ' 假設 FileId = 123 時需要條款確認
+    If fileId = "123" Then
+        Return "Y" ' 需要條款
+    Else
+        Return "N" ' 不需要條款
+    End If
+End Function
+
+
+---
+
+3. 條款頁面 (termsPage.aspx)
+
+條款頁面與之前邏輯相同，按下同意按鈕後執行以下操作：
+
+通知原頁面下載檔案。
+
+自動關閉條款頁面。
+
+
+修改條款頁面 HTML：
+
+<html>
+<head>
+    <title>條款與條件</title>
+    <script>
+        function agreeAndDownload() {
+            // 通知原頁面觸發下載
+            if (window.opener) {
+                window.opener.location.href = 'download.aspx?FileId=123';
+            }
+            // 關閉條款頁面
+            window.close();
+        }
+    </script>
+</head>
+<body>
+    <p>請先閱讀並同意條款與條件：</p>
+    <ul>
+        <li>您同意不將檔案用於非法用途。</li>
+        <li>您同意遵守相關法律和規範。</li>
+    </ul>
+    <button onclick="agreeAndDownload()">同意並下載</button>
+</body>
+</html>
+
+
+---
+
+4. 檔案下載頁面 (download.aspx)
+
+download.aspx 負責處理檔案的實際下載，與之前一致。
+
+download.aspx.vb：
+
+Protected Sub Page_Load(ByVal sender As Object, ByVal e As EventArgs) Handles Me.Load
+    Dim fileId As String = Request.QueryString("FileId")
+
+    If String.IsNullOrEmpty(fileId) Then
+        Response.StatusCode = 400 ' 錯誤請求
+        Response.End()
+        Return
+    End If
+
+    ' 進行檔案下載
+    DownloadFile(fileId)
+End Sub
+
+Private Sub DownloadFile(ByVal fileId As String)
+    Dim filePath As String = GetFilePath(fileId)
+
+    If String.IsNullOrEmpty(filePath) OrElse Not System.IO.File.Exists(filePath) Then
+        Response.StatusCode = 404 ' 找不到檔案
+        Response.End()
+        Return
+    End If
+
+    ' 設定檔案下載
+    Response.Clear()
+    Response.ContentType = "application/octet-stream"
+    Response.AppendHeader("Content-Disposition", "attachment; filename=" & System.IO.Path.GetFileName(filePath))
+    Response.TransmitFile(filePath)
+    Response.End()
+End Sub
+
+
+---
+
+工作流程
+
+1. 使用者點擊下載按鈕：
+
+前端執行 checkTerms.aspx 的 AJAX 請求。
+
+根據返回的 showTermsAndConditions 值決定後續行為：
+
+Y：跳轉到條款頁面。
+
+N：直接觸發檔案下載。
+
+
+
+
+2. 條款頁面：
+
+使用者同意後通知原頁面觸發下載。
+
+自動關閉條款頁面。
+
+
+
+3. 下載頁面：
+
+後端處理檔案下載。
+
+
+
+
+
+---
+
+優勢
+
+根據後端動態判斷，靈活處理是否需要條款頁面。
+
+確保下載邏輯和條款顯示分離，清晰易維護。
+
+使用 AJAX 提升使用者體驗，無需刷新主頁面。
+
+
+這樣的設計可以滿足你的需求，既能根據條件決定是否跳出條款頁面，又能保持原頁面不變。
+
+
+
 根據你的需求，以下是實現的邏輯：
 
 1. 條款頁面跳出後，按下同意按鈕，條款頁面應自動消失。
