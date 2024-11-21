@@ -1,3 +1,198 @@
+如果你的按鈕是用 HyperLinkField，可以通過動態改變 NavigateUrl 來實現條件跳轉，根據 showTermsAndConditions 的值決定是否需要跳轉到條款頁面或直接下載。
+
+
+---
+
+完整實現步驟
+
+1. 設置 HyperLinkField
+
+在你的 GridView 中，設置一個 HyperLinkField，並通過後端動態生成 NavigateUrl。
+
+GridView 設置範例：
+
+<asp:GridView ID="GridView1" runat="server" AutoGenerateColumns="False" OnRowDataBound="GridView1_RowDataBound">
+    <Columns>
+        <asp:BoundField DataField="FileName" HeaderText="檔案名稱" />
+        <asp:HyperLinkField DataNavigateUrlFields="FileId" HeaderText="操作" Text="下載" DataNavigateUrlFormatString="checkTerms.aspx?FileId={0}" />
+    </Columns>
+</asp:GridView>
+
+
+---
+
+2. 後端處理條款判斷
+
+修改 checkTerms.aspx，根據 FileId 的 showTermsAndConditions 值動態跳轉。
+
+checkTerms.aspx.vb：
+
+Protected Sub Page_Load(ByVal sender As Object, ByVal e As EventArgs) Handles Me.Load
+    Dim fileId As String = Request.QueryString("FileId")
+    Dim showTerms As String = GetUserTermsCondition(fileId)
+
+    If String.IsNullOrEmpty(fileId) Then
+        Response.Write("檔案不存在！")
+        Response.End()
+        Return
+    End If
+
+    If showTerms = "Y" Then
+        ' 跳轉到條款頁面
+        Response.Redirect($"termsPage.aspx?FileId={fileId}")
+    Else
+        ' 直接下載檔案
+        Response.Redirect($"download.aspx?FileId={fileId}")
+    End If
+End Sub
+
+Private Function GetUserTermsCondition(ByVal fileId As String) As String
+    ' 模擬從資料庫取得 showTermsAndConditions 的值
+    ' 假設 FileId = 123 時需要條款
+    If fileId = "123" Then
+        Return "Y" ' 需要條款
+    Else
+        Return "N" ' 不需要條款
+    End If
+End Function
+
+
+---
+
+3. 條款頁面 (termsPage.aspx)
+
+條款頁面與之前設計相同，負責顯示條款內容，並在使用者點擊同意按鈕後通知原頁面下載檔案。
+
+條款頁面按鈕邏輯：
+
+<html>
+<head>
+    <title>條款與條件</title>
+    <script>
+        function agreeAndDownload() {
+            // 通知原頁面觸發下載
+            if (window.opener) {
+                window.opener.location.href = 'download.aspx?FileId=123';
+            }
+            // 關閉條款頁面
+            window.close();
+        }
+    </script>
+</head>
+<body>
+    <p>請先閱讀並同意條款與條件：</p>
+    <ul>
+        <li>您同意不將檔案用於非法用途。</li>
+        <li>您同意遵守相關法律和規範。</li>
+    </ul>
+    <button onclick="agreeAndDownload()">同意並下載</button>
+</body>
+</html>
+
+
+---
+
+4. 下載頁面 (download.aspx)
+
+負責檔案下載邏輯，與之前一致。
+
+下載邏輯：
+
+Protected Sub Page_Load(ByVal sender As Object, ByVal e As EventArgs) Handles Me.Load
+    Dim fileId As String = Request.QueryString("FileId")
+
+    If String.IsNullOrEmpty(fileId) Then
+        Response.StatusCode = 400 ' 錯誤請求
+        Response.End()
+        Return
+    End If
+
+    ' 進行檔案下載
+    DownloadFile(fileId)
+End Sub
+
+Private Sub DownloadFile(ByVal fileId As String)
+    Dim filePath As String = GetFilePath(fileId)
+
+    If String.IsNullOrEmpty(filePath) OrElse Not System.IO.File.Exists(filePath) Then
+        Response.StatusCode = 404 ' 找不到檔案
+        Response.End()
+        Return
+    End If
+
+    ' 設定檔案下載
+    Response.Clear()
+    Response.ContentType = "application/octet-stream"
+    Response.AppendHeader("Content-Disposition", "attachment; filename=" & System.IO.Path.GetFileName(filePath))
+    Response.TransmitFile(filePath)
+    Response.End()
+End Sub
+
+
+---
+
+5. 動態改變 HyperLinkField
+
+如果希望在 GridView 中直接判斷並生成條件化的 URL，可以通過 RowDataBound 動態修改 HyperLinkField 的 URL。
+
+修改 RowDataBound：
+
+Protected Sub GridView1_RowDataBound(ByVal sender As Object, ByVal e As GridViewRowEventArgs) Handles GridView1.RowDataBound
+    If e.Row.RowType = DataControlRowType.DataRow Then
+        Dim fileId As String = DataBinder.Eval(e.Row.DataItem, "FileId").ToString()
+        Dim showTerms As String = GetUserTermsCondition(fileId)
+
+        Dim link As HyperLink = CType(e.Row.Cells(1).Controls(0), HyperLink)
+        If showTerms = "Y" Then
+            link.NavigateUrl = $"termsPage.aspx?FileId={fileId}"
+        Else
+            link.NavigateUrl = $"download.aspx?FileId={fileId}"
+        End If
+    End If
+End Sub
+
+
+---
+
+工作流程
+
+1. 用戶點擊 HyperLinkField：
+
+若 showTermsAndConditions = Y，跳轉到條款頁面。
+
+若 showTermsAndConditions = N，直接下載檔案。
+
+
+
+2. 條款頁面處理：
+
+用戶同意後通知原頁面下載，並自動關閉條款頁面。
+
+
+
+3. 檔案下載頁面：
+
+負責處理檔案下載邏輯。
+
+
+
+
+
+---
+
+優勢
+
+簡單直觀，所有條件判斷均由後端控制，無需過多前端邏輯。
+
+靈活性高，可根據需求動態改變 URL 行為。
+
+維護方便，邏輯分離明確。
+
+
+這樣的設計可以完美實現你的需求，並適配 HyperLinkField 的使用方式。
+
+
+
 根據 showTermsAndConditions 的值來決定是否需要跳出條款頁面，你可以在後端進行判斷，並在前端執行對應的行為。以下是完整實現方式：
 
 
