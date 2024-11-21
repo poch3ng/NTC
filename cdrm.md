@@ -1,3 +1,145 @@
+根據你的需求，以下是實現的邏輯：
+
+1. 條款頁面跳出後，按下同意按鈕，條款頁面應自動消失。
+
+
+2. 按下同意後，直接觸發檔案下載。
+
+
+
+以下是完整的實現方式：
+
+
+---
+
+1. 條款頁面按鈕邏輯
+
+在條款頁面按下 "同意並下載" 按鈕後，使用 JavaScript 自動關閉條款頁面並開始下載檔案。
+
+修改 ShowTermsPage 方法：
+
+Private Sub ShowTermsPage(ByVal fileId As String)
+    Response.Clear()
+    Response.Write("<html><head><title>條款與條件</title></head><body>")
+    Response.Write("<p>請先同意以下條款與條件，才能下載檔案：</p>")
+    Response.Write("<ul>")
+    Response.Write("<li>您同意不將檔案用於非法用途。</li>")
+    Response.Write("<li>您同意遵守所有相關法律和規範。</li>")
+    Response.Write("</ul>")
+    Response.Write("<button id='agreeButton'>同意並下載</button>")
+    Response.Write("<script>")
+    Response.Write("document.getElementById('agreeButton').onclick = function() {")
+    Response.Write("    window.location.href = 'downloadFile.aspx?FileId=" & fileId & "&Agree=true';") ' 觸發下載
+    Response.Write("    setTimeout(function() { window.close(); }, 500);") ' 0.5 秒後關閉頁面
+    Response.Write("}")
+    Response.Write("</script>")
+    Response.Write("</body></html>")
+    Response.End()
+End Sub
+
+
+---
+
+2. 後端處理邏輯
+
+當用戶點擊 "同意並下載" 時，附帶 Agree=true 的參數回到 downloadFile.aspx，觸發檔案下載。
+
+修改 Page_Load 方法：
+
+Protected Sub Page_Load(ByVal sender As Object, ByVal e As EventArgs) Handles Me.Load
+    Dim fileId As String = Request.QueryString("FileId")
+    Dim agree As String = Request.QueryString("Agree") ' 檢查是否同意條款
+
+    If String.IsNullOrEmpty(fileId) Then
+        Response.Write("檔案不存在！")
+        Response.End()
+        Return
+    End If
+
+    If Not String.IsNullOrEmpty(agree) AndAlso agree = "true" Then
+        ' 使用者同意條款，直接下載檔案
+        DownloadFile(fileId)
+    Else
+        ' 檢查是否需要條款同意
+        Dim showTerms As String = GetUserTermsCondition()
+
+        If showTerms = "Y" Then
+            ' 顯示條款頁面
+            ShowTermsPage(fileId)
+        Else
+            ' 直接下載檔案
+            DownloadFile(fileId)
+        End If
+    End If
+End Sub
+
+
+---
+
+3. 檔案下載方法
+
+檔案下載邏輯不變：
+
+Private Sub DownloadFile(ByVal fileId As String)
+    Dim filePath As String = GetFilePath(fileId)
+
+    If String.IsNullOrEmpty(filePath) OrElse Not System.IO.File.Exists(filePath) Then
+        Response.Write("檔案不存在！")
+        Response.End()
+        Return
+    End If
+
+    ' 設定檔案下載
+    Response.ContentType = "application/octet-stream"
+    Response.AppendHeader("Content-Disposition", "attachment; filename=" & System.IO.Path.GetFileName(filePath))
+    Response.TransmitFile(filePath)
+    Response.End()
+End Sub
+
+
+---
+
+4. 流程解釋
+
+1. 當用戶點擊下載連結 (如 downloadFile.aspx?FileId=123)：
+
+檢查 showTermsAndConditions 的值。
+
+若為 Y：顯示條款頁面。
+
+若為 N：直接下載檔案。
+
+
+
+
+2. 條款頁面顯示時，用戶點擊 "同意並下載" 按鈕：
+
+導向 downloadFile.aspx?FileId=123&Agree=true。
+
+使用 JavaScript 關閉條款頁面。
+
+
+
+3. 在 Agree=true 的情況下，觸發檔案下載。
+
+
+
+
+---
+
+5. 注意事項
+
+視窗攔截問題：如果條款頁面是新開的視窗，window.close() 不會被攔截；否則需用戶允許。
+
+頁面延遲：setTimeout 時間可以調整，確保用戶看到跳轉過程。
+
+多次同意檢查：可以在後端記錄已同意的用戶，避免重複提示。
+
+
+這樣的設計能確保條款頁面在用戶操作後自動消失，同時完成檔案下載。
+
+
+
 在使用者點擊 同意按鈕 (Agree) 後，你可以使用 QueryString 或 POST 參數來判斷是否已經同意條款，進而觸發檔案下載。以下是處理方式的詳細步驟：
 
 
