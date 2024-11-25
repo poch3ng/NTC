@@ -1,3 +1,53 @@
+要在 VB WebForm 中創建一個函式，用於將文件從一個路徑複製到另一個路徑，您可以使用 .NET 的 System.IO 命名空間提供的 File.Copy 方法。以下是逐步指導如何實現：
+
+步驟 1: 引入命名空間
+
+在您的代碼文件中加入必要的命名空間。
+
+Imports System.IO
+
+步驟 2: 創建函式
+
+在您的 WebForm 代碼後台中創建一個函式，接收原始文件路徑和目標文件路徑作為參數。
+
+Public Sub CopyFile(ByVal sourcePath As String, ByVal destinationPath As String)
+    Try
+        ' 確保目標目錄存在
+        Dim targetDir As String = Path.GetDirectoryName(destinationPath)
+        If Not Directory.Exists(targetDir) Then
+            Directory.CreateDirectory(targetDir)
+        End If
+
+        ' 複製文件到新位置
+        File.Copy(sourcePath, destinationPath, True) ' True 表示如果目標文件已存在，則覆蓋它
+    Catch ex As Exception
+        ' 處理錯誤
+        Throw New Exception("File could not be copied: " & ex.Message)
+    End Try
+End Sub
+
+步驟 3: 調用函式
+
+您可以在需要的地方調用此函式，例如在按鈕點擊事件中。
+
+Protected Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+    ' 假設有兩個文本框用於輸入原始路徑和目標路徑
+    Dim source As String = txtSourcePath.Text
+    Dim destination As String = txtDestinationPath.Text
+
+    ' 呼叫函式
+    Try
+        CopyFile(source, destination)
+        lblStatus.Text = "File copied successfully."
+    Catch ex As Exception
+        lblStatus.Text = "Error: " & ex.Message
+    End Try
+End Sub
+
+這個函式會將指定的文件從一個位置複製到另一個位置，並且能夠處理目標位置不存在的情況。在實際應用中，您可能還需要考慮更多的錯誤處理和安全性措施，例如檢查文件類型和大小限制等。
+
+
+
 以下是條款頁面全部改為英文的版本，包含標題、介紹、條款內容以及按鈕的功能描述，適配全英文需求。
 
 
