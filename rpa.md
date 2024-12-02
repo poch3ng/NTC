@@ -1,3 +1,141 @@
+在前面使用的 VB.NET 程式碼中，可以在新增變數之前對重複的變數進行處理，確保只添加唯一的變數。以下是完整程式碼範例，已整合去重邏輯：
+
+
+---
+
+完整 VB.NET 程式碼：帶去重邏輯
+
+' 導入必要的命名空間
+Imports System.Text.RegularExpressions
+Imports System.IO
+Imports System.Linq
+
+' 定義資料夾路徑
+Dim folderPath As String = "C:\Builds\SystemName"
+
+' 獲取所有子資料夾
+Dim directories As String() = Directory.GetDirectories(folderPath)
+
+' 按修改時間排序，找到最新資料夾
+Dim latestFolder As String = directories.OrderByDescending(Function(d) Directory.GetLastWriteTime(d)).First()
+
+' 拼接 web.config 的完整路徑
+Dim configPath As String = Path.Combine(latestFolder, "web.config")
+
+' 定義結果變數（去重後的變數清單）
+Dim uniqueVariables As New List(Of String)
+
+' 確認 web.config 是否存在
+If File.Exists(configPath) Then
+    ' 讀取文件內容
+    Dim configContent As String = File.ReadAllText(configPath)
+
+    ' 使用正則表達式提取變數
+    Dim matches As MatchCollection = Regex.Matches(configContent, "__[\w]+__")
+    
+    ' 提取變數並去重
+    Dim extractedVariables As List(Of String) = matches.Cast(Of Match)().Select(Function(m) m.Value).ToList()
+
+    ' 系統中已存在的變數（模擬現有變數清單，可替換為真實值）
+    Dim existingVariables As New List(Of String) From {"__Var1__", "__Var3__"} ' 假設已存在這些變數
+
+    ' 過濾掉已存在的變數
+    uniqueVariables = extractedVariables.Where(Function(v) Not existingVariables.Contains(v)).ToList()
+
+    ' 打印去重後的變數清單（僅供測試用）
+    For Each variable As String In uniqueVariables
+        Console.WriteLine(variable)
+    Next
+Else
+    Throw New Exception("web.config 文件不存在！")
+End If
+
+' 結果返回到 UiPath 作為輸出
+Result = uniqueVariables
+
+
+---
+
+程式邏輯說明
+
+1. 提取變數
+
+使用正則表達式 __[\w]+__ 提取 web.config 中的變數名稱。
+
+
+
+2. 模擬系統現有變數
+
+使用 existingVariables 模擬已存在的變數清單，這部分需要根據實際情況替換。
+
+
+
+3. 過濾重複變數
+
+使用 LINQ 過濾掉 existingVariables 中已存在的變數，僅保留不重複的變數。
+
+
+
+4. 輸出去重結果
+
+將結果儲存到 uniqueVariables，並返回給 UiPath 的輸出變數 Result。
+
+
+
+
+
+---
+
+測試範例
+
+假設：
+
+web.config 中的變數提取結果：
+
+{"__Var1__", "__Var2__", "__Var3__", "__Var4__"}
+
+系統中已存在的變數：
+
+{"__Var1__", "__Var3__"}
+
+
+結果：
+
+uniqueVariables：
+
+{"__Var2__", "__Var4__"}
+
+
+---
+
+改進選項
+
+1. 大小寫不敏感去重 如果變數對大小寫不敏感，可以使用以下方式比較：
+
+uniqueVariables = extractedVariables.Where(Function(v) Not existingVariables.Any(Function(ev) String.Equals(ev, v, StringComparison.OrdinalIgnoreCase))).ToList()
+
+
+2. 更快的去重處理 如果變數數量多，可以使用 HashSet 提高效率：
+
+Dim existingSet As New HashSet(Of String)(existingVariables)
+uniqueVariables = extractedVariables.Where(Function(v) Not existingSet.Contains(v)).ToList()
+
+
+
+
+---
+
+適用場景
+
+當你需要確保 web.config 中的變數只添加一次。
+
+可以輕鬆替換 existingVariables 為系統的實際變數清單。
+
+
+如果還有其他需求或需要進一步調整，請隨時告訴我！
+
+
+
 如果 idx 的值以 2, 7, 12... 的形式遞增，說明這是一個固定間隔的索引模式。可以根據此模式計算每次新增的輸入框的 idx 值，並動態更新 Selector。以下是具體解決方案：
 
 
