@@ -1,3 +1,157 @@
+如果能直接透過路徑訪問存放組建的資料夾，可以使用以下流程直接排序並找到最新組建：
+
+
+---
+
+實現流程
+
+1. 進入組建存放資料夾
+
+1. 使用 Assign 設置資料夾路徑變數，例如：
+
+folderPath = "C:\Builds\SystemName"
+
+
+2. 使用 Directory.GetDirectories 列出資料夾中的所有子資料夾：
+
+directories = Directory.GetDirectories(folderPath)
+
+
+
+
+---
+
+2. 按修改時間排序
+
+1. 使用 LINQ 或 Array.Sort 按最後修改時間排序：
+
+latestFolder = directories.OrderByDescending(Function(d) Directory.GetLastWriteTime(d)).First()
+
+
+2. 獲得最新組建的資料夾路徑，存入變數 latestFolder。
+
+
+
+
+---
+
+3. 定位 web.config
+
+1. 確認 web.config 是否存在：
+
+configPath = Path.Combine(latestFolder, "web.config")
+If File.Exists(configPath) Then
+    ' 文件存在
+Else
+    ' 文件不存在，處理例外情況
+End If
+
+
+2. 讀取 web.config 文件內容：
+
+使用 Read Text File 活動讀取 configPath。
+
+
+
+
+
+---
+
+4. 提取變數
+
+1. 使用 Matches 活動設置正則表達式提取變數：
+
+__[\w]+__
+
+
+2. 結果存入變數清單（List），以供後續操作。
+
+
+
+
+---
+
+完整程式範例
+
+以下是使用 VB.NET 編寫的邏輯，適用於 UiPath 的 Invoke Code 活動：
+
+' 定義資料夾路徑
+Dim folderPath As String = "C:\Builds\SystemName"
+
+' 獲取所有子資料夾
+Dim directories As String() = Directory.GetDirectories(folderPath)
+
+' 按修改時間排序，找到最新資料夾
+Dim latestFolder As String = directories.OrderByDescending(Function(d) Directory.GetLastWriteTime(d)).First()
+
+' 拼接 web.config 的完整路徑
+Dim configPath As String = Path.Combine(latestFolder, "web.config")
+
+' 確認 web.config 是否存在
+If File.Exists(configPath) Then
+    ' 讀取文件內容
+    Dim configContent As String = File.ReadAllText(configPath)
+    ' 使用正則表達式提取變數
+    Dim matches As MatchCollection = Regex.Matches(configContent, "__[\w]+__")
+    Dim variables As New List(Of String)
+    For Each match As Match In matches
+        variables.Add(match.Value)
+    Next
+    ' 輸出變數清單
+    Result = variables
+Else
+    Throw New Exception("web.config 文件不存在！")
+End If
+
+
+---
+
+優勢
+
+1. 效率高：直接通過檔案系統操作，無需網頁模擬。
+
+
+2. 靈活性強：可以根據需求調整排序方式或文件檢索邏輯。
+
+
+
+
+---
+
+例外處理
+
+1. 資料夾不存在
+
+在 GetDirectories 前檢查資料夾是否存在：
+
+If Directory.Exists(folderPath) Then
+    ' 進行檢索
+Else
+    Throw New Exception("資料夾路徑不存在！")
+End If
+
+
+
+2. 無子資料夾
+
+檢查 directories 是否為空，避免排序錯誤。
+
+
+
+3. web.config 缺失
+
+提示用戶文件缺失，記錄錯誤資訊。
+
+
+
+
+
+---
+
+如果需要 UiPath 工作流程範本，請提供更多細節，我可以幫助進一步完善！
+
+
+
 以下是實現您的需求的完整解決方案。VBA 宏會檢查 T 欄位是否為負數，如果為負數，則將該行的 T 欄和 R 欄 設為紅字。
 
 
