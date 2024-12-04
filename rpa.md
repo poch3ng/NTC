@@ -1,3 +1,124 @@
+如果想傳入參數並格式化 Excel 特定欄位，以下提供操作步驟：
+
+
+---
+
+使用 UiPath 直接格式化特定欄位的數字格式
+
+1. 讀取 Excel 文件
+
+使用 Excel Application Scope 或 Use Excel File 活動讀取目標文件。
+
+
+
+2. 傳入欄位名稱或範圍
+
+將欄位名稱（如 "A:A" 或 "A1:A100") 作為參數傳入到流程中。
+
+
+
+3. 設置格式化（Invoke VBA 方法）
+
+使用 Invoke VBA 活動，將以下 VBA 腳本存入 .vbs 文件，然後在 UiPath 中呼叫：
+
+Sub SetDecimalFormat(columnRange As String, decimalFormat As String)
+    Columns(columnRange).NumberFormat = decimalFormat
+End Sub
+
+配置 Invoke VBA 的參數：
+
+columnRange：傳入特定的欄位範圍（如 "B:B" 或 "C1:C100"）。
+
+decimalFormat：傳入格式（如 "0.00" 表示保留兩位小數）。
+
+
+
+
+4. 傳遞參數到 VBA
+
+設置 Invoke VBA 的參數：
+
+第一個參數為目標欄位範圍。
+
+第二個參數為數字格式（如 "0.00"）。
+
+
+
+
+
+
+---
+
+示例 UiPath 流程設置
+
+1. 變數準備
+
+targetColumnRange (String) - 目標欄位範圍，例如 "B:B"。
+
+numberFormat (String) - 數字格式，例如 "0.00"。
+
+
+2. 流程邏輯
+
+1. 讀取 Excel
+
+使用 Use Excel File 或 Excel Application Scope。
+
+
+
+2. Invoke VBA
+
+使用 Invoke VBA 活動。
+
+指定外部 VBA 腳本文件路徑（如 SetDecimalFormat.vbs）。
+
+添加參數：
+
+targetColumnRange 對應欄位範圍。
+
+numberFormat 為格式化規則。
+
+
+
+
+3. 保存文件
+
+完成格式化後保存 Excel。
+
+
+
+
+
+---
+
+VBA 腳本範例
+
+存成 .vbs 文件（如 FormatColumn.vbs）：
+
+Sub SetDecimalFormat(columnRange As String, decimalFormat As String)
+    Columns(columnRange).NumberFormat = decimalFormat
+End Sub
+
+
+---
+
+注意事項
+
+1. 如果 Excel 文件為只讀，確保已啟用寫入權限。
+
+
+2. 若無法使用 VBA，考慮使用 Write Cell 搭配 Excel 函數（如 =TEXT(A1, "0.00")）。
+
+
+3. 運行過程中需確保 Excel 格式不被其他操作覆蓋。
+
+
+
+這樣可以輕鬆實現通過參數設置 Excel 特定欄位的數字格式化！
+
+
+
+
 在前面使用的 VB.NET 程式碼中，可以在新增變數之前對重複的變數進行處理，確保只添加唯一的變數。以下是完整程式碼範例，已整合去重邏輯：
 
 
