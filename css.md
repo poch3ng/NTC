@@ -6,7 +6,7 @@
 1. 使用 !important
 
 說明：強制覆蓋其他樣式 (慎用)。
-'''html
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,7 +23,7 @@
     <p class="override">這段文字會是紅色，因為 !important 優先級最高。</p>
 </body>
 </html>
-'''
+```
 > 注意： 避免過度使用 !important，除非需要緊急解決樣式衝突。
 
 
@@ -34,7 +34,7 @@
 2. 繼承與優先級
 
 說明：展示不同選擇器的優先級。
-'''html
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -56,14 +56,14 @@
     <p id="unique">藍色文字</p>
 </body>
 </html>
-'''
+```
 
 ---
 
 3. ::before 與 ::after 偽元素
 
 說明：在元素前後插入內容。
-'''html
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -86,14 +86,14 @@
     <button class="button">按鈕</button>
 </body>
 </html>
-'''
+```
 
 ---
 
 4. 透明度與顏色疊加
 
 說明：利用 rgba 和 opacity。
-'''html
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -112,14 +112,14 @@
     <div class="overlay">透明度效果</div>
 </body>
 </html>
-'''
+```
 
 ---
 
 5. CSS 變形 (Transform)
 
 說明：實現旋轉、縮放等特效。
-'''html
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -139,14 +139,14 @@
     <div class="box"></div>
 </body>
 </html>
-'''
+```
 
 ---
 
 6. CSS 多背景
 
 說明：同一元素上設定多個背景。
-'''html
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -164,14 +164,14 @@
     <div class="multi-bg"></div>
 </body>
 </html>
-'''
+```
 
 ---
 
 7. 媒體查詢 (Media Query)
 
 說明：針對不同設備設計樣式。
-'''html
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -190,14 +190,14 @@
     <p>調整視窗寬度來測試文字大小的變化。</p>
 </body>
 </html>
-'''
+```
 
 ---
 
 8. 層級 (z-index)
 
 說明：控制元素的堆疊順序。
-'''html
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -226,14 +226,14 @@
     <div class="box2"></div>
 </body>
 </html>
-'''
+```
 
 ---
 
 9. CSS 圓角邊框 (Border Radius)
 
 說明：創建不規則形狀。
-'''html
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -250,14 +250,14 @@
     <div class="circle"></div>
 </body>
 </html>
-'''
+```
 
 ---
 
 10. CSS 動態樣式切換 (Hover + Transition)
 
 說明：滑鼠懸停改變樣式，並使用動畫過渡效果。
-'''html
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -278,7 +278,7 @@
     <button class="btn">懸停看看</button>
 </body>
 </html>
-'''
+```
 
 ---
 
