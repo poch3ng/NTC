@@ -515,3 +515,63 @@ Module EDIParserAllInOne
                 Console.WriteLine($"  REF => Type={elements.ElementAtOrDefault(1)}, Value={elements.ElementAtOrDefault(2)}")
             ElseIf elements(0) = "DTM" Then
                 Console.WriteLine($"  DTM => Qualifier={elements.ElementAtOrDefault(1)}, Date={elements.ElementAtOrDefault(2)}")
+            Else
+                Console.WriteLine($"  => CTT-other: {elements(0)} => {seg}")
+            End If
+        Next
+        Console.WriteLine("=== [ProcessCTTLoop] End ===")
+    End Sub
+End Module
+
+
+---
+
+使用與延伸
+
+1. 處理多筆 ST、GS、ISA
+
+實際 EDI 檔案往往有多個 ST (多筆交易)、多個 GS (多個功能群)、甚至多個 ISA (跨日或跨廠商整合)。
+
+可以將 currentISA、currentGS、currentST 替換成「List 或物件結構」，並在遇到 IEA、GE、SE 時對應「成對」的段落做檢驗或存入資料庫。
+
+
+
+2. 欄位驗證與錯誤處理
+
+真實 EDI 常需要檢查欄位長度、合法值、日期格式等。建議在解析時加強 Try...Catch 或欄位檢查邏輯。
+
+
+
+3. 資料庫寫入
+
+在範例的 ProcessXXXLoop() 裡，目前只是 Console.WriteLine() 印出解析結果。
+
+你可以直接在這些函式中，把重要欄位（N1 的 Code/Name、PO1 的數量/價格等）透過 ADO.NET 或 EF Core 寫進資料庫。
+
+
+
+4. 各 Loop 的出現順序
+
+若實際規範中，N9、N1、PO1、CTT 的出現順序或重複次數不同，也要調整邏輯 (例如可以同時存在多個 N9 Loop 或多個頂層 N1 Loop)。本範例只示範「偵測新 Loop → 關閉舊 Loop → 開啟新 Loop」的狀態機思路。
+
+
+
+
+
+---
+
+結語
+
+以上程式碼示範了 ISA/GS/ST 結構 與 N9、N1、PO1（含 N1 Sub-Loop）、CTT 等 Loop、以及 REF / DTM 等段的解析框架。核心觀念依舊是：
+
+狀態機 (State Machine)：用布林值區分「是否在某個 Loop 中」
+
+巢狀收集：PO1 下還有 N1 Sub-Loop，就在 ProcessPO1Loop() 裡再細分
+
+遇到新 Loop 就關閉舊 Loop
+
+最後結束時做收尾處理
+
+
+如有更多 EDI 段或巢狀結構，請在此基礎上持續擴充即可。祝開發順利!
+
