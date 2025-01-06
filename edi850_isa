@@ -1,0 +1,517 @@
+以下提供一個「含 ISA、GS、ST、以及 N9/N1/PO1/CTT 等主要 Loop」的 VB.NET 完整範例程式碼，示範如何同時解析頂層與巢狀 Loop，並把 REF、DTM 等段納入考量。你可以依照此程式的骨架，再進一步改寫成更完整的 EDI 850 解析與資料庫寫入邏輯。
+
+
+---
+
+程式功能與結構說明
+
+1. Interchange / Functional Group / Transaction Set
+
+ISA (Interchange Header) / IEA (Interchange Trailer)
+
+GS (Functional Group Header) / GE (Functional Group Trailer)
+
+ST (Transaction Set Header) / SE (Transaction Set Trailer)
+
+
+這些段並非「Loop」，而是 EDI 的外層結構。通常一個檔案 (ISAGE)，每個功能群可含多個交易 (ST~SE)。
+
+範例中為求簡化，採「當偵測到 ISA/GS/ST 時，就簡單地將原始段先收集或即時打印」，並不做多重 ST 或多重 GS 的複雜處理。
+
+實務上，你可能需要另外維護多筆 ISA、GS、ST 資料，並透過控制號 (ISA13、GS06、ST02) 等進行配對，這在真實 EDI 系統中很常見。
+
+
+
+2. 頂層 Loop
+
+N9 Loop
+
+N1 Loop (頂層)
+
+PO1 Loop
+
+其下還有 N1 Sub-Loop（含 N3、N4、REF、DTM…）。
+
+
+CTT Loop
+
+
+
+3. REF、DTM 等通用段
+
+可能出現在 N9、N1、PO1、PO1 內的 N1 Sub-Loop、甚至 CTT 下。
+
+這裡採用「在哪個 Loop 狀態中，就把段歸在哪個 Loop」的方式實作；例如在 PO1 Loop 狀態下遇到 DTM，就歸入 PO1Segments。若在 PO1 的 N1 Sub-Loop 狀態中遇到 DTM，就歸入該 Sub-Loop 的 po1N1Segments。
+
+
+
+4. 程式碼說明
+
+先在最外層掃描每個 segment：
+
+如果偵測到 ISA、GS、ST → 直接呼叫對應處理函式，或先把原始段存起來。
+
+如果偵測到 N9 / N1 / PO1 / CTT → 依照頂層 Loop 狀態開關 (State Machine) 來進行「關閉舊 Loop → 開啟新 Loop」的切換。
+
+如果偵測到 REF、DTM… 則視目前所處 Loop (或子 Loop) 狀態，將其歸入對應的暫存清單。
+
+如果偵測到 SE / GE / IEA → 代表交易或整個檔案結束，先把所有已開啟的 Loop 收尾處理，再處理結尾邏輯。
+
+
+在 ProcessPO1Loop() 內部，再偵測到 N1 才進入「PO1 內的 N1 Sub-Loop」。
+
+在結尾 (For Each 結束後) 若仍有未關閉的 Loop，亦要呼叫各自 ProcessXxxLoop() 收尾。
+
+
+
+
+
+---
+
+完整程式碼 (VB.NET)
+
+Imports System.IO
+
+Module EDIParserAllInOne
+    Sub Main()
+        '=== 1. 讀取 EDI 檔案 ===
+        Dim ediFilePath As String = "C:\path\to\your\file.edi"
+        Dim ediContent As String = File.ReadAllText(ediFilePath)
+
+        '=== 2. 常見分隔：段分隔 "~"，元素分隔 "*" ===
+        Dim segmentDelimiter As String = "~"
+        Dim elementDelimiter As Char = "*"c
+
+        '=== 3. 切割 EDI 成 segment ===
+        Dim segments As String() = ediContent.Split(
+            New String() {segmentDelimiter},
+            StringSplitOptions.RemoveEmptyEntries
+        )
+
+        '--------------------------------------------
+        '   A. 上層結構：ISA / GS / ST
+        '--------------------------------------------
+        ' (簡化做法：只存最新一次看到的 ISA/GS/ST)
+        Dim currentISA As String = ""
+        Dim currentGS As String = ""
+        Dim currentST As String = ""
+
+        '--------------------------------------------
+        '   B. 頂層 Loop 狀態 (N9, N1, PO1, CTT)
+        '--------------------------------------------
+        Dim inN9Loop As Boolean = False
+        Dim inTopN1Loop As Boolean = False
+        Dim inPO1Loop As Boolean = False
+        Dim inCTTLoop As Boolean = False
+
+        '--------------------------------------------
+        '   B.1. 暫存各頂層 Loop 的段落
+        '--------------------------------------------
+        Dim N9Segments As New List(Of String)
+        Dim TopN1Segments As New List(Of String)
+        Dim PO1Segments As New List(Of String)
+        Dim CTTSegments As New List(Of String)
+
+        '=== 4. 逐段掃描 ===
+        For Each rawSeg As String In segments
+            Dim seg As String = rawSeg.Trim()
+            If seg = "" Then Continue For
+
+            Dim elements As String() = seg.Split(elementDelimiter)
+            Dim segID As String = elements(0).Trim()
+
+            Select Case segID
+
+                '=======================================
+                '  1) Interchange Level
+                '=======================================
+                Case "ISA"
+                    ' 視需求：可先關閉任何已開啟的 Loop
+                    CloseAllLoopsIfAny(inN9Loop, N9Segments,
+                                       inTopN1Loop, TopN1Segments,
+                                       inPO1Loop, PO1Segments,
+                                       inCTTLoop, CTTSegments)
+
+                    ' 處理/記錄新 ISA
+                    currentISA = seg
+                    Console.WriteLine($"[ISA] => {seg}")
+                
+                Case "IEA"
+                    ' 檔案結束
+                    CloseAllLoopsIfAny(inN9Loop, N9Segments,
+                                       inTopN1Loop, TopN1Segments,
+                                       inPO1Loop, PO1Segments,
+                                       inCTTLoop, CTTSegments)
+                    Console.WriteLine($"[IEA] => {seg}")
+                    ' 這裡可呼叫 ProcessISA() 之類來處理/檢查 ISA/IEA
+
+                '=======================================
+                '  2) Functional Group Level
+                '=======================================
+                Case "GS"
+                    ' 如果之前有未關閉的頂層 Loop，也先關閉
+                    CloseAllLoopsIfAny(inN9Loop, N9Segments,
+                                       inTopN1Loop, TopN1Segments,
+                                       inPO1Loop, PO1Segments,
+                                       inCTTLoop, CTTSegments)
+
+                    currentGS = seg
+                    Console.WriteLine($"[GS] => {seg}")
+                
+                Case "GE"
+                    CloseAllLoopsIfAny(inN9Loop, N9Segments,
+                                       inTopN1Loop, TopN1Segments,
+                                       inPO1Loop, PO1Segments,
+                                       inCTTLoop, CTTSegments)
+                    Console.WriteLine($"[GE] => {seg}")
+                    ' 可呼叫 ProcessGS(currentGS, seg) 等
+
+                '=======================================
+                '  3) Transaction Set Level
+                '=======================================
+                Case "ST"
+                    ' 先關閉任何已開啟頂層 Loop
+                    CloseAllLoopsIfAny(inN9Loop, N9Segments,
+                                       inTopN1Loop, TopN1Segments,
+                                       inPO1Loop, PO1Segments,
+                                       inCTTLoop, CTTSegments)
+
+                    currentST = seg
+                    Console.WriteLine($"[ST] => {seg}")
+
+                Case "SE"
+                    ' 結束當前的交易
+                    CloseAllLoopsIfAny(inN9Loop, N9Segments,
+                                       inTopN1Loop, TopN1Segments,
+                                       inPO1Loop, PO1Segments,
+                                       inCTTLoop, CTTSegments)
+                    Console.WriteLine($"[SE] => {seg}")
+                    ' 這裡可呼叫 ProcessST(currentST, seg) 等
+
+                '=======================================
+                '  4) 頂層 Loop: N9
+                '=======================================
+                Case "N9"
+                    ' 切換到 N9 Loop，先關閉其他頂層
+                    If inTopN1Loop Then
+                        ProcessTopN1Loop(TopN1Segments)
+                        TopN1Segments.Clear()
+                        inTopN1Loop = False
+                    End If
+                    If inPO1Loop Then
+                        ProcessPO1Loop(PO1Segments)
+                        PO1Segments.Clear()
+                        inPO1Loop = False
+                    End If
+                    If inCTTLoop Then
+                        ProcessCTTLoop(CTTSegments)
+                        CTTSegments.Clear()
+                        inCTTLoop = False
+                    End If
+
+                    inN9Loop = True
+                    N9Segments.Add(seg)
+
+                '=======================================
+                '  5) 頂層 Loop: N1 (或 PO1 的 N1 Sub-Loop)
+                '=======================================
+                Case "N1"
+                    If inPO1Loop Then
+                        ' => PO1 下的 N1 Sub-Loop
+                        PO1Segments.Add(seg)
+                    Else
+                        ' => 頂層 N1
+                        If inN9Loop Then
+                            ProcessN9Loop(N9Segments)
+                            N9Segments.Clear()
+                            inN9Loop = False
+                        End If
+                        If inTopN1Loop Then
+                            ' 如果已在 N1 Loop，再遇到 N1，先關閉上一個
+                            ProcessTopN1Loop(TopN1Segments)
+                            TopN1Segments.Clear()
+                            inTopN1Loop = False
+                        End If
+                        If inCTTLoop Then
+                            ProcessCTTLoop(CTTSegments)
+                            CTTSegments.Clear()
+                            inCTTLoop = False
+                        End If
+
+                        inTopN1Loop = True
+                        TopN1Segments.Add(seg)
+                    End If
+
+                '=======================================
+                '  6) 頂層 Loop: PO1
+                '=======================================
+                Case "PO1"
+                    If inN9Loop Then
+                        ProcessN9Loop(N9Segments)
+                        N9Segments.Clear()
+                        inN9Loop = False
+                    End If
+                    If inTopN1Loop Then
+                        ProcessTopN1Loop(TopN1Segments)
+                        TopN1Segments.Clear()
+                        inTopN1Loop = False
+                    End If
+                    If inCTTLoop Then
+                        ProcessCTTLoop(CTTSegments)
+                        CTTSegments.Clear()
+                        inCTTLoop = False
+                    End If
+
+                    ' 若已在 PO1 Loop，先關閉上一個 PO1
+                    If inPO1Loop Then
+                        ProcessPO1Loop(PO1Segments)
+                        PO1Segments.Clear()
+                        inPO1Loop = False
+                    End If
+
+                    inPO1Loop = True
+                    PO1Segments.Add(seg)
+
+                '=======================================
+                '  7) 頂層 Loop: CTT
+                '=======================================
+                Case "CTT"
+                    ' 關閉其他頂層
+                    If inN9Loop Then
+                        ProcessN9Loop(N9Segments)
+                        N9Segments.Clear()
+                        inN9Loop = False
+                    End If
+                    If inTopN1Loop Then
+                        ProcessTopN1Loop(TopN1Segments)
+                        TopN1Segments.Clear()
+                        inTopN1Loop = False
+                    End If
+                    If inPO1Loop Then
+                        ProcessPO1Loop(PO1Segments)
+                        PO1Segments.Clear()
+                        inPO1Loop = False
+                    End If
+
+                    If inCTTLoop Then
+                        ProcessCTTLoop(CTTSegments)
+                        CTTSegments.Clear()
+                        inCTTLoop = False
+                    End If
+
+                    inCTTLoop = True
+                    CTTSegments.Add(seg)
+
+                '=======================================
+                '  8) 其他常見段 (REF, DTM, 等)
+                '     - 視目前狀態，歸到對應 Loop
+                '=======================================
+                Case "REF", "DTM"
+                    ' 如果在 PO1 Loop，下的 N1 Sub-Loop，也要再到 PO1Loop內決定
+                    If inPO1Loop Then
+                        PO1Segments.Add(seg)
+                    ElseIf inN9Loop Then
+                        N9Segments.Add(seg)
+                    ElseIf inTopN1Loop Then
+                        TopN1Segments.Add(seg)
+                    ElseIf inCTTLoop Then
+                        CTTSegments.Add(seg)
+                    Else
+                        ' 不在任何 Loop 也可視需求處理
+                        Console.WriteLine($"[REF/DTM outside loop] {segID} => {seg}")
+                    End If
+
+                '=======================================
+                '  X) 任何其他段
+                '=======================================
+                Case Else
+                    ' 若在某個頂層或子 Loop 中，就往裡頭放
+                    If inN9Loop Then
+                        N9Segments.Add(seg)
+                    ElseIf inTopN1Loop Then
+                        TopN1Segments.Add(seg)
+                    ElseIf inPO1Loop Then
+                        PO1Segments.Add(seg)
+                    ElseIf inCTTLoop Then
+                        CTTSegments.Add(seg)
+                    Else
+                        ' 可能是 ISA/GS/ST 以外的控制段，或不屬於任何 Loop
+                        Console.WriteLine($"[Outside any loop] {segID} => {seg}")
+                    End If
+
+            End Select
+        Next
+
+        '=== 5. 檔案結束後，若有未關閉的頂層 Loop，收尾 ===
+        CloseAllLoopsIfAny(inN9Loop, N9Segments,
+                           inTopN1Loop, TopN1Segments,
+                           inPO1Loop, PO1Segments,
+                           inCTTLoop, CTTSegments)
+
+        Console.WriteLine("=== EDI Parsing Complete ===")
+        Console.ReadLine()
+    End Sub
+
+    '---------------------------------------------------------
+    '   輔助函式：一次關閉所有頂層 Loop
+    '---------------------------------------------------------
+    Private Sub CloseAllLoopsIfAny(ByRef inN9Loop As Boolean, N9Segments As List(Of String),
+                                   ByRef inTopN1Loop As Boolean, TopN1Segments As List(Of String),
+                                   ByRef inPO1Loop As Boolean, PO1Segments As List(Of String),
+                                   ByRef inCTTLoop As Boolean, CTTSegments As List(Of String))
+        If inN9Loop Then
+            ProcessN9Loop(N9Segments)
+            N9Segments.Clear()
+            inN9Loop = False
+        End If
+        If inTopN1Loop Then
+            ProcessTopN1Loop(TopN1Segments)
+            TopN1Segments.Clear()
+            inTopN1Loop = False
+        End If
+        If inPO1Loop Then
+            ProcessPO1Loop(PO1Segments)
+            PO1Segments.Clear()
+            inPO1Loop = False
+        End If
+        If inCTTLoop Then
+            ProcessCTTLoop(CTTSegments)
+            CTTSegments.Clear()
+            inCTTLoop = False
+        End If
+    End Sub
+
+
+    '=========================================================
+    '   以下為各頂層 Loop 的處理函式
+    '=========================================================
+    Private Sub ProcessN9Loop(n9Segments As List(Of String))
+        Console.WriteLine("=== [ProcessN9Loop] Start ===")
+        For Each seg In n9Segments
+            Dim elements = seg.Split("*"c)
+            Select Case elements(0)
+                Case "N9"
+                    Console.WriteLine($"  N9 => RefID={elements.ElementAtOrDefault(1)}, Desc={elements.ElementAtOrDefault(2)}")
+                Case "REF"
+                    Console.WriteLine($"  REF => Type={elements.ElementAtOrDefault(1)}, Value={elements.ElementAtOrDefault(2)}")
+                Case "DTM"
+                    Console.WriteLine($"  DTM => Qualifier={elements.ElementAtOrDefault(1)}, Date={elements.ElementAtOrDefault(2)}")
+                Case Else
+                    Console.WriteLine($"  N9-other => {elements(0)}: {seg}")
+            End Select
+        Next
+        Console.WriteLine("=== [ProcessN9Loop] End ===")
+    End Sub
+
+    Private Sub ProcessTopN1Loop(n1Segments As List(Of String))
+        Console.WriteLine("=== [ProcessTopN1Loop] Start ===")
+        For Each seg In n1Segments
+            Dim elements = seg.Split("*"c)
+            Select Case elements(0)
+                Case "N1"
+                    Console.WriteLine($"  N1 => Code={elements.ElementAtOrDefault(1)}, Name={elements.ElementAtOrDefault(2)}")
+                Case "N3"
+                    Console.WriteLine($"  N3 => Address={elements.ElementAtOrDefault(1)}")
+                Case "N4"
+                    Console.WriteLine($"  N4 => City/State/Zip={elements.ElementAtOrDefault(1)}/{elements.ElementAtOrDefault(2)}/{elements.ElementAtOrDefault(3)}")
+                Case "REF"
+                    Console.WriteLine($"  REF => Type={elements.ElementAtOrDefault(1)}, Value={elements.ElementAtOrDefault(2)}")
+                Case "DTM"
+                    Console.WriteLine($"  DTM => Qualifier={elements.ElementAtOrDefault(1)}, Date={elements.ElementAtOrDefault(2)}")
+                Case Else
+                    Console.WriteLine($"  N1-other => {elements(0)}: {seg}")
+            End Select
+        Next
+        Console.WriteLine("=== [ProcessTopN1Loop] End ===")
+    End Sub
+
+    Private Sub ProcessPO1Loop(po1Segments As List(Of String))
+        Console.WriteLine("=== [ProcessPO1Loop] Start ===")
+
+        '----------------------------------
+        ' 巢狀 N1 子 Loop
+        '----------------------------------
+        Dim inPO1N1Loop As Boolean = False
+        Dim po1N1Segments As New List(Of String)
+
+        For Each seg In po1Segments
+            Dim elements = seg.Split("*"c)
+            Dim segID = elements(0).Trim()
+
+            Select Case segID
+                Case "PO1"
+                    Console.WriteLine($"  PO1 => LineNo={elements.ElementAtOrDefault(1)}, Qty={elements.ElementAtOrDefault(2)}, Price={elements.ElementAtOrDefault(4)}")
+
+                Case "N1"
+                    ' => PO1 下的 N1 Sub-Loop
+                    If inPO1N1Loop Then
+                        ProcessPO1N1SubLoop(po1N1Segments)
+                        po1N1Segments.Clear()
+                        inPO1N1Loop = False
+                    End If
+                    inPO1N1Loop = True
+                    po1N1Segments.Add(seg)
+
+                Case "N3", "N4", "REF", "DTM"
+                    If inPO1N1Loop Then
+                        po1N1Segments.Add(seg)
+                    Else
+                        Console.WriteLine($"  (PO1-level) {segID} => {seg}")
+                    End If
+
+                Case "PID"
+                    Console.WriteLine($"  PID => Desc={elements.ElementAtOrDefault(4)}")
+
+                Case "SAC"
+                    Console.WriteLine($"  SAC => Code={elements.ElementAtOrDefault(1)}, Amt={elements.ElementAtOrDefault(5)}")
+
+                Case Else
+                    ' 其他段
+                    If inPO1N1Loop Then
+                        po1N1Segments.Add(seg)
+                    Else
+                        Console.WriteLine($"  => PO1-other: {segID} => {seg}")
+                    End If
+            End Select
+        Next
+
+        ' 結尾若仍在 PO1 N1 Sub-Loop
+        If inPO1N1Loop Then
+            ProcessPO1N1SubLoop(po1N1Segments)
+        End If
+
+        Console.WriteLine("=== [ProcessPO1Loop] End ===")
+    End Sub
+
+    Private Sub ProcessPO1N1SubLoop(po1N1Segments As List(Of String))
+        Console.WriteLine("    => [ProcessPO1N1SubLoop] Start")
+        For Each seg In po1N1Segments
+            Dim elements = seg.Split("*"c)
+            Select Case elements(0)
+                Case "N1"
+                    Console.WriteLine($"       N1 Sub => Code={elements.ElementAtOrDefault(1)}, Name={elements.ElementAtOrDefault(2)}")
+                Case "N3"
+                    Console.WriteLine($"       N3 Sub => Address={elements.ElementAtOrDefault(1)}")
+                Case "N4"
+                    Console.WriteLine($"       N4 Sub => City/State/Zip={elements.ElementAtOrDefault(1)}/{elements.ElementAtOrDefault(2)}/{elements.ElementAtOrDefault(3)}")
+                Case "REF"
+                    Console.WriteLine($"       REF Sub => Type={elements.ElementAtOrDefault(1)}, Value={elements.ElementAtOrDefault(2)}")
+                Case "DTM"
+                    Console.WriteLine($"       DTM Sub => Qualifier={elements.ElementAtOrDefault(1)}, Date={elements.ElementAtOrDefault(2)}")
+                Case Else
+                    Console.WriteLine($"       => PO1 N1-other: {elements(0)} => {seg}")
+            End Select
+        Next
+        Console.WriteLine("    => [ProcessPO1N1SubLoop] End")
+    End Sub
+
+    Private Sub ProcessCTTLoop(cttSegments As List(Of String))
+        Console.WriteLine("=== [ProcessCTTLoop] Start ===")
+        For Each seg In cttSegments
+            Dim elements = seg.Split("*"c)
+            If elements(0) = "CTT" Then
+                Console.WriteLine($"  CTT => TotalLineItems={elements.ElementAtOrDefault(1)}, SumOfQty={elements.ElementAtOrDefault(2)}")
+            ElseIf elements(0) = "REF" Then
+                Console.WriteLine($"  REF => Type={elements.ElementAtOrDefault(1)}, Value={elements.ElementAtOrDefault(2)}")
+            ElseIf elements(0) = "DTM" Then
+                Console.WriteLine($"  DTM => Qualifier={elements.ElementAtOrDefault(1)}, Date={elements.ElementAtOrDefault(2)}")
