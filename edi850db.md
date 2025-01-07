@@ -1,3 +1,259 @@
+是的，為了保證資料庫操作的可靠性和健壯性，應該在資料庫操作中加入 交易 (Transaction) 和 錯誤處理 (Try-Catch)。這樣可以確保當執行多個資料庫操作時，如果某一步失敗，能夠回滾 (Rollback) 整個交易，避免資料不一致的情況。
+
+
+---
+
+加入 Transaction 和 Try-Catch 的實作
+
+以下是如何將 Transaction 和 Try-Catch 整合進 DatabaseHandler 類別中的方法。
+
+修改 ExecuteNonQuery 支援交易
+
+新增支持交易的執行方法：
+
+Public Function ExecuteTransaction(queries As List(Of String), parametersList As List(Of Dictionary(Of String, Object))) As Boolean
+    Using connection As SqlClient.SqlConnection = GetConnection()
+        connection.Open()
+        Dim transaction As SqlClient.SqlTransaction = connection.BeginTransaction()
+
+        Try
+            For i As Integer = 0 To queries.Count - 1
+                Using command As New SqlClient.SqlCommand(queries(i), connection, transaction)
+                    If parametersList IsNot Nothing AndAlso parametersList.Count > i Then
+                        For Each param In parametersList(i)
+                            command.Parameters.AddWithValue(param.Key, param.Value)
+                        Next
+                    End If
+                    command.ExecuteNonQuery()
+                End Using
+            Next
+
+            ' 提交交易
+            transaction.Commit()
+            Return True
+        Catch ex As Exception
+            ' 發生錯誤時回滾交易
+            transaction.Rollback()
+            Console.WriteLine("交易失敗，已回滾: " & ex.Message)
+            Return False
+        Finally
+            connection.Close()
+        End Try
+    End Using
+End Function
+
+
+---
+
+使用 Transaction 的範例
+
+如果需要執行多個 SQL 操作，可以利用上面的 ExecuteTransaction 方法：
+
+範例：插入多筆資料
+
+Sub InsertDataWithTransaction(database As DatabaseHandler)
+    Dim queries As New List(Of String) From {
+        "INSERT INTO EdiMain (ISA01, ISA02) VALUES (@ISA01, @ISA02);",
+        "INSERT INTO EdiDetail (MainID, ST01) VALUES (@MainID, @ST01);"
+    }
+
+    Dim parametersList As New List(Of Dictionary(Of String, Object)) From {
+        New Dictionary(Of String, Object) From {
+            {"@ISA01", "00"},
+            {"@ISA02", "TEST"}
+        },
+        New Dictionary(Of String, Object) From {
+            {"@MainID", 1},
+            {"@ST01", "850"}
+        }
+    }
+
+    Dim success As Boolean = database.ExecuteTransaction(queries, parametersList)
+    If success Then
+        Console.WriteLine("交易成功，資料已寫入！")
+    Else
+        Console.WriteLine("交易失敗，資料未寫入！")
+    End If
+End Sub
+
+
+---
+
+修改其他方法加入 Try-Catch
+
+對其他執行方法（例如 ExecuteScalar 和 ExecuteNonQuery）加入 Try-Catch 錯誤處理，防止程式在異常情況下崩潰。
+
+修改 ExecuteNonQuery
+
+Public Function ExecuteNonQuery(query As String, parameters As Dictionary(Of String, Object)) As Integer
+    Using connection As SqlClient.SqlConnection = GetConnection()
+        Try
+            Using command As New SqlClient.SqlCommand(query, connection)
+                If parameters IsNot Nothing Then
+                    For Each param In parameters
+                        command.Parameters.AddWithValue(param.Key, param.Value)
+                    Next
+                End If
+                connection.Open()
+                Return command.ExecuteNonQuery()
+            End Using
+        Catch ex As Exception
+            Console.WriteLine("執行失敗: " & ex.Message)
+            Throw
+        Finally
+            connection.Close()
+        End Try
+    End Using
+End Function
+
+修改 ExecuteScalar
+
+Public Function ExecuteScalar(query As String, parameters As Dictionary(Of String, Object)) As Object
+    Using connection As SqlClient.SqlConnection = GetConnection()
+        Try
+            Using command As New SqlClient.SqlCommand(query, connection)
+                If parameters IsNot Nothing Then
+                    For Each param In parameters
+                        command.Parameters.AddWithValue(param.Key, param.Value)
+                    Next
+                End If
+                connection.Open()
+                Return command.ExecuteScalar()
+            End Using
+        Catch ex As Exception
+            Console.WriteLine("執行失敗: " & ex.Message)
+            Throw
+        Finally
+            connection.Close()
+        End Try
+    End Using
+End Function
+
+
+---
+
+完整整合範例
+
+1. 加入交易
+
+
+2. 每個方法使用 Try-Catch
+
+
+3. 保證程式健壯性
+
+
+
+完整的 DatabaseHandler 範例如下：
+
+Imports System.Configuration
+
+Public Class DatabaseHandler
+    Private connectionString As String
+
+    ' 從 App.config 讀取 Connection String
+    Public Sub New()
+        connectionString = ConfigurationManager.ConnectionStrings("MyDatabase").ConnectionString
+    End Sub
+
+    ' 建立資料庫連線
+    Private Function GetConnection() As SqlClient.SqlConnection
+        Return New SqlClient.SqlConnection(connectionString)
+    End Function
+
+    ' 執行非查詢 SQL 指令 (如 INSERT、UPDATE、DELETE)
+    Public Function ExecuteNonQuery(query As String, parameters As Dictionary(Of String, Object)) As Integer
+        Using connection As SqlClient.SqlConnection = GetConnection()
+            Try
+                Using command As New SqlClient.SqlCommand(query, connection)
+                    If parameters IsNot Nothing Then
+                        For Each param In parameters
+                            command.Parameters.AddWithValue(param.Key, param.Value)
+                        Next
+                    End If
+                    connection.Open()
+                    Return command.ExecuteNonQuery()
+                End Using
+            Catch ex As Exception
+                Console.WriteLine("執行失敗: " & ex.Message)
+                Throw
+            Finally
+                connection.Close()
+            End Try
+        End Using
+    End Function
+
+    ' 執行查詢並返回單一值 (如 SELECT COUNT(*))
+    Public Function ExecuteScalar(query As String, parameters As Dictionary(Of String, Object)) As Object
+        Using connection As SqlClient.SqlConnection = GetConnection()
+            Try
+                Using command As New SqlClient.SqlCommand(query, connection)
+                    If parameters IsNot Nothing Then
+                        For Each param In parameters
+                            command.Parameters.AddWithValue(param.Key, param.Value)
+                        Next
+                    End If
+                    connection.Open()
+                    Return command.ExecuteScalar()
+                End Using
+            Catch ex As Exception
+                Console.WriteLine("執行失敗: " & ex.Message)
+                Throw
+            Finally
+                connection.Close()
+            End Try
+        End Using
+    End Function
+
+    ' 執行多個查詢，支持交易
+    Public Function ExecuteTransaction(queries As List(Of String), parametersList As List(Of Dictionary(Of String, Object))) As Boolean
+        Using connection As SqlClient.SqlConnection = GetConnection()
+            connection.Open()
+            Dim transaction As SqlClient.SqlTransaction = connection.BeginTransaction()
+
+            Try
+                For i As Integer = 0 To queries.Count - 1
+                    Using command As New SqlClient.SqlCommand(queries(i), connection, transaction)
+                        If parametersList IsNot Nothing AndAlso parametersList.Count > i Then
+                            For Each param In parametersList(i)
+                                command.Parameters.AddWithValue(param.Key, param.Value)
+                            Next
+                        End If
+                        command.ExecuteNonQuery()
+                    End Using
+                Next
+
+                ' 提交交易
+                transaction.Commit()
+                Return True
+            Catch ex As Exception
+                ' 發生錯誤時回滾交易
+                transaction.Rollback()
+                Console.WriteLine("交易失敗，已回滾: " & ex.Message)
+                Return False
+            Finally
+                connection.Close()
+            End Try
+        End Using
+    End Function
+End Class
+
+
+---
+
+小結
+
+加入 Transaction 確保多個操作的原子性。
+
+使用 Try-Catch 確保程式的健壯性，捕捉並處理異常。
+
+封裝 ExecuteTransaction 讓多步操作更加方便、可重用。
+
+
+這樣設計後，資料庫操作的可靠性和易用性都會大大提升。
+
+
+
 InsertEdiMain 方法應該放在專門負責與資料庫交互的類別（例如 DatabaseHandler）中，因為這樣可以集中管理所有的資料庫操作，使程式碼符合單一責任原則並更具可維護性。
 
 
