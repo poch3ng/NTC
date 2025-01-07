@@ -1,3 +1,37 @@
+-- 新增單一欄位
+ALTER TABLE table_name
+ADD COLUMN column_name data_type [constraints];
+
+-- 範例:新增必填的 VARCHAR 欄位
+ALTER TABLE users
+ADD COLUMN email VARCHAR(100) NOT NULL;
+
+-- 新增多個欄位
+ALTER TABLE products
+ADD COLUMN description TEXT,
+ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+
+-- 新增欄位並設定預設值
+ALTER TABLE orders
+ADD COLUMN status VARCHAR(20) DEFAULT 'pending' NOT NULL;
+
+-- 新增欄位並加入外鍵約束
+ALTER TABLE orders
+ADD COLUMN user_id INT,
+ADD CONSTRAINT fk_user
+FOREIGN KEY (user_id) REFERENCES users(id);
+
+-- 新增欄位並設定檢查條件
+ALTER TABLE employees
+ADD COLUMN age INT CHECK (age >= 18);
+
+-- 新增唯一索引欄位
+ALTER TABLE customers
+ADD COLUMN phone VARCHAR(20),
+ADD UNIQUE INDEX idx_phone (phone);
+
+
 -- 1. 訂單主表 (Header Level)
 CREATE TABLE EDI_850_Header (
     HeaderID INT IDENTITY(1,1) PRIMARY KEY,
