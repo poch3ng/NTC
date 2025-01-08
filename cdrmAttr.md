@@ -1,3 +1,81 @@
+在 SQL Server Management Studio (SSMS) 中，你可以使用動態 SQL 來生成並執行動態查詢。以下是詳細的步驟和範例：
+
+動態 SQL 實現步驟
+
+1. 使用 STRING_AGG 或 FOR XML PATH 來拼接動態欄位。
+
+
+2. 將拼接好的欄位用於最終查詢。
+
+
+3. 使用 EXEC 執行動態生成的 SQL。
+
+
+
+實現範例
+
+假設你的表是 ProductSpecEdit，結構如下：
+
+以下是完整的動態 SQL 程式碼：
+
+DECLARE @columns NVARCHAR(MAX);
+DECLARE @sql NVARCHAR(MAX);
+
+-- Step 1: 動態生成所有的 CASE 欄位
+SELECT 
+    @columns = STRING_AGG(
+        'MAX(CASE WHEN attribute = ''' + attribute + ''' THEN attributeValue END) AS [' + attribute + ']',
+        ', '
+    )
+FROM (SELECT DISTINCT attribute FROM ProductSpecEdit) AS distinct_attributes;
+
+-- Step 2: 拼接完整 SQL 查詢
+SET @sql = '
+    SELECT 
+        partNo, 
+        ' + @columns + '
+    FROM ProductSpecEdit
+    GROUP BY partNo
+    ORDER BY partNo;
+';
+
+-- Step 3: 執行動態 SQL
+EXEC sp_executesql @sql;
+
+關鍵點說明
+
+1. STRING_AGG
+用於動態拼接欄位名稱（SQL Server 2017+ 支援）。如果是更舊的版本，可以改用 FOR XML PATH 方法。
+
+替代方式（FOR XML PATH）：
+
+SELECT 
+    @columns = STUFF((
+        SELECT 
+            ', MAX(CASE WHEN attribute = ''' + attribute + ''' THEN attributeValue END) AS [' + attribute + ']'
+        FROM (SELECT DISTINCT attribute FROM ProductSpecEdit) AS distinct_attributes
+        FOR XML PATH(''), TYPE).value('.', 'NVARCHAR(MAX)'), 1, 2, '');
+
+
+2. sp_executesql
+安全地執行動態生成的 SQL。
+
+
+3. 動態欄位名 依據表中的 attribute 動態生成。
+
+
+
+執行結果
+
+如果表中的數據如下：
+
+執行後的查詢結果為：
+
+這樣就能在 SQL Server 中實現動態生成欄位和查詢的需求！
+
+
+
+
 要一次選取所有的 attribute，可以使用動態 SQL 或其他方式來達到目的。以下是調整後的 SQL 範例，假設你的表結構固定，且你希望將每個 attribute 轉為欄位：
 
 SQL 查詢範例
