@@ -1,3 +1,79 @@
+如果你的 SQL Server 版本不支援 STRING_AGG，可以使用 FOR XML PATH 來實現動態 SQL 拼接。以下是適用於舊版本 SQL Server 的完整範例：
+
+實現動態 SQL 拼接
+
+DECLARE @columns NVARCHAR(MAX);
+DECLARE @sql NVARCHAR(MAX);
+
+-- Step 1: 動態生成所有的 CASE 欄位
+SELECT 
+    @columns = STUFF((
+        SELECT 
+            ', MAX(CASE WHEN attribute = ''' + attribute + ''' THEN attributeValue END) AS [' + attribute + ']'
+        FROM (SELECT DISTINCT attribute FROM ProductSpecEdit) AS distinct_attributes
+        FOR XML PATH(''), TYPE).value('.', 'NVARCHAR(MAX)'), 1, 2, '');
+
+-- Step 2: 拼接完整 SQL 查詢
+SET @sql = '
+    SELECT 
+        partNo, 
+        ' + @columns + '
+    FROM ProductSpecEdit
+    GROUP BY partNo
+    ORDER BY partNo;
+';
+
+-- Step 3: 執行動態 SQL
+EXEC sp_executesql @sql;
+
+說明
+
+1. FOR XML PATH
+
+將每個 attribute 動態轉換為 SQL 中的欄位語法。
+
+使用 STUFF 函數刪除拼接結果開頭的多餘逗號。
+
+
+
+2. 動態生成的欄位
+
+查詢會生成每個 attribute 的動態欄位，例如：
+
+MAX(CASE WHEN attribute = 'name' THEN attributeValue END) AS [name],
+MAX(CASE WHEN attribute = 'color' THEN attributeValue END) AS [color],
+MAX(CASE WHEN attribute = 'size' THEN attributeValue END) AS [size]
+
+
+
+3. EXEC sp_executesql
+
+用於執行生成的動態查詢。
+
+
+
+
+假設數據
+
+結果
+
+執行後，生成的 SQL 查詢如下：
+
+SELECT 
+    partNo, 
+    MAX(CASE WHEN attribute = 'name' THEN attributeValue END) AS [name],
+    MAX(CASE WHEN attribute = 'color' THEN attributeValue END) AS [color],
+    MAX(CASE WHEN attribute = 'size' THEN attributeValue END) AS [size]
+FROM ProductSpecEdit
+GROUP BY partNo
+ORDER BY partNo;
+
+查詢結果：
+
+此方法適用於不支援 STRING_AGG 的 SQL Server 版本，並能動態生成查詢以處理不固定的欄位名稱需求。
+
+
+
 在 SQL Server Management Studio (SSMS) 中，你可以使用動態 SQL 來生成並執行動態查詢。以下是詳細的步驟和範例：
 
 動態 SQL 實現步驟
