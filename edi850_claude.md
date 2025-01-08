@@ -1,3 +1,201 @@
+-- 建立EDI主表
+CREATE TABLE EdiMain (
+    MainId INT PRIMARY KEY IDENTITY(1,1),
+    
+    -- ISA段落
+    Isa01 VARCHAR(2),                -- 授權資訊限定符
+    Isa02 VARCHAR(10),               -- 授權資訊
+    Isa03 VARCHAR(2),                -- 安全資訊限定符
+    Isa04 VARCHAR(10),               -- 安全資訊
+    Isa05 VARCHAR(2),                -- 交換發送者ID限定符
+    Isa06 VARCHAR(15),               -- 交換發送者ID
+    Isa07 VARCHAR(2),                -- 交換接換者ID限定符
+    Isa08 VARCHAR(15),               -- 交換接換者ID
+    Isa09 VARCHAR(6),                -- 交換日期
+    Isa10 VARCHAR(4),                -- 交換時間
+    Isa11 VARCHAR(1),                -- 控制標準識別碼
+    Isa12 VARCHAR(5),                -- 控制版本號
+    Isa13 VARCHAR(9),                -- 控制編號
+    Isa14 VARCHAR(1),                -- 確認要求標誌
+    Isa15 VARCHAR(1),                -- 使用指示器
+    Isa16 VARCHAR(1),                -- 元件分隔符號
+
+    -- GS段落
+    Gs01 VARCHAR(2),                 -- 功能識別碼
+    Gs02 VARCHAR(15),                -- 應用發送者代碼
+    Gs03 VARCHAR(15),                -- 應用接收者代碼
+    Gs04 VARCHAR(8),                 -- 日期
+    Gs05 VARCHAR(4),                 -- 時間
+    Gs06 VARCHAR(9),                 -- 群組控制編號
+    Gs07 VARCHAR(2),                 -- 負責機構代碼
+    Gs08 VARCHAR(12),                -- 版本號
+
+    -- ST段落
+    St01 VARCHAR(3),                 -- 交易組識別碼
+    St02 VARCHAR(9),                 -- 控制編號
+
+    -- BEG段落
+    Beg01 VARCHAR(2),                -- 交易組用途代碼
+    Beg02 VARCHAR(2),                -- 採購單類型代碼
+    Beg03 VARCHAR(22),               -- 採購單號碼
+    Beg04 VARCHAR(8),                -- 採購單日期
+    Beg05 VARCHAR(30),               -- 合約編號
+
+    -- CUR段落
+    Cur01 VARCHAR(2),                -- 實體類型限定符
+    Cur02 VARCHAR(3),                -- 貨幣代碼
+
+    -- FOB段落
+    Fob01 VARCHAR(2),                -- 裝運條款代碼限定符
+    Fob02 VARCHAR(30),               -- 裝運條款代碼
+    Fob03 VARCHAR(2),                -- 運輸方式代碼
+
+    -- ITD段落
+    Itd01 VARCHAR(2),                -- 條款類型代碼
+    Itd02 VARCHAR(2),                -- 條款基準代碼
+    Itd03 VARCHAR(6),                -- 條款折扣百分比
+    Itd04 VARCHAR(3),                -- 條款折扣天數
+    Itd05 VARCHAR(3),                -- 條款淨天數
+
+    -- MSG段落
+    Msg01 VARCHAR(255),              -- 訊息文字
+
+    -- SE段落
+    Se01 VARCHAR(6),                 -- 包含的段落數
+    Se02 VARCHAR(9),                 -- 控制編號
+
+    -- GE段落
+    Ge01 VARCHAR(6),                 -- 包含的組數
+    Ge02 VARCHAR(9),                 -- 群組控制編號
+
+    -- IEA段落
+    Iea01 VARCHAR(6),                -- 包含的功能群組數
+    Iea02 VARCHAR(9),                -- 控制編號
+
+    CreateDate DATETIME DEFAULT GETDATE(),
+    LastUpdateDate DATETIME
+);
+
+-- 建立EDI段落表 (REF和DTM)
+CREATE TABLE EdiSegment (
+    SegmentId INT PRIMARY KEY IDENTITY(1,1),
+    MainId INT,                      -- 關聯到EdiMain
+    DetailItemId INT NULL,           -- 關聯到EdiDetailItem (如果是項目層級)
+    SegmentLevel VARCHAR(10),        -- HEADER/ITEM
+    SegmentType VARCHAR(3),          -- REF/DTM
+    SequenceNo INT,                  -- 序號
+
+    -- REF段落欄位
+    Ref01 VARCHAR(3),                -- 參考編號限定符
+    Ref02 VARCHAR(50),               -- 參考編號
+    Ref03 VARCHAR(80),               -- 描述
+
+    -- DTM段落欄位
+    Dtm01 VARCHAR(3),                -- 日期限定符
+    Dtm02 VARCHAR(8),                -- 日期
+    Dtm03 VARCHAR(8),                -- 時間
+    Dtm04 VARCHAR(2),                -- 時區
+
+    CreateDate DATETIME DEFAULT GETDATE(),
+    LastUpdateDate DATETIME,
+
+    CONSTRAINT FK_EdiSegment_Main FOREIGN KEY (MainId) 
+        REFERENCES EdiMain(MainId),
+    CONSTRAINT FK_EdiSegment_DetailItem FOREIGN KEY (DetailItemId) 
+        REFERENCES EdiDetailItem(DetailItemId)
+);
+
+-- 建立EDI明細表 (N1 Loop相關)
+CREATE TABLE EdiDetail (
+    DetailId INT PRIMARY KEY IDENTITY(1,1),
+    MainId INT,
+    LoopType VARCHAR(10),            -- N1 或 N9
+    LoopSequence INT,                -- Loop序號
+
+    -- N1段落
+    N101 VARCHAR(2),                 -- 實體識別碼限定符
+    N102 VARCHAR(60),                -- 名稱
+    N103 VARCHAR(2),                 -- 識別碼限定符
+    N104 VARCHAR(80),                -- 識別碼
+
+    -- N3段落
+    N301 VARCHAR(55),                -- 地址資訊
+    N302 VARCHAR(55),                -- 地址資訊
+
+    -- N4段落
+    N401 VARCHAR(30),                -- 城市名稱
+    N402 VARCHAR(2),                 -- 州別代碼
+    N403 VARCHAR(15),                -- 郵遞區號
+    N404 VARCHAR(3),                 -- 國家代碼
+
+    -- PER段落
+    Per01 VARCHAR(2),                -- 聯絡功能代碼
+    Per02 VARCHAR(60),               -- 聯絡人姓名
+    Per03 VARCHAR(2),                -- 通訊號碼限定符
+    Per04 VARCHAR(80),               -- 通訊號碼
+
+    CreateDate DATETIME DEFAULT GETDATE(),
+    LastUpdateDate DATETIME,
+
+    CONSTRAINT FK_EdiDetail_Main FOREIGN KEY (MainId) 
+        REFERENCES EdiMain(MainId)
+);
+
+-- 建立EDI項目明細表
+CREATE TABLE EdiDetailItem (
+    DetailItemId INT PRIMARY KEY IDENTITY(1,1),
+    MainId INT,
+    LoopSequence INT,                -- PO1 Loop序號
+
+    -- PO1段落
+    Po101 VARCHAR(6),                -- 行項目號碼
+    Po102 VARCHAR(9),                -- 數量
+    Po103 VARCHAR(2),                -- 單位代碼
+    Po104 VARCHAR(17),               -- 單價
+    Po105 VARCHAR(2),                -- 價格基準代碼
+    Po106 VARCHAR(2),                -- 產品限定符
+    Po107 VARCHAR(30),               -- 產品編號
+
+    -- PID段落
+    Pid01 VARCHAR(1),                -- 項目描述類型
+    Pid02 VARCHAR(2),                -- 產品特性限定符
+    Pid03 VARCHAR(2),                -- 代碼清單限定符
+    Pid04 VARCHAR(12),               -- 代碼
+    Pid05 VARCHAR(80),               -- 描述
+
+    -- TXI段落
+    Txi01 VARCHAR(2),                -- 稅務類型代碼
+    Txi02 VARCHAR(18),               -- 稅務金額
+    Txi03 VARCHAR(10),               -- 稅務百分比
+    Txi04 VARCHAR(2),                -- 稅務管轄區限定符
+    Txi05 VARCHAR(10),               -- 稅務管轄區代碼
+
+    -- CTT段落
+    Ctt01 VARCHAR(6),                -- 行項目總數
+    Ctt02 VARCHAR(10),               -- 總重量
+
+    CreateDate DATETIME DEFAULT GETDATE(),
+    LastUpdateDate DATETIME,
+
+    CONSTRAINT FK_EdiDetailItem_Main FOREIGN KEY (MainId) 
+        REFERENCES EdiMain(MainId)
+);
+
+-- 建立索引
+CREATE INDEX IX_EdiSegment_MainId ON EdiSegment(MainId);
+CREATE INDEX IX_EdiSegment_DetailItemId ON EdiSegment(DetailItemId);
+CREATE INDEX IX_EdiSegment_Type ON EdiSegment(SegmentType, SegmentLevel);
+CREATE INDEX IX_EdiDetail_MainId ON EdiDetail(MainId);
+CREATE INDEX IX_EdiDetailItem_MainId ON EdiDetailItem(MainId);
+
+-- 建立檢查約束
+ALTER TABLE EdiSegment ADD CONSTRAINT CK_SegmentType 
+    CHECK (SegmentType IN ('REF', 'DTM'));
+ALTER TABLE EdiSegment ADD CONSTRAINT CK_SegmentLevel 
+    CHECK (SegmentLevel IN ('HEADER', 'ITEM'));
+ALTER TABLE EdiDetail ADD CONSTRAINT CK_LoopType 
+    CHECK (LoopType IN ('N1', 'N9'));
+
 -- 新增單一欄位
 ALTER TABLE table_name
 ADD COLUMN column_name data_type [constraints];
