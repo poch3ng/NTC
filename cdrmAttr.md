@@ -1,3 +1,92 @@
+在 VB.NET 中，使用 CDATA 執行動態 SQL 時可能遇到的問題通常與語法或引用 SQL 的特殊字符相關。如果出錯，可能是以下原因：
+
+1. SQL 語法錯誤
+SQL 腳本可能存在語法問題，例如 FOR XML PATH 的用法或單引號未正確處理。
+
+
+2. 動態 SQL 的單引號問題
+在 VB.NET 中，動態 SQL 需要處理內部的單引號。VB.NET 使用雙引號包裹字串，SQL 使用單引號包裹值，這可能導致錯誤。
+
+
+3. 資料庫連線或執行錯誤
+使用的 SQL Server 版本可能不支援某些功能，或者 sp_executesql 無法正確執行。
+
+
+
+以下是修正並嵌入 VB.NET 的完整範例：
+
+修正的 SQL 腳本
+
+將單引號進行正確轉義，並測試語法。
+
+DECLARE @columns NVARCHAR(MAX);
+DECLARE @sql NVARCHAR(MAX);
+
+-- Step 1: 動態生成所有的 CASE 欄位
+SELECT @columns = STUFF((
+    SELECT ', MAX(CASE WHEN attribute = ''' + attribute + ''' THEN attributeValue END) AS [' + attribute + ']'
+    FROM (SELECT DISTINCT attribute FROM ProductSpecEdit) AS distinct_attributes
+    FOR XML PATH(''), TYPE).value('.', 'NVARCHAR(MAX)'), 1, 2, '');
+
+-- Step 2: 拼接完整 SQL 查詢
+SET @sql = 'SELECT partNo, ' + @columns + ' FROM ProductSpecEdit GROUP BY partNo ORDER BY partNo;';
+
+-- Step 3: 執行動態 SQL
+EXEC sp_executesql @sql;
+
+VB.NET 執行方式
+
+使用 ADO.NET 執行此 SQL 腳本。
+
+Imports System.Data.SqlClient
+
+Module Module1
+    Sub Main()
+        Dim connectionString As String = "YourConnectionStringHere"
+        Dim sql As String = "
+DECLARE @columns NVARCHAR(MAX);
+DECLARE @sql NVARCHAR(MAX);
+
+-- Step 1: 動態生成所有的 CASE 欄位
+SELECT @columns = STUFF((
+    SELECT ', MAX(CASE WHEN attribute = ''''' + attribute + ''''' THEN attributeValue END) AS ['''' + attribute + '''']'
+    FROM (SELECT DISTINCT attribute FROM ProductSpecEdit) AS distinct_attributes
+    FOR XML PATH(''), TYPE).value('.', 'NVARCHAR(MAX)'), 1, 2, '');
+
+-- Step 2: 拼接完整 SQL 查詢
+SET @sql = 'SELECT partNo, ' + @columns + ' FROM ProductSpecEdit GROUP BY partNo ORDER BY partNo;';
+
+-- Step 3: 執行動態 SQL
+EXEC sp_executesql @sql;
+"
+        Using connection As New SqlConnection(connectionString)
+            connection.Open()
+            Using command As New SqlCommand(sql, connection)
+                command.ExecuteNonQuery()
+            End Using
+        End Using
+    End Sub
+End Module
+
+注意事項
+
+1. 雙引號與單引號的處理
+SQL 中的單引號需要在 VB.NET 中寫成 ''''（四個單引號）。
+
+
+2. 權限問題
+確保資料庫使用者具備執行 sp_executesql 的權限。
+
+
+3. 測試 SQL 語法
+在 SQL Server Management Studio 測試動態 SQL 的生成結果。
+
+
+
+如果問題仍未解決，提供錯誤訊息以便進一步協助！
+
+
+
 如果你的 SQL Server 版本不支援 STRING_AGG，可以使用 FOR XML PATH 來實現動態 SQL 拼接。以下是適用於舊版本 SQL Server 的完整範例：
 
 實現動態 SQL 拼接
