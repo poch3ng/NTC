@@ -1,3 +1,116 @@
+如果您還需要記錄 FileName 和 Message，可以在 精簡版設計 的基礎上增加這兩個欄位。這樣可以在保留交易唯一性追蹤的同時，記錄檔案來源和錯誤訊息，便於排查問題。
+
+
+---
+
+更新後的資料表設計
+
+CREATE TABLE EDIProcessingLogs (
+    LogID INT IDENTITY(1,1) PRIMARY KEY, -- 唯一識別
+    LogTime DATETIME NOT NULL,           -- 記錄時間
+    FileName NVARCHAR(255) NOT NULL,     -- 接收到的檔案名稱
+    Message NVARCHAR(MAX) NOT NULL,      -- 錯誤或狀態描述
+    ISA13 NVARCHAR(20) NOT NULL,         -- Interchange Control Number
+    GS06 NVARCHAR(20) NOT NULL,          -- Group Control Number
+    ST02 NVARCHAR(20) NOT NULL           -- Transaction Set Control Number
+);
+
+
+---
+
+Log 方法設計
+
+方法程式碼
+
+Public Sub LogTransaction(logTime As DateTime, 
+                          fileName As String, 
+                          message As String, 
+                          isa13 As String, 
+                          gs06 As String, 
+                          st02 As String, 
+                          <System.Runtime.CompilerServices.CallerMemberName> Optional methodName As String = "")
+    ' 組合 Log 訊息
+    Dim logMessage As String = $"[{logTime}] FileName: {fileName}, Message: {message}, ISA13: {isa13}, GS06: {gs06}, ST02: {st02}, 方法名稱: {methodName}"
+
+    ' 輸出到 Debug 或 Console
+    System.Diagnostics.Debug.WriteLine(logMessage)
+
+    ' 寫入資料庫
+    WriteLogToDatabase(logTime, fileName, message, isa13, gs06, st02)
+End Sub
+
+Private Sub WriteLogToDatabase(logTime As DateTime, fileName As String, message As String, isa13 As String, gs06 As String, st02 As String)
+    Dim connectionString As String = "Your_Connection_String"
+    Using conn As New SqlConnection(connectionString)
+        conn.Open()
+        Dim sql As String = "INSERT INTO EDIProcessingLogs (LogTime, FileName, Message, ISA13, GS06, ST02) " & 
+                            "VALUES (@LogTime, @FileName, @Message, @ISA13, @GS06, @ST02)"
+        Using cmd As New SqlCommand(sql, conn)
+            cmd.Parameters.AddWithValue("@LogTime", logTime)
+            cmd.Parameters.AddWithValue("@FileName", fileName)
+            cmd.Parameters.AddWithValue("@Message", message)
+            cmd.Parameters.AddWithValue("@ISA13", isa13)
+            cmd.Parameters.AddWithValue("@GS06", gs06)
+            cmd.Parameters.AddWithValue("@ST02", st02)
+            cmd.ExecuteNonQuery()
+        End Using
+    End Using
+End Sub
+
+
+---
+
+呼叫範例
+
+記錄交易成功
+
+LogTransaction(DateTime.Now, "edi850_20250115.txt", "交易解析成功", "000000123", "456", "123456789")
+
+輸出：
+
+[2025-01-15 16:00:00] FileName: edi850_20250115.txt, Message: 交易解析成功, ISA13: 000000123, GS06: 456, ST02: 123456789, 方法名稱: ProcessTransaction
+
+記錄交易失敗
+
+LogTransaction(DateTime.Now, "edi850_20250115.txt", "解析失敗，缺少 ST01 欄位", "000000123", "456", "123456789")
+
+輸出：
+
+[2025-01-15 16:05:00] FileName: edi850_20250115.txt, Message: 解析失敗，缺少 ST01 欄位, ISA13: 000000123, GS06: 456, ST02: 123456789, 方法名稱: ProcessTransaction
+
+
+---
+
+設計的優勢
+
+1. 精簡且實用
+
+只記錄 5 個關鍵欄位：FileName、Message、ISA13、GS06、ST02，覆蓋交易追蹤和排錯需求。
+
+
+
+2. 專注交易唯一性和來源
+
+記錄 ISA13、GS06、ST02 保證交易唯一性，FileName 和 Message 用於追蹤檔案來源和問題描述。
+
+
+
+3. 易於擴展
+
+如果未來需要新增欄位（如 SenderID 或 ReceiverID），可以輕鬆添加而不影響現有結構。
+
+
+
+
+
+---
+
+結論
+
+這樣的設計結構清晰，欄位數量最小化但覆蓋了交易追蹤、檔案來源和錯誤排查需求，非常適合您的應用場景。
+
+
+
 如果想要 精簡版的 Log 設計，並且未來仍然具有可維護性，可以著重於以下關鍵資訊，同時保持結構簡單、靈活。這樣設計可以在滿足日常需求的同時，為後續擴展預留空間。
 
 
