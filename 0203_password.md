@@ -1,3 +1,198 @@
+以下是一個依據您提供 UI 文案設計的強制修改密碼範例，僅包含「New Password」與「Confirm New Password」兩個欄位，並提供疊在文字框右上角的 Show/Hide 切換按鈕。您可直接放在 Master Page 的 Content 區塊中使用：
+
+<asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
+  <style type="text/css">
+      .password-panel {
+          max-width: 400px;
+          margin: 50px auto;
+          padding: 20px;
+          background-color: #333;
+          border: 1px solid #444;
+          border-radius: 8px;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+          font-family: Calibri, "微軟正黑體", "Courier New", "Ms Pmincho", sans-serif;
+          color: #fff;
+          text-align: center;
+      }
+      .password-panel h1 {
+          margin-bottom: 20px;
+          color: #fff;
+      }
+      .instruction {
+          margin-bottom: 20px;
+          font-size: 14px;
+          line-height: 1.4;
+      }
+      .instruction p {
+          margin: 5px 0;
+      }
+      .form-group {
+          margin-bottom: 15px;
+          text-align: left;
+      }
+      .form-group label {
+          display: block;
+          margin-bottom: 5px;
+          font-weight: bold;
+          color: #fff;
+      }
+      .input-container {
+          position: relative;
+      }
+      .input-container .password-field {
+          width: 100%;
+          padding: 8px;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          background-color: #555;
+          color: #fff;
+          font-family: inherit;
+      }
+      /* 將按鈕疊在文字框上方右上角 */
+      .toggle-link {
+          position: absolute;
+          top: 0;
+          right: 0;
+          background: rgba(0, 0, 0, 0.6);
+          padding: 4px 8px;
+          border-radius: 0 4px 0 0;
+          cursor: pointer;
+          color: #fff;
+          text-decoration: none;
+          font-size: 12px;
+      }
+      .btn-custom {
+          width: 100%;
+          padding: 10px;
+          background-color: #007bff;
+          border: none;
+          color: #fff;
+          border-radius: 4px;
+          cursor: pointer;
+          font-family: inherit;
+          font-size: 16px;
+      }
+      .btn-custom:hover {
+          background-color: #0056b3;
+      }
+      .message {
+          margin-top: 15px;
+          color: #fff;
+          font-size: 14px;
+      }
+  </style>
+
+  <script type="text/javascript">
+      function toggleFieldVisibility(fieldId, link) {
+          var field = document.getElementById(fieldId);
+          if (field) {
+              if (field.type === 'password') {
+                  field.type = 'text';
+                  link.textContent = 'Hide';
+              } else {
+                  field.type = 'password';
+                  link.textContent = 'Show';
+              }
+          }
+      }
+  </script>
+
+  <asp:Panel ID="pnlPassword" runat="server" CssClass="password-panel">
+      <!-- 標題 -->
+      <h1>Password Expired – Update Required</h1>
+      
+      <!-- 說明文字 -->
+      <div class="instruction">
+          <p>To continue using your account, please set a new password.</p>
+          <p>For security reasons, you must update your password before accessing your account.</p>
+      </div>
+      
+      <!-- New Password -->
+      <div class="form-group">
+          <label for="txtNewPassword">New Password</label>
+          <div class="input-container">
+              <asp:TextBox ID="txtNewPassword" runat="server" TextMode="Password" CssClass="password-field"></asp:TextBox>
+              <a href="javascript:void(0);" 
+                 onclick="toggleFieldVisibility('<%= txtNewPassword.ClientID %>', this);" 
+                 class="toggle-link">Show</a>
+          </div>
+          <asp:RequiredFieldValidator ID="rfvNewPassword" runat="server"
+              ControlToValidate="txtNewPassword" 
+              ErrorMessage="Please enter a new password" 
+              Display="Dynamic" ForeColor="Red" />
+          <asp:RegularExpressionValidator ID="revNewPassword" runat="server"
+              ControlToValidate="txtNewPassword"
+              ErrorMessage="Password must be greater than 12 characters and include uppercase, lowercase, number, and special symbol."
+              ValidationExpression="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{13,}$"
+              Display="Dynamic" ForeColor="Red" />
+      </div>
+      
+      <!-- Confirm New Password -->
+      <div class="form-group">
+          <label for="txtConfirmPassword">Confirm New Password</label>
+          <div class="input-container">
+              <asp:TextBox ID="txtConfirmPassword" runat="server" TextMode="Password" CssClass="password-field"></asp:TextBox>
+              <a href="javascript:void(0);" 
+                 onclick="toggleFieldVisibility('<%= txtConfirmPassword.ClientID %>', this);" 
+                 class="toggle-link">Show</a>
+          </div>
+          <asp:RequiredFieldValidator ID="rfvConfirmPassword" runat="server"
+              ControlToValidate="txtConfirmPassword" 
+              ErrorMessage="Please confirm your new password" 
+              Display="Dynamic" ForeColor="Red" />
+      </div>
+      
+      <!-- 更新密碼按鈕 -->
+      <asp:Button ID="btnUpdate" runat="server" Text="Update Password" OnClick="btnUpdate_Click" CssClass="btn-custom" />
+      
+      <!-- 成功訊息 (初始隱藏) -->
+      <asp:Label ID="lblSuccess" runat="server" CssClass="message" Visible="false"></asp:Label>
+  </asp:Panel>
+</asp:Content>
+
+
+---
+
+UI 設計說明
+
+1. 標題與說明文字
+
+標題使用 "Password Expired – Update Required"。
+
+說明文字分為兩行，分別顯示「To continue using your account, please set a new password.」與「For security reasons, you must update your password before accessing your account.」
+
+
+
+2. 輸入欄位
+
+僅包含「New Password」與「Confirm New Password」欄位。
+
+每個欄位皆採用疊在右上角的 Show/Hide 按鈕，可切換密碼顯示狀態，不影響文字框的寬度與置中效果。
+
+
+
+3. 按鈕
+
+按鈕文字為 "Update Password"，符合強制修改密碼的要求，並未提供取消或稍後提醒選項。
+
+
+
+4. 成功訊息
+
+成功訊息區塊 (lblSuccess) 可根據後端處理結果顯示如下訊息之一：
+
+"Your password has been successfully updated. Redirecting to your account..."
+
+"Password updated successfully. You will now be logged in."
+
+
+
+
+
+此設計保持簡潔、清楚，並符合安全要求，避免出現「Cancel」與「Remind Me Later」等選項。您可依專案需求進一步調整樣式與後端邏輯。
+
+
+
 以下提供新版範例，將每個密碼欄位旁加上顯示/隱藏切換連結，並與文字框保持在同一水平線上：
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
