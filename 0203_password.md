@@ -1,3 +1,129 @@
+以下是更新後的英文版範例，包含密碼至少13個字元，並必須含有大小寫英文、數字及特殊符號的正規表示式驗證器。請將下列程式碼放在 Master Page 的 Content 區塊中使用：
+
+<asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
+    <style type="text/css">
+        .password-panel {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #333;  /* Dark background */
+            border: 1px solid #444;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+            font-family: Calibri, "微軟正黑體", "Courier New", "Ms Pmincho", sans-serif;
+            color: #fff;  /* White text */
+        }
+        .password-panel h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #fff;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #555; /* Dark input background */
+            color: #fff;
+            font-family: inherit;
+        }
+        .form-group input:focus {
+            border-color: #66afe9;
+            outline: none;
+        }
+        .btn-custom {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            border: none;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .btn-custom:hover {
+            background-color: #0056b3;
+        }
+        .message {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+    </style>
+
+    <asp:Panel ID="pnlPassword" runat="server" CssClass="password-panel">
+        <h2>Change Password</h2>
+        <asp:Label ID="lblMessage" runat="server" CssClass="message" ForeColor="Red"></asp:Label>
+        
+        <div class="form-group">
+            <label for="txtOldPassword">Old Password</label>
+            <asp:TextBox ID="txtOldPassword" runat="server" TextMode="Password"></asp:TextBox>
+            <asp:RequiredFieldValidator ID="rfvOldPassword" runat="server"
+                ControlToValidate="txtOldPassword" 
+                ErrorMessage="Please enter your old password" 
+                Display="Dynamic" ForeColor="Red" />
+        </div>
+        
+        <div class="form-group">
+            <label for="txtNewPassword">New Password</label>
+            <asp:TextBox ID="txtNewPassword" runat="server" TextMode="Password"></asp:TextBox>
+            <asp:RequiredFieldValidator ID="rfvNewPassword" runat="server"
+                ControlToValidate="txtNewPassword" 
+                ErrorMessage="Please enter a new password" 
+                Display="Dynamic" ForeColor="Red" />
+            <asp:RegularExpressionValidator ID="revNewPassword" runat="server"
+                ControlToValidate="txtNewPassword"
+                ErrorMessage="Password must be greater than 12 characters and include uppercase, lowercase, number, and special symbol."
+                ValidationExpression="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{13,}$"
+                Display="Dynamic" ForeColor="Red" />
+        </div>
+        
+        <div class="form-group">
+            <label for="txtConfirmPassword">Confirm New Password</label>
+            <asp:TextBox ID="txtConfirmPassword" runat="server" TextMode="Password"></asp:TextBox>
+            <asp:RequiredFieldValidator ID="rfvConfirmPassword" runat="server"
+                ControlToValidate="txtConfirmPassword" 
+                ErrorMessage="Please confirm your new password" 
+                Display="Dynamic" ForeColor="Red" />
+        </div>
+        
+        <asp:Button ID="btnChange" runat="server" Text="Change Password" OnClick="btnChange_Click" CssClass="btn-custom" />
+    </asp:Panel>
+</asp:Content>
+
+
+---
+
+說明：
+
+1. RegularExpressionValidator 說明
+
+ValidationExpression 設定為
+^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{13,}$
+此正規表達式確保密碼至少有13個字元，並包含至少一個小寫字母、一個大寫字母、一個數字和一個特殊符號。
+
+
+
+2. 其他驗證
+
+針對每個欄位皆有必填驗證器，確保使用者填寫必要資訊。
+
+
+
+
+依照需求可進一步調整樣式或驗證內容。
+
+
+
 以下提供一個新版範例，符合以下要求：
 
 字體：Calibri, 微軟正黑體, Courier New, Ms Pmincho
