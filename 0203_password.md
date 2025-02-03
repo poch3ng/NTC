@@ -1,3 +1,133 @@
+以下提供一個 VB 後端範例，說明如何在使用者按下「Update Password」按鈕後：
+
+1. 驗證頁面與欄位內容（例如：兩次輸入的新密碼是否一致）
+
+
+2. 將新密碼進行 Hash（可依需求選用其他加密方式）
+
+
+3. 呼叫資料庫更新密碼（請根據實際資料庫邏輯修改）
+
+
+4. 成功後顯示成功訊息並導向至帳戶頁面
+
+
+
+請參考以下程式碼，將其放在 UpdatePassword.aspx.vb（或相應的 CodeBehind 檔案）中：
+
+Partial Public Class UpdatePassword
+    Inherits System.Web.UI.Page
+
+    ' 按下「Update Password」按鈕時觸發
+    Protected Sub btnUpdate_Click(sender As Object, e As EventArgs) Handles btnUpdate.Click
+        ' 若驗證未通過，直接結束
+        If Not Page.IsValid Then
+            Return
+        End If
+
+        Dim newPassword As String = txtNewPassword.Text.Trim()
+        Dim confirmPassword As String = txtConfirmPassword.Text.Trim()
+
+        ' 驗證兩次輸入的密碼是否一致
+        If newPassword <> confirmPassword Then
+            lblSuccess.ForeColor = Drawing.Color.Red
+            lblSuccess.Text = "The new password and confirmation do not match."
+            lblSuccess.Visible = True
+            Return
+        End If
+
+        ' 將新密碼進行 Hash（此處以 SHA256 為例）
+        Dim hashedPassword As String = HashPassword(newPassword)
+
+        ' 更新密碼到資料庫（請依實際情況修改此函式）
+        If UpdateUserPassword(hashedPassword) Then
+            lblSuccess.ForeColor = Drawing.Color.Green
+            lblSuccess.Text = "Your password has been successfully updated. Redirecting to your account..."
+            lblSuccess.Visible = True
+
+            ' 使用 JavaScript 進行導向（此處設 3 秒後導向）
+            Dim script As String = "setTimeout(function(){ window.location.href='Default.aspx'; }, 3000);"
+            ClientScript.RegisterStartupScript(Me.GetType(), "Redirect", script, True)
+        Else
+            lblSuccess.ForeColor = Drawing.Color.Red
+            lblSuccess.Text = "There was an error updating your password. Please try again."
+            lblSuccess.Visible = True
+        End If
+    End Sub
+
+    ' 使用 SHA256 進行密碼 Hash
+    Private Function HashPassword(ByVal password As String) As String
+        Using sha256 As System.Security.Cryptography.SHA256 = System.Security.Cryptography.SHA256.Create()
+            Dim bytes As Byte() = System.Text.Encoding.UTF8.GetBytes(password)
+            Dim hashBytes As Byte() = sha256.ComputeHash(bytes)
+            Return BitConverter.ToString(hashBytes).Replace("-", "").ToLower()
+        End Using
+    End Function
+
+    ' 更新密碼到資料庫 (請根據您的資料庫與驗證機制修改此邏輯)
+    Private Function UpdateUserPassword(ByVal hashedPassword As String) As Boolean
+        Try
+            ' 假設使用者 ID 可從 Session 或其他方式取得
+            ' Dim userId As Integer = GetCurrentUserId()
+
+            ' 假設連線字串存放在 Web.config 中
+            ' Dim connectionString As String = ConfigurationManager.ConnectionStrings("YourConnectionString").ConnectionString
+            ' Dim sql As String = "UPDATE Users SET Password = @Password WHERE UserId = @UserId"
+
+            ' Using conn As New SqlConnection(connectionString)
+            '     Using cmd As New SqlCommand(sql, conn)
+            '         cmd.Parameters.AddWithValue("@Password", hashedPassword)
+            '         cmd.Parameters.AddWithValue("@UserId", userId)
+            '         conn.Open()
+            '         cmd.ExecuteNonQuery()
+            '     End Using
+            ' End Using
+
+            ' 這裡僅回傳 True 代表更新成功，請依實際情況處理錯誤
+            Return True
+        Catch ex As Exception
+            ' 記錄錯誤訊息（例如寫入 Log）
+            Return False
+        End Try
+    End Function
+End Class
+
+
+---
+
+說明
+
+1. 驗證與比對
+
+使用 Page.IsValid 確認所有 ASP.NET 驗證控件皆通過。
+
+檢查 newPassword 與 confirmPassword 是否一致。
+
+
+
+2. 密碼加密
+
+以 SHA256 為例，將新密碼進行 Hash 後再存入資料庫，避免明碼存取。
+
+
+
+3. 更新資料庫
+
+UpdateUserPassword 函式中示範如何使用 ADO.NET 更新資料庫，請根據實際專案修改。
+
+
+
+4. 顯示成功訊息與導向
+
+更新成功後，使用 lblSuccess 顯示成功訊息，並以 JavaScript 延遲 3 秒後導向到帳戶頁面（範例中為 Default.aspx）。
+
+
+
+
+依需求進一步修改或擴充後端邏輯即可。
+
+
+
 你的說明文字可以這樣設計，既清楚告知用戶密碼過期的情況，也強調是為了符合資安規範：
 
 
