@@ -1,3 +1,40 @@
+你的說明文字可以這樣設計，既清楚告知用戶密碼過期的情況，也強調是為了符合資安規範：
+
+
+---
+
+標題 (Title)
+
+🔹 "Your Password Has Expired"
+🔹 "Password Expired – Security Update Required"
+
+說明文字 (Instructional Text)
+
+🔹 "For security reasons, your password has expired and must be updated to continue using your account."
+🔹 "To comply with security policies, your password has expired. Please set a new password to regain access."
+🔹 "Your password has expired as part of our security policy. Please update your password to continue."
+
+輸入欄位 (Form Labels)
+
+🔹 "New Password"（新密碼）
+🔹 "Confirm New Password"（確認新密碼）
+
+按鈕 (Button)
+
+🔹 "Update Password"（更新密碼）
+
+成功訊息 (Success Message)
+
+🔹 "Your password has been successfully updated. Redirecting to your account..."
+🔹 "Password updated successfully. You will now be logged in."
+
+
+---
+
+這樣的設計既能明確傳達密碼過期的必要性，也讓客戶理解這是為了安全考量，而不是額外的麻煩。
+
+
+
 以下是一個依據您提供 UI 文案設計的強制修改密碼範例，僅包含「New Password」與「Confirm New Password」兩個欄位，並提供疊在文字框右上角的 Show/Hide 切換按鈕。您可直接放在 Master Page 的 Content 區塊中使用：
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
