@@ -1,3 +1,170 @@
+以下提供新版範例，將每個密碼欄位旁加上顯示/隱藏切換連結，並與文字框保持在同一水平線上：
+
+<asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
+  <style type="text/css">
+      .password-panel {
+          max-width: 400px;
+          margin: 50px auto;
+          padding: 20px;
+          background-color: #333;
+          border: 1px solid #444;
+          border-radius: 8px;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+          font-family: Calibri, "微軟正黑體", "Courier New", "Ms Pmincho", sans-serif;
+          color: #fff;
+      }
+      .password-panel h2 {
+          text-align: center;
+          margin-bottom: 20px;
+          color: #fff;
+      }
+      .form-group {
+          margin-bottom: 15px;
+      }
+      .form-group label {
+          font-weight: bold;
+          margin-bottom: 5px;
+          display: block;
+          color: #fff;
+      }
+      .input-group {
+          display: flex;
+          align-items: center;
+      }
+      .input-group .password-field {
+          flex: 1;
+          padding: 8px;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          background-color: #555;
+          color: #fff;
+          font-family: inherit;
+      }
+      .toggle-link {
+          margin-left: 10px;
+          cursor: pointer;
+          color: #fff;
+          text-decoration: underline;
+      }
+      .btn-custom {
+          width: 100%;
+          padding: 10px;
+          background-color: #007bff;
+          border: none;
+          color: #fff;
+          border-radius: 4px;
+          cursor: pointer;
+          font-family: inherit;
+      }
+      .btn-custom:hover {
+          background-color: #0056b3;
+      }
+      .message {
+          text-align: center;
+          margin-bottom: 15px;
+          color: #fff;
+      }
+  </style>
+
+  <script type="text/javascript">
+      function toggleFieldVisibility(fieldId, link) {
+          var field = document.getElementById(fieldId);
+          if (field) {
+              if (field.type === 'password') {
+                  field.type = 'text';
+                  link.textContent = 'Hide';
+              } else {
+                  field.type = 'password';
+                  link.textContent = 'Show';
+              }
+          }
+      }
+  </script>
+
+  <asp:Panel ID="pnlPassword" runat="server" CssClass="password-panel">
+      <h2>Change Password</h2>
+      <asp:Label ID="lblMessage" runat="server" CssClass="message" ForeColor="Red"></asp:Label>
+      
+      <!-- Old Password -->
+      <div class="form-group">
+          <label for="txtOldPassword">Old Password</label>
+          <div class="input-group">
+              <asp:TextBox ID="txtOldPassword" runat="server" TextMode="Password" CssClass="password-field"></asp:TextBox>
+              <a href="javascript:void(0);" onclick="toggleFieldVisibility('<%= txtOldPassword.ClientID %>', this);" class="toggle-link">Show</a>
+          </div>
+          <asp:RequiredFieldValidator ID="rfvOldPassword" runat="server"
+              ControlToValidate="txtOldPassword" 
+              ErrorMessage="Please enter your old password" 
+              Display="Dynamic" ForeColor="Red" />
+      </div>
+      
+      <!-- New Password -->
+      <div class="form-group">
+          <label for="txtNewPassword">New Password</label>
+          <div class="input-group">
+              <asp:TextBox ID="txtNewPassword" runat="server" TextMode="Password" CssClass="password-field"></asp:TextBox>
+              <a href="javascript:void(0);" onclick="toggleFieldVisibility('<%= txtNewPassword.ClientID %>', this);" class="toggle-link">Show</a>
+          </div>
+          <asp:RequiredFieldValidator ID="rfvNewPassword" runat="server"
+              ControlToValidate="txtNewPassword" 
+              ErrorMessage="Please enter a new password" 
+              Display="Dynamic" ForeColor="Red" />
+          <asp:RegularExpressionValidator ID="revNewPassword" runat="server"
+              ControlToValidate="txtNewPassword"
+              ErrorMessage="Password must be greater than 12 characters and include uppercase, lowercase, number, and special symbol."
+              ValidationExpression="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{13,}$"
+              Display="Dynamic" ForeColor="Red" />
+      </div>
+      
+      <!-- Confirm New Password -->
+      <div class="form-group">
+          <label for="txtConfirmPassword">Confirm New Password</label>
+          <div class="input-group">
+              <asp:TextBox ID="txtConfirmPassword" runat="server" TextMode="Password" CssClass="password-field"></asp:TextBox>
+              <a href="javascript:void(0);" onclick="toggleFieldVisibility('<%= txtConfirmPassword.ClientID %>', this);" class="toggle-link">Show</a>
+          </div>
+          <asp:RequiredFieldValidator ID="rfvConfirmPassword" runat="server"
+              ControlToValidate="txtConfirmPassword" 
+              ErrorMessage="Please confirm your new password" 
+              Display="Dynamic" ForeColor="Red" />
+      </div>
+      
+      <asp:Button ID="btnChange" runat="server" Text="Change Password" OnClick="btnChange_Click" CssClass="btn-custom" />
+  </asp:Panel>
+</asp:Content>
+
+
+---
+
+設計重點說明：
+
+1. 同水平排列
+
+使用 .input-group 的 Flex 排版，讓文字框與切換連結保持同一水平線。
+
+
+
+2. 顯示/隱藏切換
+
+每個密碼欄位右側放置一個 <a> 連結，點擊後呼叫 toggleFieldVisibility 函式。
+
+函式根據目前狀態變更輸入欄位的 type 屬性，並更新連結文字為 "Show" 或 "Hide"。
+
+
+
+3. 其他功能
+
+新密碼欄位包含正規表示式驗證，確保密碼大於 12 字元且包含大小寫、數字及特殊符號。
+
+所有元件均使用深色背景與白色文字，並指定所需字體。
+
+
+
+
+依需求再調整樣式或驗證內容即可。
+
+
+
 以下提供新版範例，將每個密碼輸入框旁邊各自加上切換顯示/隱藏功能，請參考：
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
