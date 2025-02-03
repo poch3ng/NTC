@@ -1,3 +1,162 @@
+以下提供新版範例，將每個密碼輸入框旁邊各自加上切換顯示/隱藏功能，請參考：
+
+<asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
+    <style type="text/css">
+        .password-panel {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #333;
+            border: 1px solid #444;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+            font-family: Calibri, "微軟正黑體", "Courier New", "Ms Pmincho", sans-serif;
+            color: #fff;
+        }
+        .password-panel h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+            color: #fff;
+        }
+        .input-group {
+            display: flex;
+            align-items: center;
+        }
+        .input-group .password-field {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #555;
+            color: #fff;
+            font-family: inherit;
+        }
+        .input-group input[type="checkbox"] {
+            margin-left: 10px;
+        }
+        .btn-custom {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            border: none;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .btn-custom:hover {
+            background-color: #0056b3;
+        }
+        .message {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+    </style>
+
+    <script type="text/javascript">
+        function toggleFieldVisibility(fieldId, checkbox) {
+            var field = document.getElementById(fieldId);
+            if (field) {
+                field.type = checkbox.checked ? 'text' : 'password';
+            }
+        }
+    </script>
+
+    <asp:Panel ID="pnlPassword" runat="server" CssClass="password-panel">
+        <h2>Change Password</h2>
+        <asp:Label ID="lblMessage" runat="server" CssClass="message" ForeColor="Red"></asp:Label>
+        
+        <!-- Old Password -->
+        <div class="form-group">
+            <label for="txtOldPassword">Old Password</label>
+            <div class="input-group">
+                <asp:TextBox ID="txtOldPassword" runat="server" TextMode="Password" CssClass="password-field"></asp:TextBox>
+                <input type="checkbox" id="chkShowOld" onclick="toggleFieldVisibility('<%= txtOldPassword.ClientID %>', this);" />
+                <label for="chkShowOld" style="color: #fff; margin-left: 5px;">Show</label>
+            </div>
+            <asp:RequiredFieldValidator ID="rfvOldPassword" runat="server"
+                ControlToValidate="txtOldPassword" 
+                ErrorMessage="Please enter your old password" 
+                Display="Dynamic" ForeColor="Red" />
+        </div>
+        
+        <!-- New Password -->
+        <div class="form-group">
+            <label for="txtNewPassword">New Password</label>
+            <div class="input-group">
+                <asp:TextBox ID="txtNewPassword" runat="server" TextMode="Password" CssClass="password-field"></asp:TextBox>
+                <input type="checkbox" id="chkShowNew" onclick="toggleFieldVisibility('<%= txtNewPassword.ClientID %>', this);" />
+                <label for="chkShowNew" style="color: #fff; margin-left: 5px;">Show</label>
+            </div>
+            <asp:RequiredFieldValidator ID="rfvNewPassword" runat="server"
+                ControlToValidate="txtNewPassword" 
+                ErrorMessage="Please enter a new password" 
+                Display="Dynamic" ForeColor="Red" />
+            <asp:RegularExpressionValidator ID="revNewPassword" runat="server"
+                ControlToValidate="txtNewPassword"
+                ErrorMessage="Password must be greater than 12 characters and include uppercase, lowercase, number, and special symbol."
+                ValidationExpression="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{13,}$"
+                Display="Dynamic" ForeColor="Red" />
+        </div>
+        
+        <!-- Confirm New Password -->
+        <div class="form-group">
+            <label for="txtConfirmPassword">Confirm New Password</label>
+            <div class="input-group">
+                <asp:TextBox ID="txtConfirmPassword" runat="server" TextMode="Password" CssClass="password-field"></asp:TextBox>
+                <input type="checkbox" id="chkShowConfirm" onclick="toggleFieldVisibility('<%= txtConfirmPassword.ClientID %>', this);" />
+                <label for="chkShowConfirm" style="color: #fff; margin-left: 5px;">Show</label>
+            </div>
+            <asp:RequiredFieldValidator ID="rfvConfirmPassword" runat="server"
+                ControlToValidate="txtConfirmPassword" 
+                ErrorMessage="Please confirm your new password" 
+                Display="Dynamic" ForeColor="Red" />
+        </div>
+        
+        <asp:Button ID="btnChange" runat="server" Text="Change Password" OnClick="btnChange_Click" CssClass="btn-custom" />
+    </asp:Panel>
+</asp:Content>
+
+
+---
+
+重點說明：
+
+1. 獨立切換控制
+
+每個密碼輸入框旁都放置一個 checkbox，點選後透過 JavaScript 函式 toggleFieldVisibility 切換該欄位的 type 屬性，從 password 切換到 text，反之亦然。
+
+
+
+2. 排版樣式
+
+使用 .input-group 以 Flex 方式排列，確保輸入框與切換控制在同一行顯示。
+
+
+
+3. 驗證與樣式
+
+新密碼包含必填及正規表示式驗證，確保大於 12 個字元且包含大小寫英文、數字與特殊符號。
+
+整體頁面採用深色背景與白色字體，搭配指定字體。
+
+
+
+
+依需求進一步調整樣式與功能即可。
+
+
+
 以下提供更新後的英文版範例，除了包含密碼複雜度驗證外，還加入了切換密碼顯示/隱藏的功能。請將下列程式碼放在 Master Page 的 Content 區塊中使用：
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
