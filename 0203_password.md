@@ -1,3 +1,124 @@
+以下提供一個新版範例，符合以下要求：
+
+字體：Calibri, 微軟正黑體, Courier New, Ms Pmincho
+
+全部文字為白色
+
+
+請將下列程式碼放在 Master Page 的 Content 區塊中使用：
+
+<asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
+    <style type="text/css">
+        .password-panel {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #333;  /* 深色背景 */
+            border: 1px solid #444;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+            font-family: Calibri, "微軟正黑體", "Courier New", "Ms Pmincho", sans-serif;
+            color: #fff;  /* 文字白色 */
+        }
+        .password-panel h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #fff;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #555; /* 較暗的輸入框背景 */
+            color: #fff;
+            font-family: inherit;
+        }
+        .form-group input:focus {
+            border-color: #66afe9;
+            outline: none;
+        }
+        .btn-custom {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            border: none;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .btn-custom:hover {
+            background-color: #0056b3;
+        }
+        .message {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+    </style>
+
+    <asp:Panel ID="pnlPassword" runat="server" CssClass="password-panel">
+        <h2>修改密碼</h2>
+        <asp:Label ID="lblMessage" runat="server" CssClass="message" ForeColor="Red"></asp:Label>
+        
+        <div class="form-group">
+            <label for="txtOldPassword">舊密碼</label>
+            <asp:TextBox ID="txtOldPassword" runat="server" TextMode="Password"></asp:TextBox>
+            <asp:RequiredFieldValidator ID="rfvOldPassword" runat="server" ControlToValidate="txtOldPassword" ErrorMessage="請輸入舊密碼" Display="Dynamic" />
+        </div>
+        
+        <div class="form-group">
+            <label for="txtNewPassword">新密碼</label>
+            <asp:TextBox ID="txtNewPassword" runat="server" TextMode="Password"></asp:TextBox>
+            <asp:RequiredFieldValidator ID="rfvNewPassword" runat="server" ControlToValidate="txtNewPassword" ErrorMessage="請輸入新密碼" Display="Dynamic" />
+        </div>
+        
+        <div class="form-group">
+            <label for="txtConfirmPassword">確認新密碼</label>
+            <asp:TextBox ID="txtConfirmPassword" runat="server" TextMode="Password"></asp:TextBox>
+            <asp:RequiredFieldValidator ID="rfvConfirmPassword" runat="server" ControlToValidate="txtConfirmPassword" ErrorMessage="請確認新密碼" Display="Dynamic" />
+        </div>
+        
+        <asp:Button ID="btnChange" runat="server" Text="修改密碼" OnClick="btnChange_Click" CssClass="btn-custom" />
+    </asp:Panel>
+</asp:Content>
+
+
+---
+
+簡要說明：
+
+1. CSS 設定：
+
+設定了 Panel 及所有文字的字體為指定字體，文字顏色統一使用白色。
+
+為輸入框指定較暗背景，以便白色文字易於辨識。
+
+
+
+2. 版面配置：
+
+使用 Panel 包裹整體表單，並以分組方式排列標籤、輸入框與驗證器。
+
+按鈕採用自定義樣式，符合整體風格。
+
+
+
+
+依需求再進一步調整樣式即可。
+
+
+
 以下提供一個美化範例，使用內嵌 CSS 來調整版面，方便你直接放在 Master Page 的 Content 區塊中：
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
