@@ -1,3 +1,212 @@
+如果你不想要額外寫 Class，直接獲取 Email 內容，那可以直接 在 SQL 查詢後組合 Email 內容，避免使用 EdiOrderInfo 和 EdiOrderItem。
+
+
+---
+
+1. 直接產生 Email 內容
+
+這個方法：
+
+COMMIT 後查詢資料
+
+直接在迴圈組合 Email 內容
+
+不使用 EdiOrderInfo、EdiOrderItem
+
+
+Function GenerateEdiEmailContent(mainId As Integer, connection As SqlConnection) As String
+    Dim query As String = "
+        SELECT 
+            e.St01 AS OrderType, e.Beg03 AS PurchaseOrderNumber, 
+            e.Beg05 AS ContractNumber, i.Po107 AS ProductCode, 
+            i.Po102 AS Quantity, i.Po104 AS UnitPrice, i.Po109 AS Amount,
+            sch.Po102 AS ScheduleQuantity
+        FROM EdiMain e
+        LEFT JOIN EdiDetailItem i ON e.MainId = i.MainId AND i.LoopType = 'PO1'
+        LEFT JOIN EdiDetailItem sch ON i.MainId = sch.MainId 
+             AND i.LoopSequence = sch.LoopSequence
+             AND sch.LoopType = 'SCH'
+        WHERE e.MainId = @MainId
+        ORDER BY i.LoopSequence, sch.LoopSequence"
+    
+    Dim body As New StringBuilder()
+    Dim orderType As String = ""
+    Dim purchaseOrderNumber As String = ""
+    Dim contractNumber As String = ""
+
+    Using cmd As New SqlCommand(query, connection)
+        cmd.Parameters.AddWithValue("@MainId", mainId)
+        Using reader As SqlDataReader = cmd.ExecuteReader()
+            While reader.Read()
+                ' 訂單主資訊 (只設置一次)
+                If orderType = "" Then
+                    orderType = reader("OrderType").ToString()
+                    purchaseOrderNumber = reader("PurchaseOrderNumber").ToString()
+                    contractNumber = reader("ContractNumber").ToString()
+
+                    ' 設定 Email 標題
+                    If orderType = "850" Then
+                        body.AppendLine($"[新訂單通知] 訂單 {purchaseOrderNumber} 已收到")
+                        body.AppendLine()
+                        body.AppendLine($"訂單號碼: {purchaseOrderNumber}")
+                        body.AppendLine($"訂單類型: 850 (新訂單)")
+                    ElseIf orderType = "860" Then
+                        body.AppendLine($"[訂單變更通知] 訂單 {purchaseOrderNumber} 已變更")
+                        body.AppendLine()
+                        body.AppendLine($"訂單號碼: {purchaseOrderNumber}")
+                        body.AppendLine($"訂單類型: 860 (變更訂單)")
+                    End If
+
+                    body.AppendLine($"合約編號: {contractNumber}")
+                    body.AppendLine()
+                    body.AppendLine("【產品清單】")
+                End If
+
+                ' 讀取 PO1 明細
+                Dim productCode As String = reader("ProductCode").ToString()
+                Dim quantity As String = reader("Quantity").ToString()
+                Dim unitPrice As String = reader("UnitPrice").ToString()
+                Dim amount As String = reader("Amount").ToString()
+                Dim scheduleQuantity As String = If(IsDBNull(reader("ScheduleQuantity")), "無排程", reader("ScheduleQuantity").ToString())
+
+                ' 加入 Email 內容
+                body.AppendLine($"- 產品編號: {productCode}")
+                body.AppendLine($"  數量: {quantity}")
+                body.AppendLine($"  單價: {unitPrice}")
+                body.AppendLine($"  總金額: {amount}")
+                body.AppendLine($"  排程數量 (SCH05): {scheduleQuantity}")
+                body.AppendLine()
+            End While
+        End Using
+    End Using
+    
+    Return body.ToString()
+End Function
+
+
+---
+
+2. 交易 (COMMIT 後)
+
+這段程式碼會：
+
+1. 解析 EDI 並存入資料庫
+
+
+2. 成功後 COMMIT
+
+
+3. 直接查詢 Email 內容
+
+
+4. 發送 Email
+
+
+
+Try
+    Using connection As New SqlConnection(connectionString)
+        connection.Open()
+        Using transaction As SqlTransaction = connection.BeginTransaction()
+
+            ' 解析 EDI 並存入資料庫
+            Dim mainId As Integer = SaveEdiData(transaction, ediData)
+
+            ' 提交交易
+            transaction.Commit()
+
+            ' **查詢 EDI 訂單內容，直接生成 Email**
+            Dim emailContent As String = GenerateEdiEmailContent(mainId, connection)
+
+            ' **發送通知信**
+            SendEmail("sales@example.com", "EDI 訂單通知", emailContent)
+        End Using
+    End Using
+Catch ex As Exception
+    ' 交易失敗處理
+    LogError(ex.Message)
+End Try
+
+
+---
+
+3. 直接發送 Email
+
+Sub SendEmail(toEmail As String, subject As String, body As String)
+    Dim smtp As New SmtpClient("smtp.example.com")
+    smtp.Credentials = New NetworkCredential("your_email@example.com", "your_password")
+    smtp.EnableSsl = True
+    
+    Dim mail As New MailMessage()
+    mail.From = New MailAddress("noreply@example.com")
+    mail.To.Add(toEmail)
+    mail.Subject = subject
+    mail.Body = body
+    
+    smtp.Send(mail)
+End Sub
+
+
+---
+
+4. 最終 Email 格式
+
+850 (新訂單)
+
+[新訂單通知] 訂單 PO12345 已收到
+
+訂單號碼: PO12345
+訂單類型: 850 (新訂單)
+合約編號: ABC123
+
+【產品清單】
+- 產品編號: ITEM001
+  數量: 100
+  單價: 50
+  總金額: 5000
+  排程數量 (SCH05): 30, 50
+
+- 產品編號: ITEM002
+  數量: 200
+  單價: 30
+  總金額: 6000
+  排程數量 (SCH05): 100
+
+860 (訂單變更)
+
+[訂單變更通知] 訂單 PO12345 已變更
+
+訂單號碼: PO12345
+訂單類型: 860 (變更訂單)
+合約編號: ABC123
+
+【變更後產品清單】
+- 產品編號: ITEM001
+  數量: 150
+  單價: 45
+  總金額: 6750
+  排程數量 (SCH05): 50, 50, 20
+
+- 產品編號: ITEM003
+  數量: 50
+  單價: 25
+  總金額: 1250
+  排程數量 (SCH05): 無排程
+
+
+---
+
+結論
+
+✅ COMMIT 後直接查詢資料並組合 Email
+✅ 避免寫 EdiOrderInfo、EdiOrderItem 類別，簡化程式碼
+✅ 直接在 SQL 查詢後組合 Email 內容
+✅ 確保 PO1 與 SCH05（排程數量）正確對應
+✅ 高效能，不影響交易效能
+
+這樣 程式碼更簡潔、直接生成 Email 內容、確保數據準確！
+
+
+
 你想在 相同 PO1 之下 抓取 LoopType = 'SCH' 的 SCH05（排程數量），那我們需要：
 
 1. 查詢 PO1 產品資訊
