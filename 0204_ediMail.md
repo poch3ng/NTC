@@ -1,3 +1,235 @@
+如果 信件內容要明確告知業務這是 AWS 的訂單，建議在郵件中明確標註客戶名稱，同時保持專業與簡潔的風格。
+
+
+---
+
+1. Email 格式
+
+📌 新訂單 (EDI 850 - New Purchase Order from AWS)
+
+Subject: [AWS Purchase Order] PO {PurchaseOrderNumber} Received
+
+Dear {SalesRepName},
+
+We have received a new purchase order from **AWS**. Please find the details below:
+
+**Customer:** AWS (Amazon Web Services)  
+**PO Number:** {PurchaseOrderNumber}  
+**Order Type:** 850 (New Order)  
+**Contract Number:** {ContractNumber}  
+
+**Order Details:**  
+{OrderDetails}
+
+**Next Steps:**  
+- Please review the order and confirm the details.  
+- If any discrepancies are found, contact AWS Procurement immediately.  
+
+Best regards,  
+{YourCompanyName} Procurement Team  
+{YourEmail}  
+{YourPhone}
+
+
+---
+
+📌 訂單變更通知 (EDI 860 - Order Change Notification from AWS)
+
+Subject: [AWS Order Update] PO {PurchaseOrderNumber} Changed
+
+Dear {SalesRepName},
+
+The purchase order **{PurchaseOrderNumber}** from **AWS (Amazon Web Services)** has been updated. Please review the revised order details below:
+
+**Customer:** AWS  
+**PO Number:** {PurchaseOrderNumber}  
+**Order Type:** 860 (Order Change)  
+
+**Updated Order Details:**  
+{UpdatedOrderDetails}
+
+**Action Required:**  
+- Review the changes and confirm if additional actions are needed.  
+- Notify AWS Procurement if any issues arise.  
+
+Best regards,  
+{YourCompanyName} Procurement Team  
+{YourEmail}  
+{YourPhone}
+
+
+---
+
+2. 生成 AWS 訂單 Email 內容
+
+Function GenerateAwsSalesEmailContent(mainId As Integer, connection As SqlConnection) As Tuple(Of String, String)
+    Dim query As String = "
+        SELECT 
+            e.St01 AS OrderType, e.Beg03 AS PurchaseOrderNumber, 
+            e.Beg05 AS ContractNumber, i.Po107 AS ProductCode, 
+            i.Po102 AS Quantity, i.Po104 AS UnitPrice, i.Po109 AS Amount,
+            sch.Po102 AS RequirementDate
+        FROM EdiMain e
+        LEFT JOIN EdiDetailItem i ON e.MainId = i.MainId AND i.LoopType = 'PO1'
+        LEFT JOIN EdiDetailItem sch ON i.MainId = sch.MainId 
+             AND i.LoopSequence = sch.LoopSequence
+             AND sch.LoopType = 'SCH'
+        WHERE e.MainId = @MainId
+        ORDER BY i.LoopSequence, sch.LoopSequence"
+    
+    Dim body As New StringBuilder()
+    Dim subject As String = ""
+    Dim orderType As String = ""
+    Dim purchaseOrderNumber As String = ""
+    Dim contractNumber As String = ""
+    Dim orderDetails As New StringBuilder()
+
+    Using cmd As New SqlCommand(query, connection)
+        cmd.Parameters.AddWithValue("@MainId", mainId)
+        Using reader As SqlDataReader = cmd.ExecuteReader()
+            While reader.Read()
+                ' 訂單主資訊 (只設置一次)
+                If orderType = "" Then
+                    orderType = reader("OrderType").ToString()
+                    purchaseOrderNumber = reader("PurchaseOrderNumber").ToString()
+                    contractNumber = reader("ContractNumber").ToString()
+
+                    ' 設定 Email 標題
+                    If orderType = "850" Then
+                        subject = $"[AWS Purchase Order] PO {purchaseOrderNumber} Received"
+                        body.AppendLine($"Dear {SalesRepName},")
+                        body.AppendLine()
+                        body.AppendLine($"We have received a new purchase order from **AWS**. Please find the details below:")
+                        body.AppendLine()
+                        body.AppendLine($"**Customer:** AWS (Amazon Web Services)")
+                        body.AppendLine($"**PO Number:** {purchaseOrderNumber}")
+                        body.AppendLine($"**Order Type:** 850 (New Order)")
+                    ElseIf orderType = "860" Then
+                        subject = $"[AWS Order Update] PO {purchaseOrderNumber} Changed"
+                        body.AppendLine($"Dear {SalesRepName},")
+                        body.AppendLine()
+                        body.AppendLine($"The purchase order **{purchaseOrderNumber}** from **AWS** has been updated. Please review the revised order details below:")
+                        body.AppendLine()
+                        body.AppendLine($"**Customer:** AWS (Amazon Web Services)")
+                        body.AppendLine($"**PO Number:** {purchaseOrderNumber}")
+                        body.AppendLine($"**Order Type:** 860 (Order Change)")
+                    End If
+
+                    body.AppendLine()
+                    body.AppendLine($"**Order Details:**")
+                End If
+
+                ' 讀取 PO1 明細
+                Dim productCode As String = reader("ProductCode").ToString()
+                Dim quantity As String = reader("Quantity").ToString()
+                Dim unitPrice As String = reader("UnitPrice").ToString()
+                Dim amount As String = reader("Amount").ToString()
+                Dim requirementDate As String = If(IsDBNull(reader("RequirementDate")), "N/A", reader("RequirementDate").ToString())
+
+                ' 加入 Email 內容
+                orderDetails.AppendLine($"- **Product Code:** {productCode}")
+                orderDetails.AppendLine($"  - Quantity: {quantity}")
+                orderDetails.AppendLine($"  - Unit Price: {unitPrice}")
+                orderDetails.AppendLine($"  - Total Amount: {amount}")
+                orderDetails.AppendLine($"  - Requirement Date (SCH05): {requirementDate}")
+                orderDetails.AppendLine()
+            End While
+        End Using
+    End Using
+    
+    body.AppendLine(orderDetails.ToString())
+    body.AppendLine()
+    body.AppendLine("**Next Steps:**")
+    body.AppendLine("- Please review the order and confirm the details.")
+    body.AppendLine("- If any discrepancies are found, contact AWS Procurement immediately.")
+    body.AppendLine()
+    body.AppendLine("Best regards,")
+    body.AppendLine("{YourCompanyName} Procurement Team")
+    body.AppendLine("{YourEmail}")
+    body.AppendLine("{YourPhone}")
+
+    Return Tuple.Create(subject, body.ToString())
+End Function
+
+
+---
+
+3. 交易 (COMMIT 後)
+
+這段程式碼確保：
+
+1. 解析 EDI 並存入資料庫
+
+
+2. 成功後 COMMIT
+
+
+3. 直接查詢 Email 內容
+
+
+4. 發送 Email 給內部業務團隊
+
+
+
+Try
+    Using connection As New SqlConnection(connectionString)
+        connection.Open()
+        Using transaction As SqlTransaction = connection.BeginTransaction()
+
+            ' 解析 EDI 並存入資料庫
+            Dim mainId As Integer = SaveEdiData(transaction, ediData)
+
+            ' 提交交易
+            transaction.Commit()
+
+            ' **查詢 EDI 訂單內容，直接生成 Email**
+            Dim emailInfo = GenerateAwsSalesEmailContent(mainId, connection)
+            Dim subject As String = emailInfo.Item1
+            Dim emailContent As String = emailInfo.Item2
+
+            ' **發送通知信**
+            SendEmail("sales-team@example.com", subject, emailContent)
+        End Using
+    End Using
+Catch ex As Exception
+    ' 交易失敗處理
+    LogError(ex.Message)
+End Try
+
+
+---
+
+4. 直接發送 Email
+
+Sub SendEmail(toEmail As String, subject As String, body As String)
+    Dim smtp As New SmtpClient("smtp.example.com")
+    smtp.Credentials = New NetworkCredential("your_email@example.com", "your_password")
+    smtp.EnableSsl = True
+    
+    Dim mail As New MailMessage()
+    mail.From = New MailAddress("noreply@example.com")
+    mail.To.Add(toEmail)
+    mail.Subject = subject
+    mail.Body = body
+    mail.IsBodyHtml = False  
+
+    smtp.Send(mail)
+End Sub
+
+
+---
+
+結論
+
+✅ Email 內容明確標註「AWS 訂單」
+✅ 讓業務知道這是 AWS 客戶，避免混淆
+✅ COMMIT 後發送，確保數據準確
+✅ 直接生成 Email，避免額外物件，簡化程式碼
+
+這樣業務團隊能 快速識別 AWS 訂單、掌握訂單資訊、立即跟進！
+
+
+
 如果 SCH 代表需求日期，而 Email 內容是 英文，那麼我們需要：
 
 1. 修改查詢 讓 SCH05（需求日期） 正確對應 PO1
