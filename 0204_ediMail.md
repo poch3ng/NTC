@@ -1,3 +1,187 @@
+如果要使用 HTML 格式 來發送 Email，應該：
+
+1. 確保郵件內容清晰、專業，適合 AWS 訂單
+
+
+2. 使用 HTML Table 格式顯示訂單細節
+
+
+3. 讓郵件更易讀，並區分 PO1 (產品) 與 SCH05 (需求日期)
+
+
+
+
+---
+
+1. AWS 訂單 Email (HTML 格式)
+
+📌 新訂單 (EDI 850 - AWS Purchase Order)
+
+Subject: [AWS Purchase Order] PO {PurchaseOrderNumber} Received
+
+Dear {SalesRepName},<br><br>
+
+We have received a new purchase order from <strong>AWS (Amazon Web Services)</strong>. Please find the details below:<br><br>
+
+<table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+    <tr>
+        <th style="background-color: #f2f2f2; text-align: left;">Customer</th>
+        <td>AWS (Amazon Web Services)</td>
+    </tr>
+    <tr>
+        <th style="background-color: #f2f2f2; text-align: left;">PO Number</th>
+        <td>{PurchaseOrderNumber}</td>
+    </tr>
+    <tr>
+        <th style="background-color: #f2f2f2; text-align: left;">Order Type</th>
+        <td>850 (New Order)</td>
+    </tr>
+    <tr>
+        <th style="background-color: #f2f2f2; text-align: left;">Contract Number</th>
+        <td>{ContractNumber}</td>
+    </tr>
+</table>
+
+<br><strong>Order Details:</strong><br>
+<table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+    <tr>
+        <th style="background-color: #f2f2f2; text-align: left;">Product Code</th>
+        <th style="background-color: #f2f2f2; text-align: left;">Quantity</th>
+        <th style="background-color: #f2f2f2; text-align: left;">Unit Price</th>
+        <th style="background-color: #f2f2f2; text-align: left;">Total Amount</th>
+        <th style="background-color: #f2f2f2; text-align: left;">Requirement Date (SCH05)</th>
+    </tr>
+    {OrderDetails}
+</table>
+
+<br><strong>Next Steps:</strong><br>
+- Please review the order and confirm the details.<br>
+- If any discrepancies are found, contact AWS Procurement immediately.<br><br>
+
+Best regards,<br>
+{YourCompanyName} Procurement Team<br>
+{YourEmail}<br>
+{YourPhone}
+
+
+---
+
+2. 生成 HTML Email 內容
+
+Function GenerateAwsSalesEmailContent(mainId As Integer, connection As SqlConnection) As Tuple(Of String, String)
+    Dim query As String = "
+        SELECT 
+            e.St01 AS OrderType, e.Beg03 AS PurchaseOrderNumber, 
+            e.Beg05 AS ContractNumber, i.Po107 AS ProductCode, 
+            i.Po102 AS Quantity, i.Po104 AS UnitPrice, i.Po109 AS Amount,
+            sch.Po102 AS RequirementDate
+        FROM EdiMain e
+        LEFT JOIN EdiDetailItem i ON e.MainId = i.MainId AND i.LoopType = 'PO1'
+        LEFT JOIN EdiDetailItem sch ON i.MainId = sch.MainId 
+             AND i.LoopSequence = sch.LoopSequence
+             AND sch.LoopType = 'SCH'
+        WHERE e.MainId = @MainId
+        ORDER BY i.LoopSequence, sch.LoopSequence"
+
+    Dim subject As String = ""
+    Dim body As New StringBuilder()
+    Dim orderType As String = ""
+    Dim purchaseOrderNumber As String = ""
+    Dim contractNumber As String = ""
+    Dim orderDetails As New StringBuilder()
+
+    Using cmd As New SqlCommand(query, connection)
+        cmd.Parameters.AddWithValue("@MainId", mainId)
+        Using reader As SqlDataReader = cmd.ExecuteReader()
+            While reader.Read()
+                ' 訂單主資訊 (只設置一次)
+                If orderType = "" Then
+                    orderType = reader("OrderType").ToString()
+                    purchaseOrderNumber = reader("PurchaseOrderNumber").ToString()
+                    contractNumber = reader("ContractNumber").ToString()
+
+                    If orderType = "850" Then
+                        subject = $"[AWS Purchase Order] PO {purchaseOrderNumber} Received"
+                    ElseIf orderType = "860" Then
+                        subject = $"[AWS Order Update] PO {purchaseOrderNumber} Changed"
+                    End If
+                End If
+
+                ' 讀取 PO1 明細
+                Dim productCode As String = reader("ProductCode").ToString()
+                Dim quantity As String = reader("Quantity").ToString()
+                Dim unitPrice As String = reader("UnitPrice").ToString()
+                Dim amount As String = reader("Amount").ToString()
+                Dim requirementDate As String = If(IsDBNull(reader("RequirementDate")), "N/A", reader("RequirementDate").ToString())
+
+                ' 加入 HTML 表格內容
+                orderDetails.AppendLine($"<tr><td>{productCode}</td><td>{quantity}</td><td>{unitPrice}</td><td>{amount}</td><td>{requirementDate}</td></tr>")
+            End While
+        End Using
+    End Using
+
+    ' 組合 HTML 內容
+    body.AppendFormat("<html><body>")
+    body.AppendFormat("<h3>Dear {0},</h3>", "{SalesRepName}")
+    body.AppendFormat("<p>We have received a new purchase order from <strong>AWS (Amazon Web Services)</strong>. Please find the details below:</p>")
+
+    body.AppendFormat("<table border='1' cellpadding='5' cellspacing='0' style='border-collapse: collapse; width: 100%;'>")
+    body.AppendFormat("<tr><th>Customer</th><td>AWS (Amazon Web Services)</td></tr>")
+    body.AppendFormat("<tr><th>PO Number</th><td>{0}</td></tr>", purchaseOrderNumber)
+    body.AppendFormat("<tr><th>Order Type</th><td>{0} ({1})</td></tr>", orderType, If(orderType = "850", "New Order", "Order Change"))
+    body.AppendFormat("<tr><th>Contract Number</th><td>{0}</td></tr>", contractNumber)
+    body.AppendFormat("</table><br>")
+
+    body.AppendFormat("<h4>Order Details:</h4>")
+    body.AppendFormat("<table border='1' cellpadding='5' cellspacing='0' style='border-collapse: collapse; width: 100%;'>")
+    body.AppendFormat("<tr><th>Product Code</th><th>Quantity</th><th>Unit Price</th><th>Total Amount</th><th>Requirement Date (SCH05)</th></tr>")
+    body.Append(orderDetails.ToString())
+    body.AppendFormat("</table><br>")
+
+    body.AppendFormat("<h4>Next Steps:</h4>")
+    body.AppendFormat("<ul><li>Please review the order and confirm the details.</li>")
+    body.AppendFormat("<li>If any discrepancies are found, contact AWS Procurement immediately.</li></ul>")
+
+    body.AppendFormat("<p>Best regards,<br>{0} Procurement Team<br>{1}<br>{2}</p>", "{YourCompanyName}", "{YourEmail}", "{YourPhone}")
+    body.AppendFormat("</body></html>")
+
+    Return Tuple.Create(subject, body.ToString())
+End Function
+
+
+---
+
+3. 直接發送 HTML Email
+
+Sub SendEmail(toEmail As String, subject As String, body As String)
+    Dim smtp As New SmtpClient("smtp.example.com")
+    smtp.Credentials = New NetworkCredential("your_email@example.com", "your_password")
+    smtp.EnableSsl = True
+
+    Dim mail As New MailMessage()
+    mail.From = New MailAddress("noreply@example.com")
+    mail.To.Add(toEmail)
+    mail.Subject = subject
+    mail.Body = body
+    mail.IsBodyHtml = True  ' 設定為 HTML 格式
+
+    smtp.Send(mail)
+End Sub
+
+
+---
+
+結論
+
+✅ 使用 HTML 表格，讓 AWS 訂單資訊清晰可讀
+✅ 郵件內容正式、清楚標示「AWS 訂單」
+✅ 適用於 EDI 850 & 860，確保業務能迅速識別
+✅ 自動發送 HTML Email，排版更專業
+
+這樣 AWS 訂單的 Email 美觀、易讀、符合企業標準！
+
+
+
 如果 信件內容要明確告知業務這是 AWS 的訂單，建議在郵件中明確標註客戶名稱，同時保持專業與簡潔的風格。
 
 
