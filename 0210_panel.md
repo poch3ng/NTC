@@ -1,3 +1,219 @@
+你想根據 po1 的數量 自動生成相同數量的 Panel，這可以透過 Request 變數或參數傳遞 po1 值，然後在後端根據這個數值 動態新增 Panel。
+
+
+---
+
+✅ 解決方案
+
+1. 從 Request 取得 po1 的數值
+
+
+2. 根據 po1 產生對應數量的 Panel
+
+
+3. 確保 PostBack 後 Panel 不會消失
+
+
+4. 暫存 Panel 內的資料（可選）
+
+
+
+
+---
+
+🔹 程式碼
+
+Protected Sub Page_Load(ByVal sender As Object, ByVal e As EventArgs) Handles Me.Load
+    If Not IsPostBack Then
+        ' 從 QueryString 或 Request 取得 po1 數量
+        Dim po1Count As Integer = If(Request.QueryString("po1") IsNot Nothing, Convert.ToInt32(Request.QueryString("po1")), 0)
+
+        ' 紀錄 Panel 數量
+        ViewState("PanelCount") = po1Count
+
+        ' 生成對應數量的 Panel
+        GeneratePanels(po1Count)
+    Else
+        ' PostBack 時，重新載入 Panel
+        ReloadPanels()
+    End If
+End Sub
+
+' 產生 Panel
+Private Sub GeneratePanels(po1Count As Integer)
+    Dim panelYOffset As Integer = 10 ' Panel 間距
+
+    For i As Integer = 1 To po1Count
+        Dim newPanel As New Panel()
+        newPanel.ID = "Panel_" & i
+        newPanel.CssClass = "panel"
+        newPanel.BorderStyle = BorderStyle.Solid
+        newPanel.BorderWidth = Unit.Pixel(1)
+        newPanel.Width = Unit.Percentage(100)
+        newPanel.Style("margin-bottom") = "10px"
+
+        ' 生成 Label 與 TextBox
+        Dim lbl As New Label()
+        lbl.Text = "Panel " & i
+        lbl.ID = "lbl_" & i
+        lbl.CssClass = "panel-title"
+        newPanel.Controls.Add(lbl)
+
+        Dim txt As New TextBox()
+        txt.ID = "txt_" & i
+        txt.CssClass = "panel-input"
+        newPanel.Controls.Add(New LiteralControl("<br/>")) ' 換行
+        newPanel.Controls.Add(txt)
+
+        ' 將 Panel 加入 PlaceHolder
+        PlaceHolder1.Controls.Add(newPanel)
+    Next
+End Sub
+
+' PostBack 時還原 Panel
+Private Sub ReloadPanels()
+    Dim po1Count As Integer = If(ViewState("PanelCount") IsNot Nothing, CInt(ViewState("PanelCount")), 0)
+    GeneratePanels(po1Count)
+End Sub
+
+
+---
+
+🔹 說明
+
+1. 從 URL 讀取 po1
+
+透過 Request.QueryString("po1") 取得 po1 的數值
+
+po1 數值代表要 生成的 Panel 數量
+
+例如：http://yourdomain.com/page.aspx?po1=3 → 會生成 3 個 Panel
+
+
+
+2. GeneratePanels(po1Count As Integer)
+
+根據 po1 數值動態產生 Panel
+
+每個 Panel 內有一個 Label 和 TextBox
+
+Panel 間距 margin-bottom: 10px
+
+
+
+3. 確保 PostBack 時不消失
+
+ViewState("PanelCount") 記錄 po1 值
+
+Page_Load() 檢查 IsPostBack，如果是 PostBack，就 重新載入 Panel
+
+
+
+
+
+---
+
+🔹 測試方式
+
+1. 開啟網頁時傳入 po1
+網址示例：
+
+http://yourdomain.com/page.aspx?po1=5
+
+結果：
+
+會自動生成 5 個 Panel
+
+每個 Panel 內有 Label 和 TextBox
+
+
+
+2. 頁面重新整理後 Panel 不會消失
+
+因為 ViewState 記錄了 po1 的數量，PostBack 會自動重建 Panel。
+
+
+
+
+
+---
+
+✅ 進階功能：儲存 Panel 內的輸入資料
+
+如果你希望 暫存使用者填入的數據，可以使用 Session。
+
+📌 修改 Page_Load()
+
+Protected Sub Page_Load(ByVal sender As Object, ByVal e As EventArgs) Handles Me.Load
+    If Not IsPostBack Then
+        Dim po1Count As Integer = If(Request.QueryString("po1") IsNot Nothing, Convert.ToInt32(Request.QueryString("po1")), 0)
+        ViewState("PanelCount") = po1Count
+        GeneratePanels(po1Count)
+    Else
+        ReloadPanels()
+        RestorePanelData()
+    End If
+End Sub
+
+📌 儲存使用者輸入的資料
+
+Protected Sub SavePanelData()
+    Dim panelData As New Dictionary(Of String, String)
+
+    For Each panel As Control In PlaceHolder1.Controls
+        If TypeOf panel Is Panel Then
+            Dim panelId As String = panel.ID
+
+            For Each ctrl As Control In panel.Controls
+                If TypeOf ctrl Is TextBox Then
+                    Dim txt As TextBox = DirectCast(ctrl, TextBox)
+                    panelData(panelId & "_" & txt.ID) = txt.Text
+                End If
+            Next
+        End If
+    Next
+
+    Session("PanelData") = panelData ' 暫存到 Session
+End Sub
+
+📌 還原輸入資料
+
+Private Sub RestorePanelData()
+    If Session("PanelData") IsNot Nothing Then
+        Dim panelData As Dictionary(Of String, String) = DirectCast(Session("PanelData"), Dictionary(Of String, String))
+
+        For Each panel As Control In PlaceHolder1.Controls
+            If TypeOf panel Is Panel Then
+                Dim panelId As String = panel.ID
+
+                For Each ctrl As Control In panel.Controls
+                    If TypeOf ctrl Is TextBox Then
+                        Dim txt As TextBox = DirectCast(ctrl, TextBox)
+                        Dim key As String = panelId & "_" & txt.ID
+                        If panelData.ContainsKey(key) Then
+                            txt.Text = panelData(key) ' 還原 TextBox 內容
+                        End If
+                    End If
+                Next
+            End If
+        Next
+    End If
+End Sub
+
+
+---
+
+🔹 總結
+
+✅ 根據 po1 數量動態產生 Panel
+✅ 確保 PostBack 時 Panel 不消失
+✅ 可以記住並還原 TextBox 內的數據（選擇性儲存）
+✅ 未來可擴展：將 Session 內的資料存入 SQL
+
+這樣你的 Panel 就可以根據 po1 數值 自動生成相同數量的 Panel，並確保 PostBack 不會影響它們！
+
+
+
 是的，你可以直接 複製已經設計好的 Panel，並在 後端（VB.NET）動態產生新的 Panel，然後將它們加入 PlaceHolder 或其他容器內，無需手動重新建立所有 Label 和 TextBox。
 
 
