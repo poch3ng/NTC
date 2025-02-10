@@ -1,3 +1,134 @@
+如果你的 Panel 內包含 純 HTML 的 <table>，以及 td 內的 Style，你可以 動態複製 LiteralControl，並保留所有 HTML Style。
+
+
+---
+
+✅ 解決方案
+
+1. 從 Panel 內的 Table 取得 HTML
+
+
+2. 將 Table 內容轉為 LiteralControl，動態複製
+
+
+3. 確保 td 的 Style 也複製
+
+
+4. PostBack 之後仍能保持 Table 及 td 的 Style
+
+
+
+
+---
+
+🔹 改進 CloneControl() 方法
+
+' ✅ 複製控制項，包括 HTML Table
+Private Function CloneControl(ctrl As Control, prefix As String) As Control
+    If TypeOf ctrl Is LiteralControl Then
+        ' ✅ 複製 LiteralControl（HTML 原始碼）
+        Dim originalLiteral As LiteralControl = DirectCast(ctrl, LiteralControl)
+        Dim newLiteral As New LiteralControl()
+        newLiteral.Text = originalLiteral.Text
+        Return newLiteral
+    ElseIf TypeOf ctrl Is TextBox Then
+        Dim originalTextBox As TextBox = DirectCast(ctrl, TextBox)
+        Dim newTextBox As New TextBox()
+        newTextBox.ID = prefix & "_" & originalTextBox.ID
+        newTextBox.Text = originalTextBox.Text
+        newTextBox.CssClass = originalTextBox.CssClass
+
+        ' ✅ 複製 Style 屬性
+        For Each key As String In originalTextBox.Style.Keys
+            newTextBox.Style(key) = originalTextBox.Style(key)
+        Next
+
+        Return newTextBox
+    ElseIf TypeOf ctrl Is Label Then
+        Dim originalLabel As Label = DirectCast(ctrl, Label)
+        Dim newLabel As New Label()
+        newLabel.ID = prefix & "_" & originalLabel.ID
+        newLabel.Text = originalLabel.Text
+        newLabel.CssClass = originalLabel.CssClass
+
+        ' ✅ 複製 Style 屬性
+        For Each key As String In originalLabel.Style.Keys
+            newLabel.Style(key) = originalLabel.Style(key)
+        Next
+
+        Return newLabel
+    End If
+
+    Return Nothing ' 其他類型的控制項可視需求添加
+End Function
+
+
+---
+
+🔹 ASPX (HTML Table)
+
+<asp:Panel ID="PanelTemplate" runat="server" CssClass="panel" BorderStyle="Solid" BorderWidth="1px" Width="100%" Visible="False">
+    <div style="border: 1px solid black; padding: 10px; background-color: lightgray;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="border: 1px solid black; padding: 10px; background-color: yellow;">
+                    <asp:Label ID="lblTitle" runat="server" Text="標題"></asp:Label>
+                </td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid black; padding: 10px;">
+                    <asp:TextBox ID="txtInput" runat="server" Style="border: 2px solid red; background-color: lightyellow; padding: 5px;"></asp:TextBox>
+                </td>
+            </tr>
+        </table>
+    </div>
+</asp:Panel>
+
+
+---
+
+🔹 改進 ClonePanel() 方法
+
+' ✅ 複製 Panel，包括 HTML 內容
+Private Function ClonePanel(original As Panel, newID As String) As Panel
+    Dim newPanel As New Panel()
+    newPanel.ID = newID
+    newPanel.CssClass = original.CssClass
+    newPanel.BorderStyle = original.BorderStyle
+    newPanel.BorderWidth = original.BorderWidth
+    newPanel.Width = original.Width
+    newPanel.Visible = True ' 讓複製的 Panel 顯示
+
+    ' ✅ 複製 Style 屬性
+    For Each key As String In original.Style.Keys
+        newPanel.Style(key) = original.Style(key)
+    Next
+
+    ' ✅ 複製 Panel 內的所有 HTML 內容
+    For Each ctrl As Control In original.Controls
+        Dim newCtrl As Control = CloneControl(ctrl, newID)
+        If newCtrl IsNot Nothing Then
+            newPanel.Controls.Add(newCtrl)
+        End If
+    Next
+
+    Return newPanel
+End Function
+
+
+---
+
+🔹 測試方式
+
+1. Panel 內的 HTML Table 保持原始結構
+
+
+2. **每個 td 的 Style（邊框
+
+
+
+
+
 如果你的 Panel 內 包含 Table 和 td，並且希望完整複製 Table 內的所有 td 的 Style，你需要 遞迴複製 Panel 內所有控制項（包含 Table、tr、td）。
 
 
