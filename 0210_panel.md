@@ -1,3 +1,169 @@
+你希望 每次新增 Panel 時，附加一個 CheckBox，來控制該 Panel 的 Visible 屬性，這可以透過 動態新增 CheckBox 並為其綁定 CheckedChanged 事件 來實現。
+
+
+---
+
+✅ 解決方案
+
+1. 動態新增 CheckBox，並與 Panel 綁定
+
+
+2. 當 CheckBox 被勾選或取消勾選時，控制對應的 Panel 顯示或隱藏
+
+
+3. 確保 PostBack 之後仍能保留 Panel 及 CheckBox
+
+
+4. 讓 CheckBox 影響對應 Panel 的 Visible
+
+
+
+
+---
+
+🔹 更新 ClonePanel() 方法
+
+' ✅ 複製 Panel 並新增 CheckBox 控制其顯示
+Private Function ClonePanel(original As Panel, newID As String) As Panel
+    Dim newPanel As New Panel()
+    newPanel.ID = newID
+    newPanel.CssClass = original.CssClass
+    newPanel.BorderStyle = original.BorderStyle
+    newPanel.BorderWidth = original.BorderWidth
+    newPanel.Width = original.Width
+    newPanel.Visible = True ' 讓複製的 Panel 預設顯示
+
+    ' ✅ 複製 Style 屬性
+    For Each key As String In original.Style.Keys
+        newPanel.Style(key) = original.Style(key)
+    Next
+
+    ' ✅ 複製 Panel 內的所有控制項
+    For Each ctrl As Control In original.Controls
+        Dim newCtrl As Control = CloneControl(ctrl, newID)
+        If newCtrl IsNot Nothing Then
+            newPanel.Controls.Add(newCtrl)
+        End If
+    Next
+
+    ' ✅ 新增對應的 CheckBox
+    Dim newCheckBox As New CheckBox()
+    newCheckBox.ID = "chk_" & newID
+    newCheckBox.Text = "顯示/隱藏 " & newID
+    newCheckBox.AutoPostBack = True ' 讓 CheckBox 變更時觸發 PostBack
+    AddHandler newCheckBox.CheckedChanged, AddressOf CheckBox_Changed ' 綁定事件
+
+    ' ✅ 在 PlaceHolder 加入 CheckBox 與 Panel
+    PlaceHolder1.Controls.Add(newCheckBox)
+    PlaceHolder1.Controls.Add(new LiteralControl("<br/>")) ' 換行
+    PlaceHolder1.Controls.Add(newPanel)
+
+    ' 記錄 CheckBox 與 Panel 的關聯
+    ViewState(newCheckBox.ID) = newPanel.ID
+
+    Return newPanel
+End Function
+
+
+---
+
+🔹 新增 CheckBox_Changed() 事件
+
+' ✅ 當 CheckBox 被勾選/取消時，控制對應的 Panel 顯示或隱藏
+Protected Sub CheckBox_Changed(sender As Object, e As EventArgs)
+    Dim chk As CheckBox = CType(sender, CheckBox)
+    If ViewState(chk.ID) IsNot Nothing Then
+        Dim panelID As String = ViewState(chk.ID).ToString()
+        Dim targetPanel As Panel = CType(FindControl(panelID), Panel)
+        If targetPanel IsNot Nothing Then
+            targetPanel.Visible = chk.Checked
+        End If
+    End If
+End Sub
+
+
+---
+
+🔹 Page_Load() 更新
+
+Protected Sub Page_Load(ByVal sender As Object, ByVal e As EventArgs) Handles Me.Load
+    If Not IsPostBack Then
+        PanelTemplate.Visible = False
+
+        ' 取得 po1 數量
+        Dim po1Count As Integer = If(Request.QueryString("po1") IsNot Nothing, Convert.ToInt32(Request.QueryString("po1")), 0)
+
+        ' 記錄 Panel 數量
+        ViewState("PanelCount") = po1Count
+
+        ' 依照 po1 生成 Panel
+        If po1Count > 0 Then
+            GeneratePanels(po1Count)
+        End If
+    Else
+        ReloadPanels()
+    End If
+End Sub
+
+
+---
+
+🔹 更新 ReloadPanels()
+
+' ✅ 重新載入 Panel 及 CheckBox
+Private Sub ReloadPanels()
+    Dim po1Count As Integer = If(ViewState("PanelCount") IsNot Nothing, CInt(ViewState("PanelCount")), 0)
+
+    For i As Integer = 1 To po1Count
+        Dim newPanel As Panel = ClonePanel(PanelTemplate, "Panel_" & i)
+
+        ' ✅ 重新載入 CheckBox 的狀態
+        Dim chk As CheckBox = CType(FindControl("chk_Panel_" & i), CheckBox)
+        If chk IsNot Nothing AndAlso ViewState(chk.ID) IsNot Nothing Then
+            newPanel.Visible = chk.Checked
+        End If
+    Next
+End Sub
+
+
+---
+
+🔹 測試方式
+
+1. 點擊「新增 Panel」按鈕
+
+新增 Panel
+
+同時新增 CheckBox
+
+CheckBox 可以控制對應的 Panel 顯示/隱藏
+
+
+
+2. CheckBox 狀態保持
+
+勾選/取消 CheckBox
+
+對應的 Panel 會顯示或隱藏
+
+PostBack 之後狀態不會消失
+
+
+
+
+
+---
+
+✅ 結論
+
+✅ 每次新增 Panel，會同時新增 CheckBox
+✅ CheckBox 控制對應 Panel 的 Visible 屬性
+✅ PostBack 之後仍能保留 CheckBox 與 Panel 狀態
+
+這樣你的 ASP.NET WebForm 可以動態新增 Panel，並讓 CheckBox 控制對應的 Panel 是否顯示！
+
+
+
 如果你的 Panel 內包含 純 HTML 的 <table>，以及 td 內的 Style，你可以 動態複製 LiteralControl，並保留所有 HTML Style。
 
 
