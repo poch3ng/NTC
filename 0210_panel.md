@@ -1,3 +1,147 @@
+是的，在 ASP.NET WebForms 中，如果 Panel 被放置在 ContentPlaceHolder（例如 MasterPage）內，FindControl("Panel_1") 可能會 無法找到控制項，因為 ASP.NET 動態產生的 ID 會變更，例如：
+
+ctl00_ContentPlaceHolder1_Panel_1
+
+這導致 FindControl("Panel_1") 無法正確查找。
+
+
+---
+
+✅ 解決方案
+
+1. 使用 RecursiveFindControl() 方法來遞迴查找 Panel
+
+
+2. 確保 CheckBox 存入的 ViewState 是完整的 ClientID
+
+
+3. 確保 FindControl 查找時，考慮 ContentPlaceHolder
+
+
+
+
+---
+
+🔹 改進 FindControl() 方法
+
+解法 1：使用 RecursiveFindControl()
+
+' ✅ 遞迴查找控制項，避免因為 `ContentPlaceHolder` 變更 ID 而找不到
+Private Function RecursiveFindControl(root As Control, id As String) As Control
+    If root.ID = id Then
+        Return root
+    End If
+    For Each child As Control In root.Controls
+        Dim found As Control = RecursiveFindControl(child, id)
+        If found IsNot Nothing Then
+            Return found
+        End If
+    Next
+    Return Nothing
+End Function
+
+解法 2：改進 CheckBox_Changed() 事件
+
+' ✅ `CheckBox` 變更時，透過 `RecursiveFindControl()` 查找 `Panel`
+Protected Sub CheckBox_Changed(sender As Object, e As EventArgs)
+    Dim chk As CheckBox = CType(sender, CheckBox)
+    If ViewState(chk.ID) IsNot Nothing Then
+        Dim panelID As String = ViewState(chk.ID).ToString()
+        
+        ' 遞迴尋找 Panel，避免 ID 變更導致無法找到
+        Dim targetPanel As Panel = CType(RecursiveFindControl(Me, panelID), Panel)
+        If targetPanel IsNot Nothing Then
+            targetPanel.Visible = chk.Checked
+        End If
+    End If
+End Sub
+
+
+---
+
+🔹 改進 ClonePanel() 方法
+
+' ✅ 複製 Panel 並新增 CheckBox 控制其顯示
+Private Function ClonePanel(original As Panel, newID As String) As Panel
+    Dim newPanel As New Panel()
+    newPanel.ID = newID
+    newPanel.CssClass = original.CssClass
+    newPanel.BorderStyle = original.BorderStyle
+    newPanel.BorderWidth = originalBorderWidth
+    newPanel.Width = original.Width
+    newPanel.Visible = True ' 預設顯示
+
+    ' ✅ 複製 Style 屬性
+    For Each key As String In original.Style.Keys
+        newPanel.Style(key) = original.Style(key)
+    Next
+
+    ' ✅ 複製 Panel 內的所有控制項
+    For Each ctrl As Control In original.Controls
+        Dim newCtrl As Control = CloneControl(ctrl, newID)
+        If newCtrl IsNot Nothing Then
+            newPanel.Controls.Add(newCtrl)
+        End If
+    Next
+
+    ' ✅ 新增對應的 CheckBox
+    Dim newCheckBox As New CheckBox()
+    newCheckBox.ID = "chk_" & newID
+    newCheckBox.Text = "顯示/隱藏 " & newID
+    newCheckBox.AutoPostBack = True ' 讓 CheckBox 變更時觸發 PostBack
+    AddHandler newCheckBox.CheckedChanged, AddressOf CheckBox_Changed ' 綁定事件
+
+    ' ✅ 在 PlaceHolder 加入 CheckBox 與 Panel
+    PlaceHolder1.Controls.Add(newCheckBox)
+    PlaceHolder1.Controls.Add(New LiteralControl("<br/>")) ' 換行
+    PlaceHolder1.Controls.Add(newPanel)
+
+    ' 記錄 CheckBox 與 Panel 的關聯（存入完整 `ClientID`）
+    ViewState(newCheckBox.ID) = newPanel.ClientID
+
+    Return newPanel
+End Function
+
+
+---
+
+🔹 測試方式
+
+1. 點擊「新增 Panel」按鈕
+
+新增 Panel
+
+同時新增 CheckBox
+
+CheckBox 可以控制對應的 Panel 顯示/隱藏
+
+
+
+2. CheckBox 狀態保持
+
+勾選/取消 CheckBox
+
+對應的 Panel 會顯示或隱藏
+
+PostBack 之後狀態不會消失
+
+
+
+
+
+---
+
+✅ 結論
+
+✅ 使用 RecursiveFindControl() 確保 FindControl() 能找到 Panel
+✅ CheckBox 變更時能正確控制對應的 Panel
+✅ 解決 ContentPlaceHolder 影響 Panel 的 ID 問題
+✅ PostBack 之後仍能保持 Panel 與 CheckBox 的關聯
+
+這樣你的 ASP.NET WebForm 可以在 MasterPage + ContentPlaceHolder 內動態新增 Panel，並讓 CheckBox 控制對應 Panel 的顯示！
+
+
+
 你希望 每次新增 Panel 時，附加一個 CheckBox，來控制該 Panel 的 Visible 屬性，這可以透過 動態新增 CheckBox 並為其綁定 CheckedChanged 事件 來實現。
 
 
