@@ -1,3 +1,194 @@
+如果你的 Panel 內 包含 Table 和 td，並且希望完整複製 Table 內的所有 td 的 Style，你需要 遞迴複製 Panel 內所有控制項（包含 Table、tr、td）。
+
+
+---
+
+✅ 解決方案
+
+1. 確保 Panel 內的 Table 結構不變
+
+
+2. 遞迴複製 Table 及其內部的 tr、td，保留 Style
+
+
+3. 確保 TextBox、Label、DropDownList 也完整複製
+
+
+4. 在 PostBack 之後仍能保持 Table 及 td 的 Style
+
+
+
+
+---
+
+🔹 改進 CloneControl() 方法
+
+' ✅ 遞迴複製控制項，包含 Table、tr、td
+Private Function CloneControl(ctrl As Control, prefix As String) As Control
+    If TypeOf ctrl Is Table Then
+        Dim originalTable As Table = DirectCast(ctrl, Table)
+        Dim newTable As New Table()
+        newTable.ID = prefix & "_" & originalTable.ID
+        newTable.CssClass = originalTable.CssClass
+
+        ' ✅ 複製 Style 屬性
+        For Each key As String In originalTable.Style.Keys
+            newTable.Style(key) = originalTable.Style(key)
+        Next
+
+        ' ✅ 複製 Table 內的 tr 和 td
+        For Each row As TableRow In originalTable.Rows
+            Dim newRow As New TableRow()
+            For Each cell As TableCell In row.Cells
+                Dim newCell As New TableCell()
+
+                ' ✅ 複製 td 的 Style
+                For Each key As String In cell.Style.Keys
+                    newCell.Style(key) = cell.Style(key)
+                Next
+
+                ' ✅ 複製 td 內的所有控制項
+                For Each innerCtrl As Control In cell.Controls
+                    Dim newInnerCtrl As Control = CloneControl(innerCtrl, prefix)
+                    If newInnerCtrl IsNot Nothing Then
+                        newCell.Controls.Add(newInnerCtrl)
+                    End If
+                Next
+
+                newRow.Cells.Add(newCell)
+            Next
+            newTable.Rows.Add(newRow)
+        Next
+
+        Return newTable
+
+    ElseIf TypeOf ctrl Is TableRow Then
+        Dim originalRow As TableRow = DirectCast(ctrl, TableRow)
+        Dim newRow As New TableRow()
+
+        ' ✅ 複製 tr 內的 td
+        For Each cell As TableCell In originalRow.Cells
+            Dim newCell As New TableCell()
+            newCell.Text = cell.Text
+
+            ' ✅ 複製 td 的 Style
+            For Each key As String In cell.Style.Keys
+                newCell.Style(key) = cell.Style(key)
+            Next
+
+            newRow.Cells.Add(newCell)
+        Next
+
+        Return newRow
+
+    ElseIf TypeOf ctrl Is TableCell Then
+        Dim originalCell As TableCell = DirectCast(ctrl, TableCell)
+        Dim newCell As New TableCell()
+        newCell.Text = originalCell.Text
+
+        ' ✅ 複製 td 的 Style
+        For Each key As String In originalCell.Style.Keys
+            newCell.Style(key) = originalCell.Style(key)
+        Next
+
+        Return newCell
+
+    ElseIf TypeOf ctrl Is TextBox Then
+        Dim originalTextBox As TextBox = DirectCast(ctrl, TextBox)
+        Dim newTextBox As New TextBox()
+        newTextBox.ID = prefix & "_" & originalTextBox.ID
+        newTextBox.Text = originalTextBox.Text
+        newTextBox.CssClass = originalTextBox.CssClass
+
+        ' ✅ 複製 Style 屬性
+        For Each key As String In originalTextBox.Style.Keys
+            newTextBox.Style(key) = originalTextBox.Style(key)
+        Next
+
+        Return newTextBox
+
+    ElseIf TypeOf ctrl Is Label Then
+        Dim originalLabel As Label = DirectCast(ctrl, Label)
+        Dim newLabel As New Label()
+        newLabel.ID = prefix & "_" & originalLabel.ID
+        newLabel.Text = originalLabel.Text
+        newLabel.CssClass = originalLabel.CssClass
+
+        ' ✅ 複製 Style 屬性
+        For Each key As String In originalLabel.Style.Keys
+            newLabel.Style(key) = originalLabel.Style(key)
+        Next
+
+        Return newLabel
+
+    ElseIf TypeOf ctrl Is DropDownList Then
+        Dim originalDropDown As DropDownList = DirectCast(ctrl, DropDownList)
+        Dim newDropDown As New DropDownList()
+        newDropDown.ID = prefix & "_" & originalDropDown.ID
+        newDropDown.CssClass = originalDropDown.CssClass
+
+        ' ✅ 複製 Style 屬性
+        For Each key As String In originalDropDown.Style.Keys
+            newDropDown.Style(key) = originalDropDown.Style(key)
+        Next
+
+        ' 複製選項
+        For Each item As ListItem In originalDropDown.Items
+            newDropDown.Items.Add(New ListItem(item.Text, item.Value))
+        Next
+
+        Return newDropDown
+    End If
+
+    Return Nothing ' 其他類型的控制項可視需求添加
+End Function
+
+
+---
+
+🔹 ASPX 範例
+
+<asp:Panel ID="PanelTemplate" runat="server" CssClass="panel" BorderStyle="Solid" BorderWidth="1px" Width="100%" Visible="False">
+    <asp:Table ID="tblMain" runat="server" CssClass="table-style" Style="border-collapse: collapse; width: 100%; border: 1px solid black;">
+        <asp:TableRow>
+            <asp:TableCell Style="border: 1px solid black; padding: 10px; background-color: lightgray;">
+                <asp:Label ID="lblTitle" runat="server" Text="標題"></asp:Label>
+            </asp:TableCell>
+        </asp:TableRow>
+        <asp:TableRow>
+            <asp:TableCell Style="border: 1px solid black; padding: 10px;">
+                <asp:TextBox ID="txtInput" runat="server" Style="border: 2px solid red; background-color: lightyellow; padding: 5px;"></asp:TextBox>
+            </asp:TableCell>
+        </asp:TableRow>
+        <asp:TableRow>
+            <asp:TableCell Style="border: 1px solid black; padding: 10px;">
+                <asp:DropDownList ID="ddlOptions" runat="server" Style="width: 200px; font-weight: bold;">
+                    <asp:ListItem Text="選項 1" Value="1"></asp:ListItem>
+                    <asp:ListItem Text="選項 2" Value="2"></asp:ListItem>
+                    <asp:ListItem Text="選項 3" Value="3"></asp:ListItem>
+                </asp:DropDownList>
+            </asp:TableCell>
+        </asp:TableRow>
+    </asp:Table>
+</asp:Panel>
+
+
+---
+
+🔹 測試結果
+
+1. Panel 內的 Table 保持原始結構
+
+
+2. 每個 td 的 Style（邊框、背景色、padding）完整複製
+
+
+3. **TextBox
+
+
+
+
+
 如果你希望 複製 Panel 內所有控制項的 Style，可以在 CloneControl() 方法中 將原本 TextBox、Label、DropDownList 等控制項的 Style 屬性完整複製到新控制項。
 
 
