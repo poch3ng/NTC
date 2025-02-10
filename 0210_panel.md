@@ -1,3 +1,104 @@
+如果你希望 複製 Panel 內所有控制項的 Style，可以在 CloneControl() 方法中 將原本 TextBox、Label、DropDownList 等控制項的 Style 屬性完整複製到新控制項。
+
+
+---
+
+🔹 改進 CloneControl() 方法
+
+' ✅ 複製控制項，包含 CSSClass 和 Style
+Private Function CloneControl(ctrl As Control, prefix As String) As Control
+    If TypeOf ctrl Is TextBox Then
+        Dim originalTextBox As TextBox = DirectCast(ctrl, TextBox)
+        Dim newTextBox As New TextBox()
+        newTextBox.ID = prefix & "_" & originalTextBox.ID
+        newTextBox.Text = originalTextBox.Text
+        newTextBox.CssClass = originalTextBox.CssClass
+
+        ' ✅ 複製 Style 屬性
+        For Each key As String In originalTextBox.Style.Keys
+            newTextBox.Style(key) = originalTextBox.Style(key)
+        Next
+
+        Return newTextBox
+
+    ElseIf TypeOf ctrl Is Label Then
+        Dim originalLabel As Label = DirectCast(ctrl, Label)
+        Dim newLabel As New Label()
+        newLabel.ID = prefix & "_" & originalLabel.ID
+        newLabel.Text = originalLabel.Text
+        newLabel.CssClass = originalLabel.CssClass
+
+        ' ✅ 複製 Style 屬性
+        For Each key As String In originalLabel.Style.Keys
+            newLabel.Style(key) = originalLabel.Style(key)
+        Next
+
+        Return newLabel
+
+    ElseIf TypeOf ctrl Is DropDownList Then
+        Dim originalDropDown As DropDownList = DirectCast(ctrl, DropDownList)
+        Dim newDropDown As New DropDownList()
+        newDropDown.ID = prefix & "_" & originalDropDown.ID
+        newDropDown.CssClass = originalDropDown.CssClass
+
+        ' ✅ 複製 Style 屬性
+        For Each key As String In originalDropDown.Style.Keys
+            newDropDown.Style(key) = originalDropDown.Style(key)
+        Next
+
+        ' 複製選項
+        For Each item As ListItem In originalDropDown.Items
+            newDropDown.Items.Add(New ListItem(item.Text, item.Value))
+        Next
+
+        Return newDropDown
+    End If
+
+    Return Nothing ' 其他類型的控制項可視需求添加
+End Function
+
+
+---
+
+🔹 說明
+
+1. 完整複製 Style 屬性
+
+For Each key As String In originalTextBox.Style.Keys
+    newTextBox.Style(key) = originalTextBox.Style(key)
+Next
+
+這段程式碼會遍歷 原本的控制項（如 TextBox、Label、DropDownList）的 Style，並將它們逐一 複製到新控制項。
+
+確保 font-size、color、background-color、margin、padding 等樣式不變。
+
+
+
+2. 完整支援
+
+TextBox
+
+Label
+
+DropDownList
+
+你可以擴展到其他 Web 控制項，如 Button、CheckBox 等。
+
+
+
+
+
+---
+
+🔹 測試方式
+
+在 PanelTemplate 設定一些 Style
+
+<asp:Panel ID="PanelTemplate" runat="server" CssClass="panel" BorderStyle="Solid" BorderWidth="1px" Width="100%" Visible="False">
+    <asp:Label ID="lblTitle" runat="server
+
+
+
 如果你的 aspx 已經有一個設計好的 Panel，而你希望 根據 po1 數量動態複製這個 Panel，你可以使用 動態複製控制項的方法 來達成。
 
 
