@@ -1,3 +1,225 @@
+如果你的 aspx 已經有一個設計好的 Panel，而你希望 根據 po1 數量動態複製這個 Panel，你可以使用 動態複製控制項的方法 來達成。
+
+
+---
+
+✅ 解決方案
+
+1. 使用 FindControl 取得已存在的 Panel
+
+
+2. 複製 Panel 內的所有控制項
+
+
+3. 確保 PostBack 時不會消失
+
+
+4. 保持 TextBox 內的輸入值
+
+
+
+
+---
+
+🔹 程式碼
+
+Protected Sub Page_Load(ByVal sender As Object, ByVal e As EventArgs) Handles Me.Load
+    If Not IsPostBack Then
+        ' 從 QueryString 或 Request 取得 po1 數量
+        Dim po1Count As Integer = If(Request.QueryString("po1") IsNot Nothing, Convert.ToInt32(Request.QueryString("po1")), 0)
+
+        ' 紀錄 Panel 數量
+        ViewState("PanelCount") = po1Count
+
+        ' 生成對應數量的 Panel
+        DuplicatePanels(po1Count)
+    Else
+        ' PostBack 時，重新載入 Panel
+        ReloadPanels()
+    End If
+End Sub
+
+' ✅ 根據 po1 數量複製現有 Panel
+Private Sub DuplicatePanels(po1Count As Integer)
+    Dim originalPanel As Panel = CType(FindControl("PanelTemplate"), Panel)
+
+    If originalPanel IsNot Nothing Then
+        For i As Integer = 1 To po1Count
+            Dim newPanel As Panel = ClonePanel(originalPanel, "Panel_" & i)
+            PlaceHolder1.Controls.Add(newPanel)
+        Next
+    End If
+End Sub
+
+' ✅ 複製 Panel
+Private Function ClonePanel(original As Panel, newID As String) As Panel
+    Dim newPanel As New Panel()
+    newPanel.ID = newID
+    newPanel.CssClass = original.CssClass
+    newPanel.BorderStyle = original.BorderStyle
+    newPanel.BorderWidth = original.BorderWidth
+    newPanel.Width = original.Width
+    newPanel.Style("margin-bottom") = "10px"
+
+    ' 複製 Panel 內的所有控制項
+    For Each ctrl As Control In original.Controls
+        Dim newCtrl As Control = CloneControl(ctrl, newID)
+        If newCtrl IsNot Nothing Then
+            newPanel.Controls.Add(newCtrl)
+        End If
+    Next
+
+    Return newPanel
+End Function
+
+' ✅ 複製 Label、TextBox、DropDownList
+Private Function CloneControl(ctrl As Control, prefix As String) As Control
+    If TypeOf ctrl Is TextBox Then
+        Dim originalTextBox As TextBox = DirectCast(ctrl, TextBox)
+        Dim newTextBox As New TextBox()
+        newTextBox.ID = prefix & "_" & originalTextBox.ID
+        newTextBox.Text = originalTextBox.Text
+        newTextBox.CssClass = originalTextBox.CssClass
+        Return newTextBox
+    ElseIf TypeOf ctrl Is Label Then
+        Dim originalLabel As Label = DirectCast(ctrl, Label)
+        Dim newLabel As New Label()
+        newLabel.ID = prefix & "_" & originalLabel.ID
+        newLabel.Text = originalLabel.Text
+        newLabel.CssClass = originalLabel.CssClass
+        Return newLabel
+    ElseIf TypeOf ctrl Is DropDownList Then
+        Dim originalDropDown As DropDownList = DirectCast(ctrl, DropDownList)
+        Dim newDropDown As New DropDownList()
+        newDropDown.ID = prefix & "_" & originalDropDown.ID
+        newDropDown.CssClass = originalDropDown.CssClass
+
+        ' 複製選項
+        For Each item As ListItem In originalDropDown.Items
+            newDropDown.Items.Add(New ListItem(item.Text, item.Value))
+        Next
+
+        Return newDropDown
+    End If
+
+    Return Nothing ' 其他類型的控制項可視需求添加
+End Function
+
+' ✅ PostBack 時還原 Panel
+Private Sub ReloadPanels()
+    Dim po1Count As Integer = If(ViewState("PanelCount") IsNot Nothing, CInt(ViewState("PanelCount")), 0)
+    DuplicatePanels(po1Count)
+End Sub
+
+
+---
+
+🔹 ASPX 範例
+
+<asp:Panel ID="PanelTemplate" runat="server" CssClass="panel" BorderStyle="Solid" BorderWidth="1px" Width="100%">
+    <asp:Label ID="lblTitle" runat="server" Text="標題"></asp:Label>
+    <br />
+    <asp:TextBox ID="txtInput" runat="server"></asp:TextBox>
+    <br />
+    <asp:DropDownList ID="ddlOptions" runat="server">
+        <asp:ListItem Text="選項 1" Value="1"></asp:ListItem>
+        <asp:ListItem Text="選項 2" Value="2"></asp:ListItem>
+        <asp:ListItem Text="選項 3" Value="3"></asp:ListItem>
+    </asp:DropDownList>
+</asp:Panel>
+
+<asp:PlaceHolder ID="PlaceHolder1" runat="server"></asp:PlaceHolder>
+
+<asp:Button ID="btnSave" runat="server" Text="儲存" OnClick="SavePanelData"/>
+
+
+---
+
+🔹 進階：儲存 Panel 內的輸入資料
+
+如果你希望 暫存使用者填入的數據，可以使用 Session。
+
+📌 儲存使用者輸入的資料
+
+Protected Sub SavePanelData()
+    Dim panelData As New Dictionary(Of String, String)
+
+    For Each panel As Control In PlaceHolder1.Controls
+        If TypeOf panel Is Panel Then
+            Dim panelId As String = panel.ID
+
+            For Each ctrl As Control In panel.Controls
+                If TypeOf ctrl Is TextBox Then
+                    Dim txt As TextBox = DirectCast(ctrl, TextBox)
+                    panelData(panelId & "_" & txt.ID) = txt.Text
+                ElseIf TypeOf ctrl Is DropDownList Then
+                    Dim ddl As DropDownList = DirectCast(ctrl, DropDownList)
+                    panelData(panelId & "_" & ddl.ID) = ddl.SelectedValue
+                End If
+            Next
+        End If
+    Next
+
+    Session("PanelData") = panelData ' 暫存到 Session
+End Sub
+
+📌 還原輸入資料
+
+Private Sub RestorePanelData()
+    If Session("PanelData") IsNot Nothing Then
+        Dim panelData As Dictionary(Of String, String) = DirectCast(Session("PanelData"), Dictionary(Of String, String))
+
+        For Each panel As Control In PlaceHolder1.Controls
+            If TypeOf panel Is Panel Then
+                Dim panelId As String = panel.ID
+
+                For Each ctrl As Control In panel.Controls
+                    If TypeOf ctrl Is TextBox Then
+                        Dim txt As TextBox = DirectCast(ctrl, TextBox)
+                        Dim key As String = panelId & "_" & txt.ID
+                        If panelData.ContainsKey(key) Then
+                            txt.Text = panelData(key) ' 還原 TextBox 內容
+                        End If
+                    ElseIf TypeOf ctrl Is DropDownList Then
+                        Dim ddl As DropDownList = DirectCast(ctrl, DropDownList)
+                        Dim key As String = panelId & "_" & ddl.ID
+                        If panelData.ContainsKey(key) Then
+                            ddl.SelectedValue = panelData(key) ' 還原選擇的值
+                        End If
+                    End If
+                Next
+            End If
+        Next
+    End If
+End Sub
+
+📌 更新 Page_Load()
+
+Protected Sub Page_Load(ByVal sender As Object, ByVal e As EventArgs) Handles Me.Load
+    If Not IsPostBack Then
+        Dim po1Count As Integer = If(Request.QueryString("po1") IsNot Nothing, Convert.ToInt32(Request.QueryString("po1")), 0)
+        ViewState("PanelCount") = po1Count
+        DuplicatePanels(po1Count)
+    Else
+        ReloadPanels()
+        RestorePanelData() ' 還原輸入值
+    End If
+End Sub
+
+
+---
+
+🔹 結果
+
+✅ 根據 po1 數量動態複製 Panel
+✅ 複製 Label、TextBox、DropDownList
+✅ PostBack 不會消失
+✅ 輸入資料可暫存並還原
+
+這樣你的 ASP.NET WebForm 就能 根據 po1 數量，自動複製現有的 Panel，並保持 PostBack 後的數據！
+
+
+
 你想根據 po1 的數量 自動生成相同數量的 Panel，這可以透過 Request 變數或參數傳遞 po1 值，然後在後端根據這個數值 動態新增 Panel。
 
 
