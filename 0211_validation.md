@@ -1,5 +1,197 @@
 ✅ 目標
 
+1. 檢查 Panel 內的 itemNo 是否存在於 dtsDetailItem（DataSet）中
+
+
+2. 如果 itemNo 不存在，顯示錯誤訊息
+
+
+3. 確保 PostBack 之後仍能保持 Panel 和 TextBox 狀態
+
+
+4. 整合 Quantity 檢核邏輯
+
+
+
+
+---
+
+🔹 解決方案
+
+1. 從 ViewState("dtsDetailItem") 取得 DataTable
+
+
+2. 遍歷 Panel 內的 itemNo
+
+
+3. 比對 dtsDetailItem 是否包含該 itemNo
+
+
+4. 如果 itemNo 不存在，顯示錯誤
+
+
+5. 如果 itemNo 存在，再檢查 Quantity 總和
+
+
+
+
+---
+
+✅ 1️⃣ ValidateItemNumbersAndQuantities() - 驗證 itemNo 是否存在且數量正確
+
+' ✅ 檢查 itemNo 是否存在於 dtsDetailItem，並檢查數量
+Private Sub ValidateItemNumbersAndQuantities()
+    Dim dtPo1 As DataTable = CType(ViewState("dtsDetailItem"), DataTable)
+    Dim itemQuantitySum As New Dictionary(Of String, Integer) ' 存放 itemNo 的加總數量
+    Dim existingItemNos As New HashSet(Of String) ' 存放 dtsDetailItem 內的 itemNo
+    Dim errors As New List(Of String) ' 儲存錯誤訊息
+
+    ' ✅ 取得所有 dtsDetailItem 內的 itemNo
+    For Each row As DataRow In dtPo1.Rows
+        existingItemNos.Add(row("ID").ToString())
+    Next
+
+    ' ✅ 遍歷所有 Panel，檢查 itemNo 是否存在於 dtsDetailItem 並累加數量
+    For Each ctrl As Control In PlaceHolder1.Controls
+        If TypeOf ctrl Is Panel Then
+            Dim panel As Panel = CType(ctrl, Panel)
+            Dim txtID As TextBox = CType(RecursiveFindControl(panel, "txt_ID_" & panel.ID), TextBox)
+            Dim txtQuantity As TextBox = CType(RecursiveFindControl(panel, "txt_Quantity_" & panel.ID), TextBox)
+
+            If txtID IsNot Nothing AndAlso txtQuantity IsNot Nothing Then
+                Dim itemNo As String = txtID.Text.Trim()
+                Dim quantity As Integer = 0
+                Integer.TryParse(txtQuantity.Text.Trim(), quantity)
+
+                ' ✅ 檢查 itemNo 是否存在
+                If Not existingItemNos.Contains(itemNo) Then
+                    errors.Add($"錯誤：ItemNo {itemNo} 不存在於原始資料內！")
+                Else
+                    ' ✅ 累加相同 itemNo 的數量
+                    If itemQuantitySum.ContainsKey(itemNo) Then
+                        itemQuantitySum(itemNo) += quantity
+                    Else
+                        itemQuantitySum(itemNo) = quantity
+                    End If
+                End If
+            End If
+        End If
+    Next
+
+    ' ✅ 檢查數量是否匹配
+    For Each row As DataRow In dtPo1.Rows
+        Dim itemNo As String = row("ID").ToString()
+        Dim originalQuantity As Integer = Convert.ToInt32(row("Quantity"))
+
+        ' ✅ 比對加總數量與原始數量
+        If itemQuantitySum.ContainsKey(itemNo) AndAlso itemQuantitySum(itemNo) <> originalQuantity Then
+            errors.Add($"錯誤：ItemNo {itemNo} 的數量總和 ({itemQuantitySum(itemNo)}) 與原始數量 ({originalQuantity}) 不符！")
+        End If
+    Next
+
+    ' ✅ 顯示驗證結果
+    If errors.Count > 0 Then
+        lblValidationResult.Text = String.Join("<br/>", errors)
+        lblValidationResult.ForeColor = System.Drawing.Color.Red
+    Else
+        lblValidationResult.Text = "所有數量驗證成功，且所有 itemNo 存在！"
+        lblValidationResult.ForeColor = System.Drawing.Color.Green
+    End If
+End Sub
+
+
+---
+
+✅ 2️⃣ btnConfirm_Click() - 點擊確認按鈕時執行檢核
+
+' ✅ 點擊「確認」按鈕時執行檢核
+Protected Sub btnConfirm_Click(sender As Object, e As EventArgs)
+    ValidateItemNumbersAndQuantities()
+End Sub
+
+
+---
+
+✅ 3️⃣ Page_Load() - 確保「確認」按鈕存在
+
+Protected Sub Page_Load(ByVal sender As Object, ByVal e As EventArgs) Handles Me.Load
+    If Not IsPostBack Then
+        PanelTemplate.Visible = False
+
+        ' ✅ 初始化可刪除的 Panel 列表
+        ViewState("DeletablePanels") = New List(Of String)
+
+        ' ✅ 從 `dtsDetailItem` 取得 `po1`
+        LoadPo1FromDataSet()
+
+        ' ✅ 取得 `po1` 數量
+        Dim po1Count As Integer = CType(ViewState("PanelCount"), Integer)
+
+        ' ✅ 依照 `po1` 生成 `Panel`
+        If po1Count > 0 Then
+            GeneratePanels(po1Count) ' ✅ 這些 Panel 不可刪除
+        End If
+    Else
+        ReloadPanels() ' ✅ PostBack 之後重新載入 `Panel` 和 `CheckBox`
+    End If
+
+    ' ✅ 確保「確認」按鈕存在
+    If PlaceHolder1.FindControl("btnConfirm") Is Nothing Then
+        Dim btnConfirm As New Button()
+        btnConfirm.ID = "btnConfirm"
+        btnConfirm.Text = "確認"
+        AddHandler btnConfirm.Click, AddressOf btnConfirm_Click
+        PlaceHolder1.Controls.Add(New LiteralControl("<br/>"))
+        PlaceHolder1.Controls.Add(btnConfirm)
+
+        ' ✅ 顯示驗證結果的 Label
+        Dim lblValidation As New Label()
+        lblValidation.ID = "lblValidationResult"
+        PlaceHolder1.Controls.Add(New LiteralControl("<br/>"))
+        PlaceHolder1.Controls.Add(lblValidation)
+    End If
+End Sub
+
+
+---
+
+✅ 測試方式
+
+1. 點擊「複製」按鈕，允許拆分 itemNo
+
+
+2. 手動輸入 Quantity
+
+
+3. 嘗試輸入不存在於 dtsDetailItem 的 itemNo
+
+
+4. 點擊「確認」按鈕
+
+如果 itemNo 存在且數量正確，顯示綠色成功訊息
+
+如果 itemNo 不存在或數量不符，顯示紅色錯誤訊息
+
+
+
+5. PostBack 之後仍能保持 Panel 和 TextBox 狀態
+
+
+
+
+---
+
+✅ 結論
+
+✅ 檢查 Panel 內的 itemNo 是否存在於 dtsDetailItem
+✅ 檢查 Panel 內的 Quantity 是否等於 dtsDetailItem 的 Quantity
+✅ 點擊「確認」按鈕時檢查所有數據
+✅ PostBack 之後仍保持 Panel 和 TextBox 狀態 🚀
+
+
+
+✅ 目標
+
 1. 新增「確認」按鈕
 
 
