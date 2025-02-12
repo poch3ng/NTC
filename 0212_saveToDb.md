@@ -1,5 +1,206 @@
 ✅ 目標
 
+1. 當存入資料庫時，找出 itemNo 對應的 AWSPartNo、NTCPartNo
+
+
+2. 這些值來自 dtsDetailItem（DataSet）
+
+
+3. 將 AWSPartNo、NTCPartNo 一起存入資料庫
+
+
+4. 確保 PostBack 之後仍能保持 Panel 和 TextBox 狀態
+
+
+
+
+---
+
+🔹 解決方案
+
+1. 從 ViewState("dtsDetailItem") 取得 DataTable
+
+
+2. 找出對應 itemNo 的 AWSPartNo、NTCPartNo
+
+
+3. 將這些值一起存入資料庫
+
+
+4. 顯示存入結果（成功或失敗）
+
+
+
+
+---
+
+✅ 1️⃣ FindPartNumbers() - 查找 AWSPartNo 和 NTCPartNo
+
+' ✅ 從 dtsDetailItem 查找 AWSPartNo 和 NTCPartNo
+Private Function FindPartNumbers(itemNo As String) As Dictionary(Of String, String)
+    Dim result As New Dictionary(Of String, String) From {
+        {"AWSPartNo", ""},
+        {"NTCPartNo", ""}
+    }
+
+    Dim dtPo1 As DataTable = CType(ViewState("dtsDetailItem"), DataTable)
+    For Each row As DataRow In dtPo1.Rows
+        If row("ID").ToString() = itemNo Then
+            result("AWSPartNo") = row("AWSPartNo").ToString()
+            result("NTCPartNo") = row("NTCPartNo").ToString()
+            Exit For
+        End If
+    Next
+
+    Return result
+End Function
+
+
+---
+
+✅ 2️⃣ SavePanelsToDatabase() - 存入 AWSPartNo 和 NTCPartNo
+
+Imports System.Data.SqlClient
+
+' ✅ 儲存 Panel 內的資料至資料庫（包含 AWSPartNo、NTCPartNo）
+Private Sub SavePanelsToDatabase()
+    Dim connectionString As String = "your_connection_string_here" ' ✅ 修改為你的資料庫連線字串
+    Dim query As String = "INSERT INTO YourTable (ItemNo, AWSPartNo, NTCPartNo, Price, Quantity, Date) VALUES (@ItemNo, @AWSPartNo, @NTCPartNo, @Price, @Quantity, @Date)"
+    
+    Using conn As New SqlConnection(connectionString)
+        conn.Open()
+
+        For Each ctrl As Control In PlaceHolder1.Controls
+            If TypeOf ctrl Is Panel Then
+                Dim panel As Panel = CType(ctrl, Panel)
+                Dim txtID As TextBox = CType(RecursiveFindControl(panel, "txt_ID_" & panel.ID), TextBox)
+                Dim txtPrice As TextBox = CType(RecursiveFindControl(panel, "txt_Price_" & panel.ID), TextBox)
+                Dim txtQuantity As TextBox = CType(RecursiveFindControl(panel, "txt_Quantity_" & panel.ID), TextBox)
+                Dim txtDate As TextBox = CType(RecursiveFindControl(panel, "txt_Date_" & panel.ID), TextBox)
+
+                If txtID IsNot Nothing AndAlso txtPrice IsNot Nothing AndAlso txtQuantity IsNot Nothing AndAlso txtDate IsNot Nothing Then
+                    Dim partNumbers As Dictionary(Of String, String) = FindPartNumbers(txtID.Text.Trim())
+
+                    Using cmd As New SqlCommand(query, conn)
+                        cmd.Parameters.AddWithValue("@ItemNo", txtID.Text.Trim())
+                        cmd.Parameters.AddWithValue("@AWSPartNo", partNumbers("AWSPartNo"))
+                        cmd.Parameters.AddWithValue("@NTCPartNo", partNumbers("NTCPartNo"))
+                        cmd.Parameters.AddWithValue("@Price", Convert.ToDecimal(txtPrice.Text.Trim()))
+                        cmd.Parameters.AddWithValue("@Quantity", Convert.ToInt32(txtQuantity.Text.Trim()))
+                        cmd.Parameters.AddWithValue("@Date", Convert.ToDateTime(txtDate.Text.Trim()))
+
+                        Try
+                            cmd.ExecuteNonQuery() ' ✅ 寫入資料庫
+                        Catch ex As Exception
+                            lblSaveResult.Text = "錯誤：" & ex.Message
+                            lblSaveResult.ForeColor = System.Drawing.Color.Red
+                            Exit Sub
+                        End Try
+                    End Using
+                End If
+            End If
+        Next
+
+        lblSaveResult.Text = "所有資料成功存入資料庫！"
+        lblSaveResult.ForeColor = System.Drawing.Color.Green
+    End Using
+End Sub
+
+
+---
+
+✅ 3️⃣ btnSave_Click() - 點擊存入按鈕時執行資料庫存入
+
+' ✅ 點擊「存入資料庫」按鈕時執行儲存
+Protected Sub btnSave_Click(sender As Object, e As EventArgs)
+    SavePanelsToDatabase()
+End Sub
+
+
+---
+
+✅ 4️⃣ Page_Load() - 確保「存入資料庫」按鈕存在
+
+Protected Sub Page_Load(ByVal sender As Object, ByVal e As EventArgs) Handles Me.Load
+    If Not IsPostBack Then
+        PanelTemplate.Visible = False
+
+        ' ✅ 初始化可刪除的 Panel 列表
+        ViewState("DeletablePanels") = New List(Of String)
+
+        ' ✅ 從 `dtsDetailItem` 取得 `po1`
+        LoadPo1FromDataSet()
+
+        ' ✅ 取得 `po1` 數量
+        Dim po1Count As Integer = CType(ViewState("PanelCount"), Integer)
+
+        ' ✅ 依照 `po1` 生成 `Panel`
+        If po1Count > 0 Then
+            GeneratePanels(po1Count) ' ✅ 這些 Panel 不可刪除
+        End If
+    Else
+        ReloadPanels() ' ✅ PostBack 之後重新載入 `Panel` 和 `CheckBox`
+    End If
+
+    ' ✅ 確保「存入資料庫」按鈕存在
+    If PlaceHolder1.FindControl("btnSave") Is Nothing Then
+        Dim btnSave As New Button()
+        btnSave.ID = "btnSave"
+        btnSave.Text = "存入資料庫"
+        AddHandler btnSave.Click, AddressOf btnSave_Click
+        PlaceHolder1.Controls.Add(New LiteralControl("<br/>"))
+        PlaceHolder1.Controls.Add(btnSave)
+
+        ' ✅ 顯示存入結果的 Label
+        Dim lblSave As New Label()
+        lblSave.ID = "lblSaveResult"
+        PlaceHolder1.Controls.Add(New LiteralControl("<br/>"))
+        PlaceHolder1.Controls.Add(lblSave)
+    End If
+End Sub
+
+
+---
+
+✅ 測試方式
+
+1. 點擊「複製」按鈕，允許新增 Panel
+
+
+2. 手動輸入 Quantity、Date
+
+
+3. 點擊「存入資料庫」按鈕
+
+從 dtsDetailItem 找出 AWSPartNo、NTCPartNo
+
+存入 itemNo、AWSPartNo、NTCPartNo、Price、Quantity、Date
+
+如果存入成功，顯示綠色成功訊息
+
+如果存入失敗，顯示紅色錯誤訊息
+
+
+
+4. PostBack 之後仍能保持 Panel 和 TextBox 狀態
+
+
+
+
+---
+
+✅ 結論
+
+✅ 允許 itemNo 拆分成多筆
+✅ 允許 Quantity、Date 可自行輸入
+✅ 從 dtsDetailItem 找出 AWSPartNo、NTCPartNo
+✅ 將所有 Panel 內的資料存入資料庫
+✅ PostBack 之後仍保持狀態 🚀
+
+
+
+✅ 目標
+
 1. 將所有 Panel 內的 itemNo、Price、Quantity、Date 存入資料庫
 
 
