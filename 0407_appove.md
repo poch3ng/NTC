@@ -1,3 +1,49 @@
+明白，你在使用 SSMS（SQL Server Management Studio），以下是專為 SQL Server 調整過的完整 SQL 指令：
+
+
+---
+
+一、建立 SignLevel 資料表（SQL Server 專用）
+
+CREATE TABLE SignLevel (
+    SignLevelID INT IDENTITY(1,1) PRIMARY KEY,
+    SignCode NVARCHAR(50) NOT NULL,
+    SignName NVARCHAR(100) NOT NULL,
+    MaxLevel INT NULL,
+    SkipTitles NVARCHAR(100) NULL,
+    IsActive BIT DEFAULT 1,
+    SortOrder INT DEFAULT 0
+);
+
+
+---
+
+二、插入資料
+
+INSERT INTO SignLevel (SignCode, SignName, MaxLevel, SkipTitles, SortOrder)
+VALUES
+('skip', N'略過主管', NULL, NULL, 1),
+('level80', N'上級主管（課經理）', 80, N'副處長', 2),
+('level70', N'二級主管（部經理）', 70, N'副處長', 3),
+('level60', N'一級主管（處長）', 60, N'副處長', 4);
+
+
+---
+
+三、查詢下拉選單用資料
+
+SELECT SignCode, SignName
+FROM SignLevel
+WHERE IsActive = 1
+ORDER BY SortOrder;
+
+
+---
+
+如你還有簽核流程表（如 SignFlow, SignTask, UserManagerMap 等）也可一併規劃，讓整體流程更完整。需要我協助設計嗎？
+
+
+
 明確！以下幫你將資料表名稱統一為 SignLevel，並調整欄位與 SQL：
 
 
