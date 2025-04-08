@@ -1,3 +1,107 @@
+感謝提供資訊！你要呼叫的 .asmx 方法是：
+
+方法名稱：ProcessImageAndOCR
+
+參數：base64image（Base64 字串）
+
+驗證：匿名（無需帳密）
+
+
+
+---
+
+✅ 最穩定的做法：使用 HTTP Request + 自組 SOAP XML
+
+這方式不依賴 UiPath 的 SOAP 活動，簡單穩定。
+
+
+---
+
+完整 UiPath 流程步驟
+
+
+---
+
+1. 建立變數
+
+
+---
+
+2. 指定圖片路徑
+
+Assign 活動
+
+filePath = "C:\image.jpg"
+
+
+---
+
+3. 使用 Invoke Code：讀圖片 + 轉 Base64
+
+Dim imgBytes As Byte() = System.IO.File.ReadAllBytes(filePath)
+base64Str = Convert.ToBase64String(imgBytes)
+
+Arguments 設定
+
+
+---
+
+4. Assign：組 SOAP XML
+
+soapXml = "<soap:Envelope xmlns:soap=""http://schemas.xmlsoap.org/soap/envelope/"">" &
+            "<soap:Body>" &
+              "<ProcessImageAndOCR xmlns=""http://tempuri.org/"">" &
+                "<base64image>" & base64Str & "</base64image>" &
+              "</ProcessImageAndOCR>" &
+            "</soap:Body>" &
+          "</soap:Envelope>"
+
+
+---
+
+5. 使用 HTTP Request 活動
+
+設定如下：
+
+Endpoint：https://ntcoat009/OCR/OCR_Data.asmx
+
+Method：POST
+
+Body：soapXml
+
+Response：輸出為 responseStr
+
+Headers：
+
+
+New Dictionary(Of String, String) From {
+    {"Content-Type", "text/xml; charset=utf-8"},
+    {"SOAPAction", "http://tempuri.org/ProcessImageAndOCR"}
+}
+
+
+---
+
+6. 顯示結果（可選）
+
+使用 Message Box 或 Log：
+
+responseStr
+
+
+---
+
+✅ 完成！
+
+這樣就能穩定地用 UiPath 呼叫你的 .asmx WebService，不需要額外認證、不受 SOAP 活動限制。
+
+
+---
+
+若你需要我幫你產出 .xaml 範本檔，請說一聲，我可直接提供。是否需要？
+
+
+
 以下是完整流程，從圖片轉 Base64 → 組 SOAP → 呼叫 .asmx WebService → 回傳處理（支援 Windows 驗證），使用 UiPath + Invoke Code。
 
 
