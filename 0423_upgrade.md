@@ -1,3 +1,168 @@
+如果你希望將 MSBuild 建置後的 `.zip` 檔案和 `.cmd` 檔案直接發佈到當前 `.cmd` 檔案所在的資料夾（即不透過 Web Deploy 部署到遠端伺服器，而是將網站檔案解壓到本機的同一資料夾），你可以按照以下步驟操作。這需要稍微調整你的發佈流程，並確保生成的檔案直接在本地解壓或使用。
+
+以下是具體步驟：
+
+---
+
+### 1. 確認發佈設定
+你的 `.publishproj` 檔案目前設定為生成 `.zip` 和 `.cmd`，這通常是 **Web Deploy Package** 模式。若要將網站內容直接發佈到 `.cmd` 所在的資料夾，你可以：
+
+- **確認發佈模式**：
+  檢查 `.publishproj` 或對應的 `.pubxml`（發佈設定檔案，通常位於專案的 `Properties\PublishProfiles` 資料夾）。確保發佈模式是 `Web Deploy Package` 或 `FileSystem`，並設定目標路徑為本地資料夾。
+- **範例 `.pubxml` 內容**：
+  ```xml
+  <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+      <WebPublishMethod>FileSystem</WebPublishMethod>
+      <PublishProvider>FileSystem</PublishProvider>
+      <LastUsedBuildConfiguration>Release</LastUsedBuildConfiguration>
+      <LastUsedPlatform>Any CPU</LastUsedPlatform>
+      <SiteUrlToLaunchAfterPublish />
+      <LaunchSiteAfterPublish>True</LaunchSiteAfterPublish>
+      <ExcludeApp_Data>False</ExcludeApp_Data>
+      <publishUrl>$(MSBuildThisFileDirectory)</publishUrl>
+      <DeleteExistingFiles>True</DeleteExistingFiles>
+    </PropertyGroup>
+  </Project>
+  ```
+  - 關鍵屬性：
+    - `<WebPublishMethod>FileSystem</WebPublishMethod>`：設定為本地檔案系統。
+    - `<publishUrl>$(MSBuildThisFileDirectory)</publishUrl>`：將發佈路徑設為 `.pubxml` 所在的資料夾（即 `.cmd` 所在的資料夾）。
+    - `<DeleteExistingFiles>True</DeleteExistingFiles>`：清空目標資料夾後再發佈（可設為 `False` 以保留現有檔案）。
+
+- **修改 `.publishproj`**：
+  如果你直接在 `.publishproj` 中設定，可以添加或修改 `<TargetPath>`，例如：
+  ```xml
+  <TargetPath>$(MSBuildProjectDirectory)\bin\Release\Publish</TargetPath>
+  ```
+  將 `Publish` 資料夾改為你希望的路徑，或直接設為 `.`（當前資料夾）。
+
+---
+
+### 2. 使用 MSBuild 重新建置
+假設你希望發佈到 `.cmd` 所在的資料夾，執行以下 MSBuild 命令：
+
+```bash
+msbuild YourProject.publishproj /p:Configuration=Release /p:PublishProfile=YourProfile /p:publishUrl="%CD%"
+```
+
+- 說明：
+  - `/p:Configuration=Release`：指定建置配置（可根據需要改為 `Debug`）。
+  - `/p:PublishProfile=YourProfile`：指定使用的發佈設定檔案（例如 `YourProfile.pubxml`）。
+  - `/p:publishUrl="%CD%"`：將發佈路徑設為當前命令執行所在的資料夾（即 `.cmd` 所在的資料夾）。
+  - `%CD%` 是命令提示字元中的環境變數，表示當前工作目錄。
+
+執行後，MSBuild 會將網站檔案直接發佈到當前資料夾，而不是生成 `.zip` 和 `.cmd`。
+
+---
+
+### 3. 手動解壓 `.zip` 到當前資料夾
+如果你已經生成了 `.zip` 和 `.cmd` 檔案，但希望將 `.zip` 的內容解壓到 `.cmd` 所在的資料夾，可以手動操作：
+
+- **解壓 `.zip` 檔案**：
+  - 假設 `.zip` 檔案名為 `YourApp.zip`，在 `.cmd` 所在的資料夾執行以下命令：
+    ```bash
+    tar -xf YourApp.zip
+    ```
+    或使用 Windows 的檔案總管右鍵解壓。
+  - 解壓後，檢查是否生成了網站所需的檔案（例如 `.dll`、`.aspx`、靜態資源等）。
+- **移動檔案**：
+  - 如果解壓後的檔案在子資料夾中（例如 `Content` 或 `C_` 開頭的資料夾），將它們移動到當前資料夾：
+    ```bash
+    move YourApp\Content\* .
+    ```
+  - 確保檔案結構正確（例如 `bin` 資料夾包含編譯後的 `.dll`，根目錄包含 `.aspx` 或其他入口檔案）。
+
+---
+
+### 4. 使用 `.cmd` 將內容部署到當前資料夾
+如果你希望使用現有的 `.cmd` 檔案將 `.zip` 的內容部署到當前資料夾，可以修改 `.cmd` 的參數：
+
+- **執行 `.cmd` 並指定本地路徑**：
+  假設 `.cmd` 檔案名為 `YourApp.deploy.cmd`，執行：
+  ```bash
+  YourApp.deploy.cmd /Y -dest:contentPath="%CD%"
+  ```
+  - `/Y`：執行實際部署。
+  - `-dest:contentPath="%CD%"`：將部署目標設為當前資料夾。
+  - 如果需要測試，先用 `/T` 模擬部署：
+    ```bash
+    YourApp.deploy.cmd /T -dest:contentPath="%CD%"
+    ```
+
+- **檢查 `.cmd` 內容**：
+  開啟 `YourApp.deploy.cmd`，確認內部的 `msdeploy.exe` 命令是否正確。你可能需要手動修改 `-dest` 參數，例如：
+  ```cmd
+  msdeploy.exe -source:package='YourApp.zip' -dest:contentPath='%CD%' -verb:sync
+  ```
+
+- **執行後確認**：
+  執行後，檢查當前資料夾是否包含網站的完整檔案結構（例如 `bin`、`App_Data`、`.aspx` 等）。
+
+---
+
+### 5. 設定本地環境（例如 IIS 或 Kestrel）
+假設你已將檔案發佈到當前資料夾，接下來需要設定本地環境以運行網站：
+
+- **使用 IIS**：
+  - 開啟 IIS 管理員，新增一個網站或應用程式。
+  - 將「實體路徑」設為 `.cmd` 所在的資料夾（例如 `C:\Path\To\YourFolder`）。
+  - 設定應用程式集區（確保使用正確的 .NET Framework 或 .NET Core 版本）。
+  - 訪問網站（例如 `http://localhost:port`）確認是否正常運行。
+
+- **使用 Kestrel（適用於 .NET Core 或 ASP.NET Core）**：
+  - 如果是 .NET Core 專案，切換到當前資料夾，執行：
+    ```bash
+    dotnet YourApp.dll
+    ```
+  - 確認應用程式是否在預設埠（例如 `http://localhost:5000`）運行。
+
+- **檢查相依性**：
+  - 確保本機已安裝必要的運行時（例如 .NET Framework 4.x 或 .NET Core/5/6/7/8）。
+  - 如果網站需要資料庫，確認連線字串（通常在 `web.config` 或 `appsettings.json` 中）是否正確。
+
+---
+
+### 6. 整合到 CI/CD（可選）
+如果你在 DevOps CI/CD 流程中（例如 Azure DevOps），可以將上述步驟整合到管線：
+
+- **範例 Azure DevOps YAML**：
+  ```yaml
+  - task: MSBuild@1
+    inputs:
+      solution: 'YourProject.publishproj'
+      msbuildArguments: '/p:Configuration=Release /p:PublishProfile=YourProfile /p:publishUrl="$(Build.ArtifactStagingDirectory)"'
+  - task: PowerShell@2
+    inputs:
+      targetType: 'inline'
+      script: |
+        Expand-Archive -Path "$(Build.ArtifactStagingDirectory)\YourApp.zip" -DestinationPath "$(Build.ArtifactStagingDirectory)"
+  ```
+  - 這會將 `.zip` 解壓到指定的資料夾（例如 CI 的暫存目錄）。
+
+---
+
+### 7. 注意事項
+- **檔案覆蓋**：
+  - 如果當前資料夾已有檔案，解壓或部署時可能會覆蓋現有檔案。建議先備份。
+- **權限**：
+  - 確保執行 `.cmd` 或解壓檔案的使用者有寫入當前資料夾的權限。
+- **Web.config**：
+  - 檢查 `web.config` 中的設定（例如連線字串或環境變數）是否適用於本機環境。
+- **記憶內容參考**：
+  根據你之前的問題（例如 VB 相關、部門代號、流程設計），你可能在使用 VB.NET 的 WebForms 專案。若有特定的 VB 程式碼或設定需要調整（例如 `web.config` 或後端邏輯），請提供更多細節，我可以幫你客製化解決方案。
+
+---
+
+### 8. 如果遇到問題
+如果執行以上步驟時遇到錯誤，請提供以下資訊，我可以幫你進一步診斷：
+- `.cmd` 或 MSBuild 的錯誤訊息。
+- `.publishproj` 或 `.pubxml` 的內容（特別是發佈相關設定）。
+- 當前資料夾的路徑和檔案結構。
+- 你使用的 .NET 版本（例如 .NET Framework 4.8 或 .NET Core）。
+
+希望這些步驟能幫你順利將網站發佈到 `.cmd` 所在的資料夾！如果有其他需求，隨時告訴我！
+
 當你使用 MSBuild 建置一個 `.publishproj` 檔案（通常是用於 ASP.NET 或其他 .NET 專案的發佈設定），成功建置後生成一個 `.cmd` 檔案和一個 `.zip` 檔案，這通常是因為你使用了 **Web Deploy** 或 **Zip Package** 的發佈方式。以下是這些檔案的用途以及如何使用它們：
 
 ---
