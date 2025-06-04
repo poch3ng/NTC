@@ -1,3 +1,152 @@
+以下是針對 TFS (On-Premises) 資料庫結構中，你可用來製作 Tableau 圖表的 SQL 資料表與查詢範例，主要針對 Git Commit、Build、Release、PR 等資料。我將提供更具體的表名、說明與可視覺化方向，方便給處長參考。
+
+
+---
+
+🔍 一、Git 相關（Commit / Pull Request）
+
+✅ 表格與說明：
+
+表格名稱	說明
+
+tbl_Commit	Git commit 資訊，如時間、提交者、Repo 等
+tbl_Changeset	TFS 的版本控制（非 Git）用
+tbl_PullRequest	PR 記錄：標題、建立人、狀態、建立/完成時間
+tbl_Repository	對應的 Git Repo 資訊
+
+
+📈 圖表建議 & SQL 範例：
+
+1️⃣ 每日 Commit 數量（折線圖）
+
+SELECT 
+    CAST(c.CreationDate AS DATE) AS CommitDate,
+    COUNT(*) AS CommitCount
+FROM tbl_Commit c
+GROUP BY CAST(c.CreationDate AS DATE)
+ORDER BY CommitDate
+
+2️⃣ 開發者 Commit 排行（橫條圖）
+
+SELECT 
+    c.Committer AS Developer,
+    COUNT(*) AS CommitCount
+FROM tbl_Commit c
+GROUP BY c.Committer
+ORDER BY CommitCount DESC
+
+3️⃣ PR 合併平均時長（箱型圖）
+
+SELECT 
+    pr.PullRequestId,
+    pr.CreatedDate,
+    pr.ClosedDate,
+    DATEDIFF(HOUR, pr.CreatedDate, pr.ClosedDate) AS MergeHours
+FROM tbl_PullRequest pr
+WHERE pr.Status = 3  -- 3 表示已合併
+
+
+---
+
+🔧 二、Build（CI）
+
+✅ 表格與說明：
+
+表格名稱	說明
+
+tbl_Build	每次建置紀錄：起始時間、結果、定義、觸發人
+tbl_BuildDefinition	建置流程定義資訊
+tbl_BuildRequest	建置請求來源（可追蹤觸發者）
+
+
+📈 圖表建議 & SQL 範例：
+
+4️⃣ 每日建置成功 vs 失敗（堆疊圖）
+
+SELECT 
+    CAST(b.StartTime AS DATE) AS BuildDate,
+    COUNT(CASE WHEN b.Status = 2 THEN 1 END) AS SuccessCount,
+    COUNT(CASE WHEN b.Status != 2 THEN 1 END) AS FailCount
+FROM tbl_Build b
+GROUP BY CAST(b.StartTime AS DATE)
+ORDER BY BuildDate
+
+5️⃣ 每位開發者觸發建置次數（橫條圖）
+
+SELECT 
+    br.RequestedBy AS Developer,
+    COUNT(*) AS TriggerCount
+FROM tbl_BuildRequest br
+GROUP BY br.RequestedBy
+ORDER BY TriggerCount DESC
+
+
+---
+
+🚀 三、Release（CD）
+
+✅ 表格與說明：
+
+表格名稱	說明
+
+tbl_ReleaseDeployment	部署執行記錄
+tbl_ReleaseEnvironment	部署的環境
+tbl_Release	Release 主表，含版本、建立人、時間等資訊
+
+
+📈 圖表建議 & SQL 範例：
+
+6️⃣ 每週部署次數（折線圖）
+
+SELECT 
+    DATEPART(YEAR, r.CreatedOn) AS Year,
+    DATEPART(WEEK, r.CreatedOn) AS Week,
+    COUNT(*) AS DeploymentCount
+FROM tbl_Release r
+GROUP BY DATEPART(YEAR, r.CreatedOn), DATEPART(WEEK, r.CreatedOn)
+ORDER BY Year, Week
+
+7️⃣ 每個環境的部署成功率（堆疊長條圖）
+
+SELECT 
+    re.EnvironmentName,
+    COUNT(CASE WHEN rd.Status = 'succeeded' THEN 1 END) AS SuccessCount,
+    COUNT(CASE WHEN rd.Status != 'succeeded' THEN 1 END) AS FailCount
+FROM tbl_ReleaseDeployment rd
+JOIN tbl_ReleaseEnvironment re ON rd.EnvironmentId = re.EnvironmentId
+GROUP BY re.EnvironmentName
+
+
+---
+
+📌 四、彙整建議的圖表供處長參考
+
+圖表	重點洞察
+
+🔹 每日 Commit 折線圖	團隊活躍程度
+🔹 PR 合併所需時間箱型圖	協作效率
+🔹 Build 成功/失敗堆疊圖	CI 穩定性
+🔹 開發者觸發建置數排行	流程使用分布
+🔹 每週部署次數趨勢圖	CD 頻率與變化
+🔹 各環境部署成功率	品質控制狀況
+
+
+
+---
+
+❓你可以回覆我：
+
+目前你的資料庫叫什麼名字（如 Tfs_DefaultCollection）？
+
+你要用 SQL Server Management Studio (SSMS) 還是直接連 Tableau？
+
+想先實作哪幾個圖表？我可以幫你一次產出 SQL。
+
+
+我可以幫你整理出「整合用 View」或建立 ETL 流程，也可給你完整的 Tableau 資料來源設定流程。需要我這樣做嗎？
+
+
+
 從 Azure DevOps 的 DB（TFS）抓資料到 Tableau，可行但需釐清你使用的是哪種架構：
 
 On-premises TFS / Azure DevOps Server ✅ 可以直接連接 SQL Server 資料庫
