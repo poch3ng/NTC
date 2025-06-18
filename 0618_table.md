@@ -1,3 +1,593 @@
+好的，我理解你希望我深入分析並提供更精確的解決方案，確保 Content Page 中內層嵌套表格的奇數列背景色（`#f5faff`）正確應用，同時完全避免影響 Master Page 中 `TreeView` 的樣式，且與主題顏色（深藍色 `#003366`、淺藍色 `#e3f2fd`、漸層色 `#b3e5fc` 和 `#e1f5fe`）一致。我會重新審視問題，考慮所有可能的情境（例如 `TreeView` 的複雜表格結構、ASP.NET 控制項的渲染行為），並提供一個穩健的解決方案。CSS 將繼續分離（使用 `content-styles.css`），並確保按鈕、下拉選單、輸入框等其他元素不受影響。
+
+---
+
+### 問題深入分析
+
+1. **問題根源**：
+   - 前次的 CSS 選擇器 `.table-container td > table td:nth-child(odd)` 雖然限制了背景色應用於 `.table-container` 內的嵌套表格，但仍可能影響 `TreeView`，因為：
+     - ASP.NET 的 `<asp:TreeView>` 渲染為多層嵌套的 `<table>`，且可能位於 `.sidebar` 內，但不一定完全隔離於 `.table-container` 外的上下文。
+     - 如果 `TreeView` 的子節點包含多列 `<td>`（例如縮進層次或圖標），`td:nth-child(odd)` 可能誤套用背景色。
+   - 選擇器過於通用，未完全排除 `TreeView` 的表格結構。
+
+2. **TreeView 渲染特性**：
+   - `<asp:TreeView>` 生成的 HTML 通常如下（簡化版）：
+     ```html
+     <div class="sidebar">
+         <table class="treeview-style">
+             <tr>
+                 <td>
+                     <table>
+                         <tr><td><a href="#">節點 1</a></td></tr>
+                         <tr><td><a href="#">節點 2</a></td></tr>
+                     </table>
+                 </td>
+             </tr>
+         </table>
+     </div>
+     ```
+   - 內層 `<table>` 的 `<td>` 可能被 `td > table td:nth-child(odd)` 匹配，導致背景色應用。
+
+3. **目標**：
+   - **精確選擇器**：確保背景色僅應用於 Content Page 的 `.table-container` 內的嵌套表格的奇數列（第1、3、5...列）。
+   - **隔離 TreeView**：完全避免影響 `.treeview-style` 內的任何表格結構。
+   - **一致性**：保持表格、按鈕、下拉選單等與 Master Page 的顏色主題協調。
+   - **穩健性**：考慮 ASP.NET 控制項（如 `<asp:GridView>`）可能生成的複雜結構。
+   - **可維護性**：CSS 保持分離，使用 `content-styles.css`。
+
+4. **可能的挑戰**：
+   - 如果內層表格由 `<asp:GridView>` 或其他控制項生成，可能包含額外類名或結構，需確保選擇器足夠靈活。
+   - `TreeView` 的子節點可能有多列 `<td>`（例如圖標和文字分開），需測試選擇器特異性。
+   - Bootstrap 的表格樣式（來自 `Content/bootstrap.css`）可能干擾，需確保自訂 CSS 優先。
+
+---
+
+### 解決方案
+
+我將更新 `content-styles.css`，使用更具體的選擇器（`.table-container table td > table td:nth-child(odd)`），並添加防護措施（如 `.treeview-style` 的排除規則）以完全隔離 `TreeView`。我還會檢查 `TreeView` 的 CSS，確保其表格樣式明確定義背景色，防止被 Content Page 的樣式覆蓋。
+
+#### 更新 Content Page CSS (Content/content-styles.css)
+```css
+/* content-styles.css */
+
+/* 表格樣式 */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    margin-bottom: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #e3f2fd;
+}
+
+th {
+    background-color: #003366;
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 14px;
+}
+
+td {
+    color: #333;
+    font-size: 14px;
+    background-color: #fff; /* 明確設定外層 td 背景 */
+}
+
+/* 內層表格的奇數列背景色，限制在 .table-container 內 */
+.table-container table td > table td:nth-child(odd):not(.treeview-style td) {
+    background-color: #f5faff; /* 淺藍色背景，與主題一致 */
+}
+
+/* 表格行 hover 效果 */
+.table-container tr:hover {
+    background-color: #e3f2fd; /* hover 時使用更深的淺藍色 */
+}
+
+/* 保護 TreeView 的表格背景 */
+.treeview-style table,
+.treeview-style td {
+    background-color: transparent !important; /* 確保 TreeView 不受影響 */
+}
+
+/* 按鈕樣式 */
+.btn {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    border: none;
+    outline: none;
+}
+
+.btn-primary {
+    background-color: #003366;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #002244;
+    transform: translateY(-1px);
+}
+
+.btn-primary:disabled, .btn-primary.disabled {
+    background-color: #90caf9;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.btn-secondary {
+    background-color: #e3f2fd;
+    color: #003366;
+    border: 1px solid #003366;
+}
+
+.btn-secondary:hover {
+    background-color: #cbe3ff;
+    transform: translateY(-1px);
+}
+
+.btn-secondary:disabled, .btn-secondary.disabled {
+    background-color: #f5faff;
+    color: #666;
+    cursor: not-allowed;
+    border: 1px solid #ccc;
+}
+
+.btn-danger {
+    background-color: #d32f2f;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #b71c1c;
+    transform: translateY(-1px);
+}
+
+.btn-danger:disabled, .btn-danger.disabled {
+    background-color: #ef9a9a;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* 下拉選單樣式 */
+select, .dropdown-list {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-color: #fff;
+    border: 1px solid #e3f2fd;
+    border-radius: 4px;
+    padding: 8px 30px 8px 12px;
+    font-size: 14px;
+    color: #333;
+    width: 100%;
+    max-width: 300px;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23003366"><path d="M7 10l5 5 5-5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 16px;
+    transition: border-color 0.2s ease;
+}
+
+select:focus, .dropdown-list:focus {
+    border-color: #003366;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 51, 102, 0.3);
+}
+
+select:disabled, .dropdown-list:disabled {
+    background-color: #f5faff;
+    color: #666;
+    cursor: not-allowed;
+}
+
+/* 輸入框和文字區域 */
+input[type="text"], input[type="email"], input[type="number"], textarea {
+    border: 1px solid #e3f2fd;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 14px;
+    color: #333;
+    width: 100%;
+    max-width: 300px;
+    transition: border-color 0.2s ease;
+}
+
+input:focus, textarea:focus {
+    border-color: #003366;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 51, 102, 0.3);
+}
+
+input:disabled, textarea:disabled {
+    background-color: #f5faff;
+    color: #666;
+    cursor: not-allowed;
+}
+
+/* ASP.NET 控制項樣式 */
+.aspNetDisabled {
+    background-color: #f5faff !important;
+    color: #666 !important;
+    cursor: not-allowed !important;
+    opacity: 0.6;
+}
+
+/* 響應式調整 */
+@media (max-width: 768px) {
+    table {
+        font-size: 13px;
+    }
+    th, td {
+        padding: 8px 10px;
+    }
+    .btn {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+    select, input[type="text"], input[type="email"], input[type="number"], textarea {
+        font-size: 13px;
+        padding: 6px 10px;
+    }
+}
+```
+
+#### 更新 Master Page CSS (Site.master)
+為確保 `TreeView` 的表格背景不受影響，我會在 Master Page 的 CSS 中為 `.treeview-style` 明確定義背景色，增加保護層。以下是更新的 Master Page，僅顯示 CSS 部分的變更（其他部分不變）：
+
+```html
+<style>
+    body, html {
+        height: 100%;
+        margin: 0;
+        font-family: "Segoe UI", "微軟正黑體", sans-serif;
+    }
+
+    .header {
+        background-color: #003366;
+        color: white;
+        padding: 10px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    .header img {
+        height: 40px;
+        position: absolute;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .header h4 {
+        margin: 0;
+    }
+
+    .sidebar {
+        background-color: #e3f2fd;
+        width: 220px;
+        padding: 20px;
+        overflow-y: auto;
+    }
+
+    .treeview-style {
+        font-size: 15px;
+        color: #003366;
+    }
+
+    .treeview-style ul {
+        list-style: none;
+        padding-left: 0;
+    }
+
+    .treeview-style li {
+        margin-bottom: 8px;
+        position: relative;
+    }
+
+    .treeview-style img[src*="plus.gif"],
+    .treeview-style img[src*="minus.gif"] {
+        display: none;
+    }
+
+    .treeview-style a {
+        color: #003366;
+        padding: 8px 12px;
+        display: block;
+        border-radius: 4px;
+        text-decoration: none;
+        transition: background-color 0.2s ease, color 0.2s ease;
+        position: relative;
+        padding-left: 30px;
+    }
+
+    .treeview-style a:hover {
+        background-color: #cbe3ff;
+        color: #002244;
+    }
+
+    .treeview-style a.selected {
+        background-color: #90caf9;
+        color: #003366;
+        font-weight: bold;
+    }
+
+    .treeview-style ul ul {
+        padding-left: 20px;
+    }
+
+    .treeview-style .AspNet-TreeView-Expand::before,
+    .treeview-style .AspNet-TreeView-Collapse::before {
+        position: absolute;
+        left: 10px;
+        font-size: 12px;
+        color: #003366;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .treeview-style .AspNet-TreeView-Expand::before {
+        content: '\25B6';
+    }
+
+    .treeview-style .AspNet-TreeView-Collapse::before {
+        content: '\25BC';
+    }
+
+    .treeview-style .AspNet-TreeView-Leaf > a::before {
+        content: '\2022';
+        position: absolute;
+        left: 10px;
+        font-size: 12px;
+        color: #003366;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .treeview-style ul ul li::before {
+        content: '';
+        position: absolute;
+        left: 5px;
+        top: -10px;
+        height: calc(100% + 10px);
+        width: 1px;
+        background-color: #90caf9;
+    }
+
+    .treeview-style ul ul li::after {
+        content: '';
+        position: absolute;
+        left: 5px;
+        top: 12px;
+        width: 10px;
+        height: 1px;
+        background-color: #90caf9;
+    }
+
+    /* 保護 TreeView 的表格背景 */
+    .treeview-style table,
+    .treeview-style td {
+        background-color: transparent !important; /* 確保 TreeView 表格背景透明 */
+    }
+
+    .content {
+        flex-grow: 1;
+        padding: 20px;
+        background-color: #fff;
+    }
+
+    .footer {
+        background: linear-gradient(to right, #b3e5fc, #e1f5fe);
+        padding: 10px 20px;
+        text-align: center;
+        color: #333;
+        font-size: 14px;
+    }
+
+    .layout {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .main-area {
+        display: flex;
+        flex-grow: 1;
+        overflow: hidden;
+    }
+</style>
+```
+
+#### Content Page (SamplePage.aspx)
+Content Page 保持不變，展示巢狀表格結構，內層表格的奇數列應顯示背景色，且不影響 `TreeView`：
+
+```html
+<%@ Page Language="C#" MasterPageFile="~/Site.master" AutoEventWireup="true" CodeFile="SamplePage.aspx.cs" Inherits="SamplePage" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
+    <link href="Content/content-styles.css" rel="stylesheet" />
+
+    <h2>資料管理</h2>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>編號</th>
+                    <th>詳細資訊</th>
+                    <th>狀態</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>001</td>
+                    <td>
+                        <table>
+                            <tr>
+                                <td>子項目 A1</td>
+                                <td>細節 A1</td>
+                            </tr>
+                            <tr>
+                                <td>子項目 A2</td>
+                                <td>細節 A2</td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td>進行中</td>
+                    <td>
+                        <asp:Button ID="EditButton1" runat="server" Text="編輯" CssClass="btn btn-primary" />
+                        <asp:Button ID="DeleteButton1" runat="server" Text="刪除" CssClass="btn btn-danger" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>002</td>
+                    <td>
+                        <table>
+                            <tr>
+                                <td>子項目 B1</td>
+                                <td>細節 B1</td>
+                            </tr>
+                            <tr>
+                                <td>子項目 B2</td>
+                                <td>細節 B2</td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td>已完成</td>
+                    <td>
+                        <asp:Button ID="ViewButton2" runat="server" Text="檢視" CssClass="btn btn-secondary" />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+        <label for="SampleDropDown">選擇類別：</label>
+        <asp:DropDownList ID="SampleDropDown" runat="server" CssClass="dropdown-list">
+            <asp:ListItem Text="選項 1" Value="1" />
+            <asp:ListItem Text="選項 2" Value="2" />
+            <asp:ListItem Text="選項 3" Value="3" />
+        </asp:DropDownList>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+        <label for="SampleTextBox">輸入名稱：</label>
+        <asp:TextBox ID="SampleTextBox" runat="server" placeholder="輸入文字..." />
+    </div>
+
+    <asp:Button ID="SubmitButton" runat="server" Text="提交" CssClass="btn btn-primary" />
+</asp:Content>
+```
+
+#### 檔案結構
+確保專案目錄如下：
+```
+YourProject/
+├── Site.master
+├── Content/
+│   ├── bootstrap.css
+│   ├── content-styles.css
+├── Scripts/
+│   ├── bootstrap.bundle.js
+├── images/
+│   ├── nanya.png
+├── SamplePage.aspx
+├── SamplePage.aspx.cs
+```
+
+---
+
+### 程式碼說明
+
+1. **精確選擇器**：
+   - 使用 `.table-container table td > table td:nth-child(odd):not(.treeview-style td)`，確保背景色僅應用於 `.table-container` 內的嵌套表格的奇數列。
+   - `:not(.treeview-style td)` 進一步排除 `TreeView` 的表格單元格。
+   - 這提高了選擇器特異性，避免影響 `.treeview-style` 內的任何 `<td>`。
+
+2. **TreeView 保護**：
+   - 在 `content-styles.css` 和 Master Page 的 CSS 中，為 `.treeview-style table` 和 `.treeview-style td` 明確設定 `background-color: transparent !important`，防止背景色被覆蓋。
+   - Master Page 的 `.sidebar` 背景（`#e3f2fd`）和 `TreeView` 的 `a` 樣式（hover 為 `#cbe3ff`，選中為 `#90caf9`）確保視覺一致性。
+
+3. **顏色一致性**：
+   - 內層表格奇數列背景（`#f5faff`）與側邊欄（`#e3f2fd`）、hover 效果（`#cbe3ff`）、頁尾漸層（`#b3e5fc`、`#e1f5fe`）協調。
+   - 表格標頭（`#003366`）與頁首一致，分隔線（`#e3f2fd`）與側邊欄匹配。
+   - 外層 `td` 的背景明確設為 `#fff`，避免與內層混淆。
+
+4. **其他元素**：
+   - 按鈕（`.btn-primary` 使用 `#003366`）、下拉選單（`.dropdown-list` 使用 `#e3f2fd` 邊框）、輸入框的邊框和禁用狀態（`#f5faff`）保持不變。
+   - `.table-container tr:hover` 限制 hover 效果於 Content Page 的表格，避免影響其他區域。
+
+5. **響應式**：
+   - 表格在小螢幕下縮減字體（13px）和內距（8px 10px），`.table-container` 支援水平滾動。
+
+---
+
+### 注意事項
+
+1. **圖片路徑**：
+   - 確認 `~/images/nanya.png` 已放置在 `/images` 資料夾，並檢查 `<img src="~/images/nanya.png" runat="server" />` 是否解析為 `/YourApp/images/nanya.png`。
+   - 若圖片無法顯示，檢查瀏覽器開發者工具中的 `<img>` 的 `src` 值。
+
+2. **TreeView 驗證**：
+   - 請檢查 `TreeView` 的生成 HTML（右鍵 > 檢查元素），確認其 `<table>` 和 `<td>` 是否仍受背景色影響。
+   - 若問題持續，請分享 `TreeView` 的 HTML 結構（特別是 `.treeview-style` 內的表格部分），我可進一步調整選擇器。
+
+3. **內層表格結構**：
+   - 範例假設內層表格位於外層表格的第二列（`詳細資訊`）。若你的內層表格來自 `<asp:GridView>` 或有其他類名/結構，請提供範例，我可確保選擇器兼容。
+   - 若內層表格的 `<td>` 包含多列（例如三列以上），請確認奇數列背景是否符合預期。
+
+4. **Bootstrap 衝突**：
+   - CSS 使用高特異性選擇器（`.table-container table td > table td:nth-child(odd)`）避免 Bootstrap 覆蓋。
+   - 若發現樣式異常（例如背景色未應用或 `TreeView` 仍受影響），請檢查瀏覽器開發者工具並分享生成的 HTML。
+
+5. **背景色調整**：
+   - 奇數列背景色（`#f5faff`）較淺，若需要更明顯的效果（例如 `#e3f2fd` 或 `#cbe3ff`），請告知。
+
+---
+
+### 下一步
+
+1. **測試**：
+   - 更新 `Site.master` 和 `Content/content-styles.css`，並使用 `SamplePage.aspx`。
+   - 確認 Content Page 的內層表格奇數列顯示背景色（`#f5faff`），且 Master Page 的 `TreeView` 不受影響（應保持透明背景或 `.sidebar` 的 `#e3f2fd`）。
+   - 檢查按鈕、下拉選單、輸入框的樣式是否與主題一致。
+   - 確認圖片 `~/images/nanya.png` 正常顯示。
+
+2. **回饋**：
+   - 若 `TreeView` 仍受影響，請提供其生成的 HTML 結構（右鍵 > 檢查元素 > 複製 `.treeview-style` 內的 HTML）。
+   - 若內層表格背景色未正確應用，或需要調整顏色/樣式，請提供細節。
+   - 若有其他控制項（例如 `<asp:GridView>`、`<asp:CheckBox>`）或需求（例如表格排序），請分享範例。
+
+3. **除錯**：
+   - 若樣式或圖片未正確顯示，檢查瀏覽器開發者工具（F12），分享問題細節（例如類名、CSS 規則或錯誤訊息）。
+
+4. **進階需求**：
+   - 若需字體圖標（Font Awesome）、動畫效果（例如 hover 動畫）、暗色模式或表格功能（排序、分頁），請告知，我可提供程式碼。
+
+---
+
+請試用以上程式碼，並告訴我結果或需要微調的地方！若 `TreeView` 或內層表格仍有問題，請提供生成的 HTML 結構或具體描述，我會立即優化。謝謝你的耐心，我會確保問題徹底解決！
+
 了解，你希望在 Content Page 的表格中，將**直的奇數列**（即第1、3、5...列）設置背景色，以增強視覺效果，並確保與 Master Page 的顏色主題（深藍色 `#003366`、淺藍色 `#e3f2fd`、漸層色 `#b3e5fc` 和 `#e1f5fe`）一致。以下我會修改 Content Page 的 CSS，添加直的奇數列背景色，並保持表格、按鈕、下拉選單等其他元素的樣式與 Master Page 協調。同時，我會確保 CSS 與 Master Page 分離，並使用你偏好的外部 CSS 檔案方式（`content-styles.css`）。
 
 ### 設計目標
