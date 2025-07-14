@@ -1,3 +1,287 @@
+要將 GridView 的更新操作記錄到日誌（log）中，您可以在使用 `SqlDataSource` 的 `UpdateCommand` 時，利用 `SqlDataSource` 的 `Updated` 事件來捕捉更新操作，並將相關資訊寫入日誌。日誌可以儲存在資料庫、文字檔或其他儲存媒介中。以下以將日誌儲存到資料庫為例，逐步說明如何實現。
+
+### 假設情境
+- 您使用前述的 `SqlDataSource` 和 GridView 設定，包含 DropDownList 用於更新 `CategoryID`。
+- 您希望每次更新操作完成後，將操作記錄到一個日誌表（例如 `UpdateLog`），記錄內容包括：
+  - 更新時間
+  - 操作者（例如當前使用者）
+  - 更新前的 `CategoryID`
+  - 更新後的 `CategoryID`
+  - 更新的記錄 ID
+- 日誌表結構假設如下：
+  ```sql
+  CREATE TABLE UpdateLog (
+      LogID INT IDENTITY(1,1) PRIMARY KEY,
+      RecordID INT, -- 被更新的記錄 ID
+      OldCategoryID INT, -- 更新前的 CategoryID
+      NewCategoryID INT, -- 更新後的 CategoryID
+      UserName NVARCHAR(50), -- 操作者
+      UpdateTime DATETIME -- 更新時間
+  )
+  ```
+
+以下是具體步驟：
+
+---
+
+### 步驟 1：修改 SqlDataSource 的 Updated 事件
+`SqlDataSource` 的 `Updated` 事件會在更新操作完成後觸發，您可以在此事件中記錄日誌。
+
+1. 在 `.aspx` 中，為 `SqlDataSource` 新增 `OnUpdated` 事件：
+   ```aspx
+   <asp:SqlDataSource ID="SqlDataSource1" runat="server"
+       ConnectionString="<%$ ConnectionStrings:YourConnectionString %>"
+       SelectCommand="SELECT ID, CategoryID, CategoryName FROM YourTable JOIN Categories ON YourTable.CategoryID = Categories.CategoryID"
+       UpdateCommand="UPDATE YourTable SET CategoryID = @CategoryID WHERE ID = @ID"
+       OnUpdated="SqlDataSource1_Updated">
+       <UpdateParameters>
+           <asp:Parameter Name="CategoryID" Type="Int32" />
+           <asp:Parameter Name="ID" Type="Int32" />
+       </UpdateParameters>
+   </asp:SqlDataSource>
+   ```
+
+2. 在 `.aspx.vb` 中，實現 `SqlDataSource1_Updated` 事件，並記錄日誌：
+   ```vb
+   Protected Sub SqlDataSource1_Updated(sender As Object, e As SqlDataSourceStatusEventArgs)
+       If e.Exception Is Nothing AndAlso e.AffectedRows > 0 Then
+           ' 獲取更新參數
+           Dim newCategoryID As Integer = Convert.ToInt32(e.Command.Parameters("@CategoryID").Value)
+           Dim recordID As Integer = Convert.ToInt32(e.Command.Parameters("@ID").Value)
+
+           ' 獲取更新前的 CategoryID
+           Dim oldCategoryID As Integer = GetOldCategoryID(recordID)
+
+           ' 獲取當前使用者（假設使用 Windows 身份驗證或 Session）
+           Dim userName As String = HttpContext.Current.User.Identity.Name
+           If String.IsNullOrEmpty(userName) Then userName = "Unknown"
+
+           ' 記錄日誌到資料庫
+           LogUpdate(recordID, oldCategoryID, newCategoryID, userName)
+
+           ' 顯示成功訊息（可選）
+           lblError.Text = "更新成功，已記錄日誌"
+       ElseIf e.Exception IsNot Nothing Then
+           ' 處理錯誤
+           lblError.Text = "更新失敗: " & e.Exception.Message
+           e.ExceptionHandled = True
+       End If
+   End Sub
+   ```
+
+---
+
+### 步驟 2：實現獲取更新前值的函數
+由於 `SqlDataSource` 的 `Updated` 事件中無法直接獲取更新前的 `CategoryID`，您需要查詢資料庫來取得更新前的值。
+
+```vb
+Private Function GetOldCategoryID(recordID As Integer) As Integer
+    Dim connectionString As String = ConfigurationManager.ConnectionStrings("YourConnectionString").ConnectionString
+    Using conn As New SqlConnection(connectionString)
+        Dim query As String = "SELECT CategoryID FROM YourTable WHERE ID = @ID"
+        Dim cmd As New SqlCommand(query, conn)
+        cmd.Parameters.AddWithValue("@ID", recordID)
+        conn.Open()
+        Dim result As Object = cmd.ExecuteScalar()
+        conn.Close()
+        Return If(result IsNot Nothing, Convert.ToInt32(result), 0)
+    End Using
+End Function
+```
+
+---
+
+### 步驟 3：實現日誌記錄函數
+撰寫一個函數將更新資訊寫入 `UpdateLog` 表：
+
+```vb
+Private Sub LogUpdate(recordID As Integer, oldCategoryID As Integer, newCategoryID As Integer, userName As String)
+    Dim connectionString As String = ConfigurationManager.ConnectionStrings("YourConnectionString").ConnectionString
+    Using conn As New SqlConnection(connectionString)
+        Dim query As String = "INSERT INTO UpdateLog (RecordID, OldCategoryID, NewCategoryID, UserName, UpdateTime) " & _
+                              "VALUES (@RecordID, @OldCategoryID, @NewCategoryID, @UserName, @UpdateTime)"
+        Dim cmd As New SqlCommand(query, conn)
+        cmd.Parameters.AddWithValue("@RecordID", recordID)
+        cmd.Parameters.AddWithValue("@OldCategoryID", oldCategoryID)
+        cmd.Parameters.AddWithValue("@NewCategoryID", newCategoryID)
+        cmd.Parameters.AddWithValue("@UserName", userName)
+        cmd.Parameters.AddWithValue("@UpdateTime", DateTime.Now)
+        conn.Open()
+        cmd.ExecuteNonQuery()
+        conn.Close()
+    End Using
+End Sub
+```
+
+---
+
+### 步驟 4：確保 Web.config 配置正確
+確保 `Web.config` 中已定義連線字串：
+```xml
+<connectionStrings>
+    <add name="YourConnectionString" connectionString="Server=您的伺服器;Database=您的資料庫;Trusted_Connection=True;" providerName="System.Data.SqlClient" />
+</connectionStrings>
+```
+
+---
+
+### 步驟 5：完整的 .aspx 和 .aspx.vb 程式碼
+#### .aspx
+```aspx
+<asp:SqlDataSource ID="SqlDataSource1" runat="server"
+    ConnectionString="<%$ ConnectionStrings:YourConnectionString %>"
+    SelectCommand="SELECT ID, CategoryID, CategoryName FROM YourTable JOIN Categories ON YourTable.CategoryID = Categories.CategoryID"
+    UpdateCommand="UPDATE YourTable SET CategoryID = @CategoryID WHERE ID = @ID"
+    OnUpdated="SqlDataSource1_Updated">
+    <UpdateParameters>
+        <asp:Parameter Name="CategoryID" Type="Int32" />
+        <asp:Parameter Name="ID" Type="Int32" />
+    </UpdateParameters>
+</asp:SqlDataSource>
+
+<asp:SqlDataSource ID="SqlDataSourceCategories" runat="server"
+    ConnectionString="<%$ ConnectionStrings:YourConnectionString %>"
+    SelectCommand="SELECT CategoryID, CategoryName FROM Categories">
+</asp:SqlDataSource>
+
+<asp:GridView ID="GridView1" runat="server" 
+    AutoGenerateColumns="False" 
+    DataSourceID="SqlDataSource1" 
+    DataKeyNames="ID"
+    AutoGenerateEditButton="True">
+    <Columns>
+        <asp:BoundField DataField="ID" HeaderText="ID" ReadOnly="True" />
+        <asp:TemplateField HeaderText="類別">
+            <ItemTemplate>
+                <asp:Label ID="lblCategory" runat="server" Text='<%# Eval("CategoryName") %>'></asp:Label>
+            </ItemTemplate>
+            <EditItemTemplate>
+                <asp:DropDownList ID="ddlCategory" runat="server"
+                    DataSourceID="SqlDataSourceCategories"
+                    DataTextField="CategoryName"
+                    DataValueField="CategoryID"
+                    SelectedValue='<%# Bind("CategoryID") %>'>
+                </asp:DropDownList>
+            </EditItemTemplate>
+        </asp:TemplateField>
+    </Columns>
+</asp:GridView>
+<asp:Label ID="lblError" runat="server" ForeColor="Red"></asp:Label>
+```
+
+#### .aspx.vb
+```vb
+Protected Sub SqlDataSource1_Updated(sender As Object, e As SqlDataSourceStatusEventArgs)
+    If e.Exception Is Nothing AndAlso e.AffectedRows > 0 Then
+        ' 獲取更新參數
+        Dim newCategoryID As Integer = Convert.ToInt32(e.Command.Parameters("@CategoryID").Value)
+        Dim recordID As Integer = Convert.ToInt32(e.Command.Parameters("@ID").Value)
+
+        ' 獲取更新前的 CategoryID
+        Dim oldCategoryID As Integer = GetOldCategoryID(recordID)
+
+        ' 獲取當前使用者
+        Dim userName As String = HttpContext.Current.User.Identity.Name
+        If String.IsNullOrEmpty(userName) Then userName = "Unknown"
+
+        ' 記錄日誌
+        LogUpdate(recordID, oldCategoryID, newCategoryID, userName)
+
+        lblError.Text = "更新成功，已記錄日誌"
+    ElseIf e.Exception IsNot Nothing Then
+        lblError.Text = "更新失敗: " & e.Exception.Message
+        e.ExceptionHandled = True
+    End If
+End Sub
+
+Private Function GetOldCategoryID(recordID As Integer) As Integer
+    Dim connectionString As String = ConfigurationManager.ConnectionStrings("YourConnectionString").ConnectionString
+    Using conn As New SqlConnection(connectionString)
+        Dim query As String = "SELECT CategoryID FROM YourTable WHERE ID = @ID"
+        Dim cmd As New SqlCommand(query, conn)
+        cmd.Parameters.AddWithValue("@ID", recordID)
+        conn.Open()
+        Dim result As Object = cmd.ExecuteScalar()
+        conn.Close()
+        Return If(result IsNot Nothing, Convert.ToInt32(result), 0)
+    End Using
+End Function
+
+Private Sub LogUpdate(recordID As Integer, oldCategoryID As Integer, newCategoryID As Integer, userName As String)
+    Dim connectionString As String = ConfigurationManager.ConnectionStrings("YourConnectionString").ConnectionString
+    Using conn As New SqlConnection(connectionString)
+        Dim query As String = "INSERT INTO UpdateLog (RecordID, OldCategoryID, NewCategoryID, UserName, UpdateTime) " & _
+                              "VALUES (@RecordID, @OldCategoryID, @NewCategoryID, @UserName, @UpdateTime)"
+        Dim cmd As New SqlCommand(query, conn)
+        cmd.Parameters.AddWithValue("@RecordID", recordID)
+        cmd.Parameters.AddWithValue("@OldCategoryID", oldCategoryID)
+        cmd.Parameters.AddWithValue("@NewCategoryID", newCategoryID)
+        cmd.Parameters.AddWithValue("@UserName", userName)
+        cmd.Parameters.AddWithValue("@UpdateTime", DateTime.Now)
+        conn.Open()
+        cmd.ExecuteNonQuery()
+        conn.Close()
+    End Using
+End Sub
+```
+
+---
+
+### 替代方案：將日誌寫入檔案
+如果您不想將日誌儲存在資料庫，而是寫入文字檔案，可以修改 `LogUpdate` 函數如下：
+
+```vb
+Private Sub LogUpdate(recordID As Integer, oldCategoryID As Integer, newCategoryID As Integer, userName As String)
+    Dim logMessage As String = String.Format("[{0}] User: {1}, RecordID: {2}, OldCategoryID: {3}, NewCategoryID: {4}{5}",
+                                            DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                                            userName,
+                                            recordID,
+                                            oldCategoryID,
+                                            newCategoryID,
+                                            Environment.NewLine)
+    Dim logFilePath As String = Server.MapPath("~/App_Data/UpdateLog.txt")
+    File.AppendAllText(logFilePath, logMessage)
+End Sub
+```
+- 確保 `~/App_Data/` 資料夾存在且應用程式有寫入權限。
+- 日誌將以純文字格式儲存在 `UpdateLog.txt` 中。
+
+---
+
+### 注意事項
+1. **更新前的值**：因為 `SqlDataSource` 的 `UpdateCommand` 不會自動提供更新前的值，您需要額外查詢資料庫（如 `GetOldCategoryID`）。如果您的資料表很大，考慮在更新前快取原始資料以提高效能。
+2. **使用者身份**：範例中使用 `HttpContext.Current.User.Identity.Name` 獲取使用者名稱。如果您的應用程式使用自訂身份驗證（例如 Forms Authentication），可能需要從 `Session` 或其他地方獲取使用者資訊。
+3. **錯誤處理**：在 `LogUpdate` 和 `GetOldCategoryID` 中加入 Try-Catch 塊，以處理可能的資料庫連線錯誤：
+   ```vb
+   Try
+       conn.Open()
+       cmd.ExecuteNonQuery()
+   Catch ex As Exception
+       lblError.Text = "記錄日誌失敗: " & ex.Message
+   Finally
+       conn.Close()
+   End Try
+   ```
+4. **日誌表結構**：根據需求，您可以擴展 `UpdateLog` 表，加入更多欄位（例如操作類型、IP 地址等）。
+5. **安全性**：確保參數化查詢（`@RecordID` 等）用於所有資料庫操作，以防止 SQL 注入。
+
+---
+
+### 測試與驗證
+1. 運行 WebForm，點擊「編輯」並選擇新的 `CategoryID`，然後點擊「更新」。
+2. 檢查 `UpdateLog` 表，確認是否正確記錄了 `RecordID`、更新前後的 `CategoryID`、使用者名稱和時間。
+3. 如果使用檔案日誌，檢查 `~/App_Data/UpdateLog.txt` 是否正確寫入記錄。
+4. 模擬更新失敗（例如斷開資料庫連線），確認錯誤訊息是否正確顯示。
+
+---
+
+### 總結
+- 使用 `SqlDataSource` 的 `Updated` 事件來捕捉更新操作，並記錄日誌。
+- 透過查詢資料庫獲取更新前的 `CategoryID`，並將日誌寫入資料庫或檔案。
+- 確保錯誤處理和安全性措施完善。
+
+如果您有其他需求（例如記錄更多欄位、不同日誌格式等），請提供更多細節，我可以進一步調整程式碼！
+
 是的，您可以直接使用 GridView 的 `UpdateCommand`（搭配資料來源控制項，例如 `SqlDataSource`）來處理更新操作，這樣可以簡化後端程式碼，無需手動撰寫 `RowUpdating` 事件中的資料庫更新邏輯。以下是逐步說明如何將您的 BoundField 改為 DropDownList，並使用 `SqlDataSource` 的 `UpdateCommand` 來處理更新。
 
 ### 假設情境
